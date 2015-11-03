@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">App24</string>
+
+
+    <!-- Splash Screen-->
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="by_continuing">By continuing, you accept the</string>
+    <string name="terms_of_use_heading">This is Terms of Use Heading</string>
+    <string name="splash_app_heading">24hours Life Share</string>
+    <string name="login_with_facebook">Login with Facebook</string>
+</resources>
