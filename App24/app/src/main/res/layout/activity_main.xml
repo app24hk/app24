@@ -5,21 +5,25 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-    <com.capstone.app24.sliding_tabs.SlidingTabLayout
-        android:id="@+id/tabs"
+    <!-- <com.capstone.app24.sliding_tabs.SlidingTabLayout
+         android:id="@+id/tabs"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:background="@android:color/white"
+         android:elevation="2dp"/>
+
+
+     <android.support.v4.view.ViewPager
+         android:id="@+id/pager"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_below="@+id/tabs"
+         android:layout_weight="1"/>-->
+
+    <FrameLayout
+        android:id="@+id/main_frame"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:elevation="2dp"/>
-
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/tabs"
-        android:layout_weight="1"/>
-
+        android:layout_height="match_parent"></FrameLayout>
 
     <!-- [ End of tab scroll color ] -->
 
@@ -36,16 +40,18 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginTop="30dp"
+            android:background="@color/white"
             android:orientation="horizontal">
 
 
             <LinearLayout
+                android:id="@+id/layout_home"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="20dp"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="20dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -54,7 +60,7 @@
 
                 <ImageButton
                     android:id="@+id/btn_home"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="16dp"
                     android:background="@android:color/transparent"
@@ -62,13 +68,13 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/layout_profile"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="20dp"
                 android:layout_weight="1"
-
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:paddingBottom="20dp">
 
                 <View
                     android:layout_width="match_parent"
@@ -77,7 +83,7 @@
 
                 <ImageButton
                     android:id="@+id/btn_profile"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="16dp"
                     android:layout_weight="1"
@@ -110,39 +116,29 @@
                     >
 
                     <Button
-                        style="@style/Item.Path"
-                        android:text="A"
-                        android:textColor="@color/path_orange"
+                        android:id="@+id/btn_add_post"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/btn_app_24_edit"
                         app:arc_angle="30"
                         />
 
                     <Button
-                        style="@style/Item.Path"
-                        android:text="B"
-                        android:textColor="@color/path_blue"
+                        android:id="@+id/btn_add_image_post"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/btn_app_24_photo"
                         app:arc_angle="90"
                         />
 
                     <Button
-                        style="@style/Item.Path"
-                        android:text="C"
-                        android:textColor="@color/path_black"
+                        android:id="@+id/btn_add_video_post"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:background="@drawable/btn_app_24_video"
                         app:arc_angle="150"
                         />
 
-                    <!--<Button
-                        style="@style/Item.Path"
-                        android:text="D"
-                        android:textColor="@color/path_green"
-                        app:arc_angle="120"
-                        />
-
-                    <Button
-                        style="@style/Item.Path"
-                        android:text="E"
-                        android:textColor="@color/path_purple"
-                        app:arc_angle="150"
-                        />-->
 
                 </com.ogaclejapan.arclayout.ArcLayout>
 

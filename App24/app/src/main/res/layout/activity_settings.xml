@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <include
+        android:id="@+id/menu_grey"
+        layout="@layout/grey_main_toolbar"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/menu_grey">
+
+        <RelativeLayout
+            android:id="@+id/layout_paypal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_profit_dash"
+            android:layout_marginTop="@dimen/main_screen_padding"
+            android:background="@color/white"
+            android:padding="@dimen/main_screen_padding">
+            <com.capstone.app24.custom.CustomTextView
+                android:id="@+id/txt_paypal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="left"
+                android:text="@string/paypal"
+                android:textColor="@color/black"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/layout_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_paypal"
+            android:layout_marginTop="@dimen/main_screen_padding"
+            android:background="@color/white"
+            android:padding="@dimen/main_screen_padding">
+            <com.capstone.app24.custom.CustomTextView
+                android:id="@+id/txt_about"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="left"
+                android:text="@string/about"
+                android:textColor="@color/black"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/layout_logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_about"
+            android:layout_marginTop="@dimen/main_screen_padding"
+            android:background="@color/white"
+            android:padding="@dimen/main_screen_padding">
+            <com.capstone.app24.custom.CustomTextView
+                android:id="@+id/txt_logout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="left"
+                android:text="@string/logout"
+                android:textColor="@color/black"/>
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+</RelativeLayout>

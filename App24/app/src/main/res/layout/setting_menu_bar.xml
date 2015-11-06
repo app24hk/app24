@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    android:background="@color/colorPrimary"
+    android:background="@color/text_background_deselect"
     android:orientation="vertical">
 
     <LinearLayout
@@ -13,6 +13,7 @@
         android:gravity="center">
 
         <ImageButton
+            android:id="@+id/ibtn_back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
@@ -28,29 +29,37 @@
         android:layout_centerInParent="true"
         android:gravity="center">
 
-        <TextView
+        <com.capstone.app24.custom.CustomTextViewBold
+            android:id="@+id/txt_settings_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:singleLine="true"
-            android:text="@string/terms_of_use"
-            android:textColor="@color/white"/>
+            android:text="@string/user_name"
+            android:textColor="@color/black"/>
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="?android:attr/actionBarSize"
-        android:layout_height="match_parent"
+        android:id="@+id/save"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/actionBarSize"
         android:layout_alignParentRight="true"
-        android:gravity="center">
-
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
         <ImageButton
-            android:layout_width="match_parent"
+            android:id="@+id/ibtn_video"
+            android:layout_width="?android:attr/actionBarSize"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:background="@android:color/transparent"
             android:gravity="center"
-            android:src="@null"/>
+            android:src="@drawable/setting"/>
     </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/view_color"/>
 </RelativeLayout>

@@ -6,7 +6,7 @@
 
     <include
         android:id="@+id/layout_action_bar"
-        layout="@layout/main_toolbar_without_menu"
+        layout="@layout/base_main_toolbar"
         />
 
     <ScrollView
@@ -23,19 +23,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:padding="@dimen/com_facebook_likeboxcountview_border_radius">
+            android:padding="@dimen/main_screen_padding">
 
-            <TextView
+            <com.capstone.app24.custom.CustomTextView
                 android:id="@+id/heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Terms and conditions heading \n"/>
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/key_to_success"
+                android:textColor="@color/black"/>
 
-            <TextView
+            <com.capstone.app24.custom.CustomTextView
                 android:id="@+id/description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Terms and conditions description "/>
+                android:text="@string/lorem_ipsum"
+                android:textColor="@color/black"/>
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>

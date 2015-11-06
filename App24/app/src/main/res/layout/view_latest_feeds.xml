@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/main_screen_padding">
+
+    <RelativeLayout
+        android:id="@+id/layout_heading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.capstone.app24.custom.CustomTextViewBold
+            android:id="@+id/txt_feed_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:text="@string/key_to_success"
+            android:textColor="@color/black"
+            android:textSize="@dimen/feed_heading_text"/>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/layout_feed_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_heading"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp">
+
+        <com.capstone.app24.custom.CustomTextView
+            android:id="@+id/txt_creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/creator_name"
+            android:textColor="@color/text_small_blue"/>
+
+        <com.capstone.app24.custom.CustomTextView
+            android:id="@+id/txt_created_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txt_creator"
+            android:paddingLeft="5dp"
+            android:text="@string/created_time"
+            android:textColor="@color/text_small_blue"/>
+
+        <com.capstone.app24.custom.CustomTextView
+            android:id="@+id/txt_profile_count_login_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/profile_count_login_user"
+            android:textColor="@color/text_small_blue"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_feed_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_feed_details">
+
+        <com.capstone.app24.custom.CustomTextView
+            android:id="@+id/txt_feed_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="5"
+            android:text="@string/lorem_ipsum"
+            android:textSize="@dimen/feed_body_text"/>
+    </RelativeLayout>
+
+    <com.capstone.app24.custom.CustomTextView
+        android:id="@+id/txt_seen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_feed_body"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:drawableLeft="@drawable/seen"
+        android:drawablePadding="5dp"
+        android:text="3,027"
+        android:textSize="12dp"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/txt_seen"
+        android:background="@color/view_color"/>
+</RelativeLayout>

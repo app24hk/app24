@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+    <include
+        android:id="@+id/menu_layout"
+        layout="@layout/base_main_toolbar"/>
+
+    <RelativeLayout
+        android:id="@+id/layout_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/menu_layout">
+        <com.capstone.app24.custom.CustomTextView
+            android:id="@+id/txt_post_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/text_background_deselect"
+            android:padding="@dimen/text_row_height"
+            android:text="@string/create_post"
+            android:textColor="@color/text_color_grey"/>
+    </RelativeLayout>
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/layout_post">
+        <EditText
+            android:id="@+id/edit_write_post"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="left"
+            android:hint="Whats in your mind"
+            android:isScrollContainer="true"
+            android:lines="5"
+            android:padding="10dp"/>
+        <LinearLayout
+            android:id="@+id/camera_tumb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/edit_write_post"
+            android:orientation="horizontal">
+        </LinearLayout>
+
+
+        <ImageButton
+            android:id="@+id/ibtn_select_image_from_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/camera_tumb"
+            android:layout_marginTop="@dimen/main_screen_padding"
+            android:background="@android:color/transparent"
+            android:padding="@dimen/main_screen_padding"
+            android:src="@drawable/camera"/>
+    </RelativeLayout>
+
+</RelativeLayout>

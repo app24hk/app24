@@ -1,11 +1,78 @@
 <resources>
     <string name="app_name">App24</string>
-
-
+    <!-- Facebook Data-->
+    <string name="app_id">1673090976236867</string>
     <!-- Splash Screen-->
     <string name="terms_of_use">Terms of Use</string>
     <string name="by_continuing">By continuing, you accept the</string>
     <string name="terms_of_use_heading">This is Terms of Use Heading</string>
     <string name="splash_app_heading">24hours Life Share</string>
     <string name="login_with_facebook">Login with Facebook</string>
+
+    <!-- Dummy Data-->
+    <string name="key_to_success">Key to Success: Celebrate failures readers digest</string>
+    <string name="creator_name">Xie Yun</string>
+    <string name="created_time">6 Hours before</string>
+    <string name="view_count">12005</string>
+    <string name="profile_count_login_user">0.8700 HKD</string>
+    <string name="create_post">Create Post</string>
+
+    <string name="edit_post">Edit Post</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_post">Delete Post</string>
+    <string name="user_name">User</string>
+    <string name="total_profit">Total Profit</string>
+    <string name="todays_profit">Todays Profit</string>
+    <string name="this_month_profit">This Month Profit</string>
+    <string name="unreceived_profit">Unreceived Profit</string>
+    <string name="paypal">Paypal</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
+    <string name="setting">Setting</string>
+
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+        tincidunt gravida libero, sed porttitor enim facilisis vitae. Aliquam in ultricies urna.
+        Nunc cursus pellentesque nisl eget vulputate. Pellentesque faucibus purus leo, eu egestas
+        dolor pellentesque eu. Phasellus lobortis elementum sapien, eu aliquam libero scelerisque
+        sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. In ornare dictum
+        purus non ornare. Donec pharetra quam augue. Sed vitae posuere mauris. Aliquam metus nibh,
+        molestie sed fringilla sit amet, dapibus sit amet libero. Aenean vitae eleifend tellus, in
+        consequat odio. Duis in nisi vel metus finibus semper. Aliquam imperdiet lectus sit amet
+        congue iaculis.
+
+        Nulla vitae dolor in ligula malesuada convallis. Proin scelerisque id tellus vitae rhoncus.
+        Donec nisl est, mollis in nulla tristique, mollis tristique enim. Mauris ac enim ex. Nam
+        finibus arcu lacus, non condimentum odio varius a. In sagittis erat ut dui efficitur, id
+        venenatis lorem lacinia. Nam iaculis accumsan purus. Aenean lacinia erat in odio tincidunt,
+        a lobortis lacus aliquam. Pellentesque sed justo in justo vulputate suscipit quis nec diam.
+        Donec ut metus dignissim, euismod tortor non, tincidunt risus. Pellentesque venenatis
+        hendrerit lorem sit amet vestibulum. Maecenas vestibulum porttitor massa vitae volutpat.
+        Mauris maximus ligula tempus lacus efficitur, ut convallis sapien porttitor. Phasellus
+        faucibus nec ipsum eu consectetur. Donec ut nunc ut massa feugiat laoreet. Nulla posuere sit
+        amet magna vitae pulvinar.
+
+        Aenean maximus leo vitae sem gravida, eu porta orci pharetra. Phasellus pretium, orci a
+        accumsan suscipit, dolor eros maximus quam, a lacinia massa massa non augue. Ut fermentum
+        arcu ac condimentum tristique. Fusce ut ipsum ac diam posuere ultrices in sed sem. Maecenas
+        volutpat aliquet magna sit amet finibus. Sed sed vehicula lorem. Nunc sapien sem, placerat
+        vel sollicitudin vel, posuere nec magna. Phasellus sit amet dolor at quam commodo feugiat.
+        Aliquam erat volutpat. Duis mattis orci in ligula gravida, eu egestas risus facilisis.
+        Pellentesque nec tellus non odio pulvinar aliquam blandit at lorem. Integer tincidunt eu
+        nibh eget ultrices. Morbi iaculis, nunc quis faucibus tristique, neque eros faucibus arcu, a
+        auctor odio lacus nec nulla. Pellentesque at odio dolor.
+
+        Cras eu posuere urna. Maecenas dictum eget lectus sed dignissim. Morbi auctor cursus nisl ut
+        dignissim. Mauris ante lacus, consequat quis nisl id, dignissim varius odio. In varius,
+        nulla ut convallis aliquam, ligula est sodales mauris, id tempor risus nisl id enim. Donec
+        viverra, turpis ac placerat feugiat, ipsum nunc dapibus mauris, in varius libero arcu sed
+        mauris. Curabitur dui dui, posuere a laoreet eu, ornare ac justo. Praesent at libero
+        bibendum, ullamcorper nibh a, hendrerit neque. Etiam tortor ligula, condimentum in pharetra
+        id, rutrum sed est.
+
+        Nam molestie ultrices leo quis scelerisque. Suspendisse sit amet aliquet purus. Sed egestas
+        mauris id malesuada vulputate. Donec non nisi id lacus tristique venenatis. Integer
+        convallis mauris vitae consectetur ornare. Aliquam sit amet arcu ac urna blandit imperdiet
+        in sed arcu. Mauris gravida sagittis suscipit.
+    </string>
 </resources>

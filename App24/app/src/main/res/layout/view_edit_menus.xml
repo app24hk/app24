@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingTop="-20dp">
+    <ImageView
+        android:id="@+id/arrow_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/arrow_menu"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/arrow_menu"
+        android:layout_marginTop="-1dp"
+        android:background="@color/scrim"
+        android:orientation="vertical">
+
+        <com.capstone.app24.custom.CustomTextView
+            android:id="@+id/txt_edit"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            android:background="@color/text_background_deselect"
+            android:gravity="center_vertical|left"
+            android:paddingLeft="5dp"
+            android:text="@string/edit_post"/>
+        <View
+            android:id="@+id/seperator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/txt_edit"
+            android:background="@color/view_color">
+
+        </View>
+        <com.capstone.app24.custom.CustomTextView
+
+            android:id="@+id/txt_delete"
+            android:layout_width="match_parent"
+            android:layout_height="?android:actionBarSize"
+            android:layout_below="@+id/seperator"
+            android:background="@color/text_background_deselect"
+            android:gravity="center_vertical|left"
+            android:paddingLeft="5dp"
+            android:text="@string/delete_post"/>
+    </RelativeLayout>
+</RelativeLayout>

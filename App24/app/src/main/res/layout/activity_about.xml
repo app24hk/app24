@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/menu_grey"
+        layout="@layout/grey_main_toolbar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/main_screen_padding">
+
+            <com.capstone.app24.custom.CustomTextView
+                android:id="@+id/about_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginBottom="30dp"
+                android:text="About"
+                android:textColor="@color/black"/>
+            <com.capstone.app24.custom.CustomTextView
+                android:id="@+id/about_sub_heading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/about_heading"
+                android:layout_marginBottom="30dp"
+                android:text="@string/key_to_success"
+                android:textColor="@color/black"/>
+            <com.capstone.app24.custom.CustomTextView
+                android:id="@+id/about_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/about_sub_heading"
+                android:text="@string/lorem_ipsum"
+                android:textColor="@color/black"/>
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>

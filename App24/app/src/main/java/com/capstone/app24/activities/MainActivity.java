@@ -4,20 +4,28 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
-import com.capstone.app24.adapters.ViewPagerAdapter;
 import com.capstone.app24.animations.AnimatorUtils;
-import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.fragments.HomeFragment;
+import com.capstone.app24.fragments.ProfileFragment;
+import com.capstone.app24.fragments.UserProfileDetailsFragment;
+import com.capstone.app24.utils.AlertToastManager;
 import com.ogaclejapan.arclayout.ArcLayout;
 
 import java.util.ArrayList;
@@ -26,52 +34,57 @@ import java.util.List;
 /**
  * Created by amritpal on 3/11/15.
  */
-public class MainActivity extends FragmentActivity implements View.OnClickListener {
-    ViewPager pager;
-    ViewPagerAdapter adapter;
-    SlidingTabLayout tabs;
-    int Numboftabs = 2;
-    CharSequence Titles[] = {"Latest", "Most Viewed"};
+public class MainActivity extends FragmentActivity implements View.OnClickListener, View.OnTouchListener {
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+
     private ImageButton btn_app_24;
     private Toast toast = null;
     View menuLayout;
     private ArcLayout arcLayout;
+    private LinearLayout layout_home, layout_profile;
+    private ImageButton btn_home, btn_profile;
+    //List<Fragment> mListFragments = new ArrayList<Fragment>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        inittializeViews();
+        initializeViews();
         setClickListeners();
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment())
+                .commit();
+
     }
 
+
+    /**
+     * Initialize the click listeners
+     */
     private void setClickListeners() {
         btn_app_24.setOnClickListener(this);
+        /*layout_home.setOnClickListener(this);
+        layout_profile.setOnClickListener(this);
+        btn_profile.setOnClickListener(this);
+        btn_home.setOnClickListener(this);*/
+
+        layout_home.setOnTouchListener(this);
+        layout_profile.setOnTouchListener(this);
+        btn_profile.setOnTouchListener(this);
+        btn_home.setOnTouchListener(this);
     }
 
-    private void inittializeViews() {
-        // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
-        adapter = new ViewPagerAdapter(getSupportFragmentManager(), Titles, Numboftabs);
+    /**
+     * Initialize the View for the user Inaterface
+     */
+    private void initializeViews() {
 
-        // Assigning ViewPager View and setting the adapter
-        pager = (ViewPager) findViewById(R.id.pager);
-        pager.setAdapter(adapter);
+        layout_home = (LinearLayout) findViewById(R.id.layout_home);
+        layout_profile = (LinearLayout) findViewById(R.id.layout_profile);
+        btn_home = (ImageButton) findViewById(R.id.btn_home);
+        btn_profile = (ImageButton) findViewById(R.id.btn_profile);
 
-        // Assiging the Sliding Tab Layout View
-        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
-        tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
-        // Setting Custom Color for the Scroll bar indicator of the Tab View
-        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.tabsScrollColor);
-            }
-        });
-
-        // Setting the ViewPager For the SlidingTabsLayout
-        tabs.setViewPager(pager);
-
+        // Floating Action Button Initialization
         btn_app_24 = (ImageButton) findViewById(R.id.btn_app_24);
 
         menuLayout = findViewById(R.id.menu_layout);
@@ -80,27 +93,86 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             arcLayout.getChildAt(i).setOnClickListener(this);
         }
 
+
     }
 
     @Override
     public void onClick(View v) {
+
+        Intent intent;
         if (v.getId() == R.id.btn_app_24) {
             onFabClick(v);
+
+            if (v instanceof Button) {
+                showToast((Button) v);
+            }
             return;
+        } else if (v.getId() == R.id.btn_add_post) {
+            intent = new Intent(MainActivity.this, CreatePostActivity.class);
+            startActivity(intent);
+        } else if (v.getId() == R.id.btn_add_image_post) {
+            intent = new Intent(MainActivity.this, CreateMediaPostActivity.class);
+            startActivity(intent);
+        } else if (v.getId() == R.id.btn_add_video_post) {
+            intent = new Intent(MainActivity.this, CreateMediaPostActivity.class);
+            startActivity(intent);
         }
 
-        if (v instanceof Button) {
-            showToast((Button) v);
-        }
     }
 
+    private void setFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, fragment).commit();
+    }
+/*
+
+    */
+/**
+ * Inflate the Profile section in the pager
+ *//*
+
+    private void getProfileSection() {
+        Utils.debug(TAG, "Profile Clicked");
+        btn_home.setImageResource(R.drawable.home_unselected);
+        btn_profile.setImageResource(R.drawable.user_selected);
+        pager.setAdapter(adapter_profile);
+        adapter_profile.notifyDataSetChanged();
+        tabs.setViewPager(pager);
+    }
+
+    */
+/**
+ * Inflate the Home section in the pager
+ *//*
+
+    private void getHomeSection() {
+        btn_home.setImageResource(R.drawable.home_selected);
+        btn_profile.setImageResource(R.drawable.user_unselected);
+        pager.setAdapter(adapter_home);
+        adapter_home.notifyDataSetChanged();
+        tabs.setViewPager(pager);
+    }
+*/
+
+    /**
+     * handle the Floationg Action Button Click
+     *
+     * @param v
+     */
     private void onFabClick(View v) {
         if (v.isSelected()) {
             hideMenu();
         } else {
             showMenu();
         }
+        if (v.isSelected()) {
+            btn_app_24.setImageResource(R.drawable.app_button);
+
+        } else {
+            btn_app_24.setImageResource(R.drawable.btn_app_24_close);
+
+        }
         v.setSelected(!v.isSelected());
+
     }
 
     private void showToast(Button btn) {
@@ -125,7 +197,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
 
         AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(400);
+        animSet.setDuration(100);
         animSet.setInterpolator(new OvershootInterpolator());
         animSet.playTogether(animList);
         animSet.start();
@@ -141,7 +213,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
 
         AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(400);
+        animSet.setDuration(100);
         animSet.setInterpolator(new AnticipateInterpolator());
         animSet.playTogether(animList);
         animSet.addListener(new AnimatorListenerAdapter() {
@@ -153,8 +225,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         });
         animSet.start();
 
+
     }
 
+    /**
+     * Create Animation for showing te Floation Action Menu
+     *
+     * @param item
+     * @return
+     */
     private Animator createShowItemAnimator(View item) {
 
         float dx = btn_app_24.getX() - item.getX();
@@ -174,6 +253,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         return anim;
     }
 
+    /**
+     * Create Animation for hiding te Floation Action Menu
+     *
+     * @param item
+     * @return
+     */
     private Animator createHideItemAnimator(final View item) {
         float dx = btn_app_24.getX() - item.getX();
         float dy = btn_app_24.getY() - item.getY();
@@ -197,4 +282,26 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         return anim;
     }
 
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+
+        if (v.getId() == R.id.layout_home) {
+            setFragment(new HomeFragment());
+            btn_home.setImageResource(R.drawable.home_selected);
+            btn_profile.setImageResource(R.drawable.user_unselected);
+        } else if (v.getId() == R.id.layout_profile) {
+            setFragment(new UserProfileDetailsFragment());
+            btn_home.setImageResource(R.drawable.home_unselected);
+            btn_profile.setImageResource(R.drawable.user_selected);
+        } else if (v.getId() == R.id.layout_home) {
+            btn_home.setImageResource(R.drawable.home_selected);
+            btn_profile.setImageResource(R.drawable.user_unselected);
+        } else if (v.getId() == R.id.layout_profile) {
+            setFragment(new UserProfileDetailsFragment());
+            btn_home.setImageResource(R.drawable.home_unselected);
+            btn_profile.setImageResource(R.drawable.user_selected);
+
+        }
+        return true;
+    }
 }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="?android:actionBarSize"
+                android:orientation="vertical">
+    <RelativeLayout
+        android:id="@+id/menu_profile"
+        android:layout_width="match_parent"
+        android:layout_height="?android:actionBarSize"
+        android:layout_alignParentTop="true"
+        android:background="@color/text_background_deselect">
+        <ImageButton
+            android:id="@+id/ibtn_back"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="?android:attr/actionBarSize"
+            android:layout_alignParentLeft="true"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:src="@drawable/black"/>
+        <com.capstone.app24.custom.CustomTextViewBold
+            android:id="@+id/txt_activity_header"
+            android:layout_width="wrap_content"
+            android:layout_height="?android:attr/actionBarSize"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/setting"
+            android:textColor="@color/black"/>
+
+    </RelativeLayout>
+    <View
+        android:id="@+id/menu_profile_seperator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/view_color"/>
+</RelativeLayout>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/actionBarSize"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical">
+
+
+    <ImageButton
+        android:id="@+id/ibtn_back"
+        android:layout_width="?android:attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:src="@drawable/back"/>
+
+    <com.capstone.app24.custom.CustomTextViewBold
+        android:id="@+id/txt_activity_header"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="@string/terms_of_use"
+        android:textColor="@color/white"/>
+    <!-- Add Image Camera Button-->
+
+    <ImageButton
+        android:id="@+id/ibtn_add_image"
+        android:layout_width="?android:attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/ibtn_add_video"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:src="@drawable/camera_icon"/>
+
+    <!-- Add Video Camera Button-->
+
+    <ImageButton
+        android:id="@+id/ibtn_add_video"
+        android:layout_width="?android:attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:src="@drawable/video_icon"/>
+
+
+    <!-- Do Post TextView -->
+
+    <com.capstone.app24.custom.CustomTextView
+        android:id="@+id/txt_save"
+        android:layout_width="?android:attr/actionBarSize"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:text="Post"
+        android:textColor="@color/white"/>
+    <!-- Share feed Button-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/actionBarSize"
+        android:layout_alignParentRight="true">
+
+        <ImageButton
+            android:id="@+id/ibtn_share"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/ibtn_dots"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:src="@drawable/share"/>
+        <!-- Menu Button-->
+
+        <ImageButton
+            android:id="@+id/ibtn_dots"
+            android:layout_width="?android:attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/ibtn_share"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:src="@drawable/dot"/>
+    </LinearLayout>
+
+</RelativeLayout>

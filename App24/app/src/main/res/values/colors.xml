@@ -6,9 +6,11 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="text_color_deselect">#CECECE</color>
+    <color name="text_color_grey">#7F7F7F</color>
+    <color name="text_background_deselect">#F7F7F7</color>
     <color name="facebook_button">#E45668</color>
-
-
+    <color name="text_small_blue">#4F93E0</color>
+    <color name="view_color">#BDBDBD</color>
     <color name="tabsScrollColor">#EE324A</color>
 
     <!-- Arc Layout -->
@@ -28,4 +30,7 @@
     <color name="path_black">#403B36</color>
     <color name="path_green">#5FB336</color>
     <color name="path_purple">#49098A</color>
+
+    <color name="fb_color">#395694</color>
+    <color name="fb_like_count">#606775</color>
 </resources>
