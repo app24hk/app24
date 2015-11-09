@@ -3,9 +3,13 @@ package com.capstone.app24.adapters;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.SparseArray;
+import android.view.ViewGroup;
 
 import com.capstone.app24.fragments.LatestFragment;
 import com.capstone.app24.fragments.MostViewedFragment;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by amritpal on 3/11/15.
@@ -14,12 +18,14 @@ public class ViewPagerAdapterHome extends FragmentStatePagerAdapter {
     CharSequence Titles[]; // This will Store the Titles of the Tabs which are Going to be passed when ViewPagerAdapter is created
     int NumbOfTabs; // Store the number of tabs, this will also be passed when the ViewPagerAdapter is created
     private Fragment[] mFragments = new Fragment[2];
+    SweetAlertDialog mDialog;
 
     // Build a Constructor and assign the passed Values to appropriate values in the class
-    public ViewPagerAdapterHome(FragmentManager fm, CharSequence mTitles[], int mNumbOfTabsumb) {
+    public ViewPagerAdapterHome(FragmentManager fm, CharSequence mTitles[], int mNumbOfTabsumb, SweetAlertDialog dialog) {
         super(fm);
         this.Titles = mTitles;
         this.NumbOfTabs = mNumbOfTabsumb;
+        mDialog = dialog;
     }
 
 
@@ -37,16 +43,11 @@ public class ViewPagerAdapterHome extends FragmentStatePagerAdapter {
             case 1:
                 frag = new MostViewedFragment();
                 break;
-
-
         }
-
         return frag;
-
     }
 
     // This method return the titles for the Tabs in the Tab Strip
-
     @Override
     public CharSequence getPageTitle(int position) {
         return Titles[position];
@@ -58,4 +59,5 @@ public class ViewPagerAdapterHome extends FragmentStatePagerAdapter {
     public int getCount() {
         return NumbOfTabs;
     }
+
 }

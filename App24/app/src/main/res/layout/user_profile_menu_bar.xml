@@ -16,7 +16,7 @@
         android:src="@drawable/search"/>
 
 
-    <com.capstone.app24.custom.CustomTextViewBold
+    <TextView
         android:id="@+id/txt_profile_header"
         android:layout_width="?android:attr/actionBarSize"
         android:layout_height="match_parent"
@@ -25,7 +25,8 @@
         android:gravity="center"
         android:singleLine="true"
         android:text="@string/user_name"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
 
     <ImageButton
         android:id="@+id/ibtn_setting"

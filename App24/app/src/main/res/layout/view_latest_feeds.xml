@@ -10,11 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.capstone.app24.custom.CustomTextViewBold
+        <TextView
             android:id="@+id/txt_feed_heading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="2"
+            android:textStyle="bold"
             android:text="@string/key_to_success"
             android:textColor="@color/black"
             android:textSize="@dimen/feed_heading_text"/>
@@ -30,7 +31,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp">
 
-        <com.capstone.app24.custom.CustomTextView
+        <TextView
             android:id="@+id/txt_creator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,7 +39,7 @@
             android:text="@string/creator_name"
             android:textColor="@color/text_small_blue"/>
 
-        <com.capstone.app24.custom.CustomTextView
+        <TextView
             android:id="@+id/txt_created_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,7 +48,7 @@
             android:text="@string/created_time"
             android:textColor="@color/text_small_blue"/>
 
-        <com.capstone.app24.custom.CustomTextView
+        <TextView
             android:id="@+id/txt_profile_count_login_user"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_feed_details">
 
-        <com.capstone.app24.custom.CustomTextView
+        <TextView
             android:id="@+id/txt_feed_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +72,7 @@
             android:textSize="@dimen/feed_body_text"/>
     </RelativeLayout>
 
-    <com.capstone.app24.custom.CustomTextView
+    <TextView
         android:id="@+id/txt_seen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

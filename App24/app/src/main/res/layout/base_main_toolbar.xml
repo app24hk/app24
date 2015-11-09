@@ -16,7 +16,7 @@
         android:gravity="center"
         android:src="@drawable/back"/>
 
-    <com.capstone.app24.custom.CustomTextViewBold
+    <TextView
         android:id="@+id/txt_activity_header"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
@@ -25,7 +25,8 @@
         android:gravity="center"
         android:singleLine="true"
         android:text="@string/terms_of_use"
-        android:textColor="@color/white"/>
+        android:textColor="@color/white"
+        android:textStyle="bold"/>
     <!-- Add Image Camera Button-->
 
     <ImageButton
@@ -51,7 +52,7 @@
 
     <!-- Do Post TextView -->
 
-    <com.capstone.app24.custom.CustomTextView
+    <TextView
         android:id="@+id/txt_save"
         android:layout_width="?android:attr/actionBarSize"
         android:layout_height="match_parent"

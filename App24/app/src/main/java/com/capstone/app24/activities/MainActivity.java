@@ -10,12 +10,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -23,13 +25,14 @@ import android.widget.Toast;
 import com.capstone.app24.R;
 import com.capstone.app24.animations.AnimatorUtils;
 import com.capstone.app24.fragments.HomeFragment;
-import com.capstone.app24.fragments.ProfileFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
-import com.capstone.app24.utils.AlertToastManager;
+import com.capstone.app24.utils.Utils;
 import com.ogaclejapan.arclayout.ArcLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by amritpal on 3/11/15.
@@ -44,7 +47,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private ArcLayout arcLayout;
     private LinearLayout layout_home, layout_profile;
     private ImageButton btn_home, btn_profile;
-    //List<Fragment> mListFragments = new ArrayList<Fragment>();
+    HomeFragment homeFragment;
+    private FrameLayout main_frame;
+    UserProfileDetailsFragment userProfileDetailsFragment;
+    private FragmentManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,22 +58,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         setContentView(R.layout.activity_main);
         initializeViews();
         setClickListeners();
-        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, new HomeFragment())
-                .commit();
-
+        setHomeFragment();
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     /**
      * Initialize the click listeners
      */
     private void setClickListeners() {
         btn_app_24.setOnClickListener(this);
-        /*layout_home.setOnClickListener(this);
-        layout_profile.setOnClickListener(this);
-        btn_profile.setOnClickListener(this);
-        btn_home.setOnClickListener(this);*/
-
         layout_home.setOnTouchListener(this);
         layout_profile.setOnTouchListener(this);
         btn_profile.setOnTouchListener(this);
@@ -78,23 +82,21 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
      * Initialize the View for the user Inaterface
      */
     private void initializeViews() {
-
         layout_home = (LinearLayout) findViewById(R.id.layout_home);
         layout_profile = (LinearLayout) findViewById(R.id.layout_profile);
         btn_home = (ImageButton) findViewById(R.id.btn_home);
         btn_profile = (ImageButton) findViewById(R.id.btn_profile);
-
+        main_frame = (FrameLayout) findViewById(R.id.main_frame);
         // Floating Action Button Initialization
         btn_app_24 = (ImageButton) findViewById(R.id.btn_app_24);
-
         menuLayout = findViewById(R.id.menu_layout);
         arcLayout = (ArcLayout) findViewById(R.id.arc_layout);
         for (int i = 0, size = arcLayout.getChildCount(); i < size; i++) {
             arcLayout.getChildAt(i).setOnClickListener(this);
         }
 
-
     }
+
 
     @Override
     public void onClick(View v) {
@@ -117,41 +119,23 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             intent = new Intent(MainActivity.this, CreateMediaPostActivity.class);
             startActivity(intent);
         }
+        if (v.getId() == R.id.layout_home) {
+            Utils.debug(TAG, "Inside OnClick home");
+            btn_home.setImageResource(R.drawable.home_selected);
+            btn_profile.setImageResource(R.drawable.user_unselected);
+            setHomeFragment();
+            //new loaderHome().execute();
+        } else if (v.getId() == R.id.layout_profile) {
+            Utils.debug(TAG, "Inside OnClick profile");
+            btn_home.setImageResource(R.drawable.home_unselected);
+            btn_profile.setImageResource(R.drawable.user_selected);
+            setUserProfileFragment();
+            // new loaderPrfile().execute();
+
+        }
 
     }
 
-    private void setFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame, fragment).commit();
-    }
-/*
-
-    */
-/**
- * Inflate the Profile section in the pager
- *//*
-
-    private void getProfileSection() {
-        Utils.debug(TAG, "Profile Clicked");
-        btn_home.setImageResource(R.drawable.home_unselected);
-        btn_profile.setImageResource(R.drawable.user_selected);
-        pager.setAdapter(adapter_profile);
-        adapter_profile.notifyDataSetChanged();
-        tabs.setViewPager(pager);
-    }
-
-    */
-/**
- * Inflate the Home section in the pager
- *//*
-
-    private void getHomeSection() {
-        btn_home.setImageResource(R.drawable.home_selected);
-        btn_profile.setImageResource(R.drawable.user_unselected);
-        pager.setAdapter(adapter_home);
-        adapter_home.notifyDataSetChanged();
-        tabs.setViewPager(pager);
-    }
-*/
 
     /**
      * handle the Floationg Action Button Click
@@ -282,26 +266,49 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         return anim;
     }
 
+
+    private void setUserProfileFragment() {
+        userProfileDetailsFragment = UserProfileDetailsFragment.newInstance("UserProfileFragment", 1);
+        manager = getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.replace(R.id.main_frame, userProfileDetailsFragment);
+        ft.commit();
+    }
+
+    private void setHomeFragment() {
+        homeFragment = new HomeFragment();
+        manager = getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.replace(R.id.main_frame, homeFragment);
+        ft.commit();
+    }
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        Utils.debug(TAG, "OnTouch ");
 
         if (v.getId() == R.id.layout_home) {
-            setFragment(new HomeFragment());
+            Utils.debug(TAG, "Inside OnClick home");
             btn_home.setImageResource(R.drawable.home_selected);
             btn_profile.setImageResource(R.drawable.user_unselected);
+            setHomeFragment();
         } else if (v.getId() == R.id.layout_profile) {
-            setFragment(new UserProfileDetailsFragment());
+            Utils.debug(TAG, "Inside OnClick profile");
             btn_home.setImageResource(R.drawable.home_unselected);
             btn_profile.setImageResource(R.drawable.user_selected);
+            setUserProfileFragment();
         } else if (v.getId() == R.id.layout_home) {
+            Utils.debug(TAG, "Inside OnClick home");
             btn_home.setImageResource(R.drawable.home_selected);
             btn_profile.setImageResource(R.drawable.user_unselected);
+            setHomeFragment();
         } else if (v.getId() == R.id.layout_profile) {
-            setFragment(new UserProfileDetailsFragment());
+            Utils.debug(TAG, "Inside OnClick profile");
             btn_home.setImageResource(R.drawable.home_unselected);
             btn_profile.setImageResource(R.drawable.user_selected);
-
+            setUserProfileFragment();
         }
-        return true;
+
+        return false;
     }
 }

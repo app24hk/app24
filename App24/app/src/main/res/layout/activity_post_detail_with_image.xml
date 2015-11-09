@@ -23,10 +23,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="3"
-
-                android:text="@string/lorem_ipsum"
+                android:text="@string/key_to_success"
                 android:textColor="@color/black"
-                android:textSize="@dimen/feed_body_text"/>
+                android:textSize="@dimen/feed_heading_text"/>
         </RelativeLayout>
 
         <RelativeLayout

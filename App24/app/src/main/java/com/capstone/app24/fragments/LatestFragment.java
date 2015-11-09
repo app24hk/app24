@@ -16,14 +16,17 @@ import com.capstone.app24.R;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.adapters.LatestFeedsAdapter;
 import com.capstone.app24.interfaces.ClickListener;
+import com.capstone.app24.interfaces.OnListUpdateListener;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.GlobalClass;
 import com.capstone.app24.utils.Utils;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by amritpal on 3/11/15.
  */
-public class LatestFragment extends Fragment {
+public class LatestFragment extends Fragment implements OnListUpdateListener {
 
     private static final String TAG = LatestFragment.class.getSimpleName();
     View mView;
@@ -31,6 +34,7 @@ public class LatestFragment extends Fragment {
     private LatestFeedsAdapter mLatestFeedsAdapter;
     private Context mContext;
     private Activity mActivity;
+    SweetAlertDialog mDialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,33 +43,23 @@ public class LatestFragment extends Fragment {
         mActivity = getActivity();
         initializeViews();
         updateUI();
+        Utils.setOnListUpdateListener(this);
         return mView;
     }
-
 
     /**
      * This method is used to Update the UI with Feeds
      */
     private void updateUI() {
+
+        Utils.debug(TAG, "setting LatestFeedsFragments in Main Activity start");
+
         mLatestFeedsAdapter = new LatestFeedsAdapter(getActivity());
-        list_latest_feeds.setAdapter(mLatestFeedsAdapter);
         list_latest_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
-     /*   list_latest_feeds.addOnItemTouchListener(new GlobalClass.RecyclerTouchListener(mContext,
-                list_latest_feeds, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
+        list_latest_feeds.setAdapter(mLatestFeedsAdapter);
 
-                AlertToastManager.showToast("Position : " + position, mContext);
-                Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-                startActivity(intent);
+        Utils.debug(TAG, "setting LatestFeedsFragments in Main Activity end");
 
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));*/
     }
 
     /**
@@ -74,5 +68,16 @@ public class LatestFragment extends Fragment {
     private void initializeViews() {
         list_latest_feeds = (RecyclerView) mView.findViewById(R.id.list_latest_feeds);
 
+    }
+
+    @Override
+    public void onListUpdate() {
+        if (list_latest_feeds.getAdapter() != null) {
+            //list_latest_feeds.setAdapter(mLatestFeedsAdapter);
+            mLatestFeedsAdapter.notifyDataSetChanged();
+        } else {
+            list_latest_feeds.setAdapter(mLatestFeedsAdapter);
+            mLatestFeedsAdapter.notifyDataSetChanged();
+        }
     }
 }

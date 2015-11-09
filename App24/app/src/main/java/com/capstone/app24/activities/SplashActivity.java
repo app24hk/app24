@@ -20,16 +20,6 @@ import android.widget.TextView;
 
 import com.capstone.app24.R;
 import com.capstone.app24.utils.Utils;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONObject;
 
@@ -43,23 +33,26 @@ import java.util.List;
  */
 public class SplashActivity extends Activity implements View.OnClickListener {
 
+    private static final String TAG = SplashActivity.class.getSimpleName();
     private TextView txt_terms_of_use;
     private Button btn_login_with_facebook;
     List<String> permissions = new ArrayList<String>();
-    private LoginButton fb_btn;
+    //private LoginButton fb_btn;
 
-    CallbackManager callbackManager;
-    AccessToken accessToken;
+    //CallbackManager callbackManager;
+    //AccessToken accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ///FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.activity_splash);
+        txt_terms_of_use = (TextView) findViewById(R.id.txt_terms_of_use);
+        btn_login_with_facebook = (Button) findViewById(R.id.btn_login_with_facebook);
        /* callbackManager = CallbackManager.Factory.create();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);*/
-        initialize();
+        //  initialize();
         setClickListeners();
         updateUI();
     }
@@ -74,7 +67,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         permissions.add("public_profile");
         permissions.add("email");
         permissions.add("user_birthday");
-//Facebook Button Initialization 
+        //Facebook Button Initialization
         fb_btn.setReadPermissions(permissions);
 
         fb_btn.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
@@ -106,10 +99,12 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.btn_login_with_facebook:
-                // loginFacebook();
+                //loginFacebook();
+                //Utils.debug(TAG, "Start Activity Main");
+                //finish();
                 intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
-                finish();
+                //finish();
                 //fb_btn.performClick();
 
                 break;
@@ -125,7 +120,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     }
 */
     //facebook Login
-    private void loginFacebook() {
+   /* private void loginFacebook() {
 
         fb_btn.registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
@@ -187,7 +182,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                     }
                 });
     }
-
+*/
     public void getKeyHash() {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(

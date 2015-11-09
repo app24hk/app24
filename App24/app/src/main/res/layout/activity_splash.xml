@@ -33,14 +33,14 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp">
 
-        <!-- <com.facebook.login.widget.LoginButton
-             android:id="@+id/login_button"
-             xmlns:fb="http://schemas.android.com/apk/res-auto"
-             android:layout_width="0dp"
-             android:layout_height="0dp"
-             android:layout_gravity="center_vertical"
-             android:background="@android:color/transparent"
-             android:scaleType="centerInside"/>-->
+        <!--<com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
+            xmlns:fb="http://schemas.android.com/apk/res-auto"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:background="@android:color/transparent"
+            android:scaleType="centerInside"/>-->
 
         <Button
             android:id="@+id/btn_login_with_facebook"
@@ -61,7 +61,7 @@
         android:orientation="horizontal"
         android:padding="15dp">
 
-        <com.capstone.app24.custom.CustomTextView
+        <TextView
             android:id="@+id/by_continuing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -69,7 +69,7 @@
             android:text="@string/by_continuing"
             android:textColor="@color/white"/>
 
-        <com.capstone.app24.custom.CustomTextView
+        <TextView
             android:id="@+id/txt_terms_of_use"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

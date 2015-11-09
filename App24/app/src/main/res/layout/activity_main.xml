@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -50,8 +49,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:paddingBottom="20dp">
+                android:orientation="vertical">
 
                 <View
                     android:layout_width="match_parent"
@@ -60,10 +58,11 @@
 
                 <ImageButton
                     android:id="@+id/btn_home"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="16dp"
                     android:src="@drawable/home_selected"/>
             </LinearLayout>
 
@@ -73,8 +72,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:paddingBottom="20dp">
+                android:orientation="vertical">
 
                 <View
                     android:layout_width="match_parent"
@@ -83,17 +81,17 @@
 
                 <ImageButton
                     android:id="@+id/btn_profile"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="16dp"
-                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
+                    android:paddingBottom="20dp"
+                    android:paddingTop="16dp"
                     android:src="@drawable/user_unselected"/>
             </LinearLayout>
         </LinearLayout>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <FrameLayout
@@ -102,19 +100,18 @@
                 android:layout_height="match_parent"
                 android:layout_alignBottom="@+id/btn_app_24"
                 android:background="@color/scrim"
-                android:visibility="invisible">
+                android:visibility="gone">
 
                 <com.ogaclejapan.arclayout.ArcLayout
                     android:id="@+id/arc_layout"
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginBottom="32dp"
                     app:arc_axisRadius="@dimen/layout_child_offset_path"
                     app:arc_freeAngle="true"
                     app:arc_origin="bottom"
-                    app:arc_radius="@dimen/layout_radius_path"
-                    >
-
+                    app:arc_radius="@dimen/layout_radius_path">
                     <Button
                         android:id="@+id/btn_add_post"
                         android:layout_width="50dp"
@@ -122,7 +119,6 @@
                         android:background="@drawable/btn_app_24_edit"
                         app:arc_angle="30"
                         />
-
                     <Button
                         android:id="@+id/btn_add_image_post"
                         android:layout_width="50dp"
@@ -130,7 +126,6 @@
                         android:background="@drawable/btn_app_24_photo"
                         app:arc_angle="90"
                         />
-
                     <Button
                         android:id="@+id/btn_add_video_post"
                         android:layout_width="50dp"
@@ -138,8 +133,6 @@
                         android:background="@drawable/btn_app_24_video"
                         app:arc_angle="150"
                         />
-
-
                 </com.ogaclejapan.arclayout.ArcLayout>
 
             </FrameLayout>
@@ -150,7 +143,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_gravity="center_horizontal"
                 android:background="@android:color/transparent"
                 android:paddingBottom="20dp"
                 android:src="@drawable/app_button"/>

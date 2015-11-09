@@ -19,13 +19,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.capstone.app24.custom.CustomTextViewBold
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLines="3"
                 android:text="@string/lorem_ipsum"
                 android:textColor="@color/black"
-                android:textSize="@dimen/feed_heading_text"/>
+                android:textSize="@dimen/feed_heading_text"
+                android:textStyle="bold"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -105,20 +106,45 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@+id/layout_feed_details">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.capstone.app24.custom.CustomTextView
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:id="@+id/layout_media_preview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@string/lorem_ipsum"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/feed_body_text"/>
-            </RelativeLayout>
+                    android:layout_height="200dp">
+                    <ImageView
+                        android:id="@+id/img_preview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:background="@drawable/pic_two"
+                        android:gravity="fill"/>
+                    <ImageView
+                        android:id="@+id/img_video_preview"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/video_icons"
+                        />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <com.capstone.app24.custom.CustomTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:text="@string/lorem_ipsum"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/feed_body_text"/>
+                </RelativeLayout>
+            </LinearLayout>
         </ScrollView>
 
     </RelativeLayout>

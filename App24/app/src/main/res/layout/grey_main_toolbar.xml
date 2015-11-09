@@ -17,7 +17,7 @@
             android:background="@android:color/transparent"
             android:gravity="center"
             android:src="@drawable/black"/>
-        <com.capstone.app24.custom.CustomTextViewBold
+        <TextView
             android:id="@+id/txt_activity_header"
             android:layout_width="wrap_content"
             android:layout_height="?android:attr/actionBarSize"
@@ -26,7 +26,8 @@
             android:gravity="center"
             android:singleLine="true"
             android:text="@string/setting"
-            android:textColor="@color/black"/>
+            android:textColor="@color/black"
+            android:textStyle="bold"/>
 
     </RelativeLayout>
     <View

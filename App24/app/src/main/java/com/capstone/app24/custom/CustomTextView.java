@@ -26,9 +26,9 @@ public class CustomTextView extends TextView {
     }
 
     private void init() {
-        if (!isInEditMode()) {
-            Typeface typeFace = Typeface.createFromAsset(getContext().getAssets(), "fonts/STHeiti-Light.ttc");
-            setTypeface(typeFace, Typeface.NORMAL);
-        }
+        //if (!isInEditMode()) {
+        Typeface typeFace = Typeface.createFromAsset(getContext().getAssets(), "fonts/STHeiti-Light.ttc");
+        setTypeface(typeFace, Typeface.NORMAL);
+        //}
     }
 }
