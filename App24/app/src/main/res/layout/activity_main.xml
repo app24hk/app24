@@ -22,12 +22,15 @@
     <FrameLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></FrameLayout>
+        android:layout_height="match_parent">
+
+    </FrameLayout>
 
     <!-- [ End of tab scroll color ] -->
 
 
     <RelativeLayout
+        android:id="@+id/animated_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">

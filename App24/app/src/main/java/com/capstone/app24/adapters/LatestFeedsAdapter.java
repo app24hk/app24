@@ -39,8 +39,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     public LatestFeedsAdapter(Activity activity) {
         mActivity = activity;
         mInflater = LayoutInflater.from(activity);
-
-        //(LayoutInflater) mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
 
@@ -67,8 +65,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                 @Override
                 public void onClick(View v) {
                     showImageDialog();
-//                    Intent intent = new Intent(mActivity, GalleryActivity.class);
-//                    mActivity.startActivity(intent);
                 }
             });
             holder.img_video_preview.setVisibility(View.GONE);
@@ -78,9 +74,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
             holder.img_video_preview.setVisibility(View.GONE);
 
         }
-
-        Utils.debug(TAG, "LatestFeed Adapter onBindViewHolder ");
-
     }
 
     @Override

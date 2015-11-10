@@ -7,7 +7,7 @@
         android:id="@+id/layout_user_profle"
         layout="@layout/user_profile_menu_bar"/>
     <ScrollView android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -111,11 +111,20 @@
                     android:text="@string/profile_count_login_user"
                     android:textColor="@color/text_small_blue"/>
             </RelativeLayout>
-            <include layout="@layout/view_latest_feeds_with_image"
+
+
+            <!--<include layout="@layout/view_latest_feeds_with_image"
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"
-                     android:layout_below="@+id/layout_unreceived"/>
+                     android:layout_below="@+id/layout_unreceived"/>-->
         </RelativeLayout>
     </ScrollView>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/user_feeds_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/layout_unreceived"
+        android:layout_marginTop="10dp">
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

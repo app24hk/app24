@@ -12,5 +12,5 @@
     <!-- Feeds Dimens-->
     <dimen name="feed_heading_text">22dp</dimen>
     <dimen name="feed_body_text">15dp</dimen>
-
+    <dimen name="enter_text">15dp</dimen>
 </resources>

@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="2"
-            android:text="@string/key_to_success"
+            android:text="@string/chinese_lorem_ipsum_title"
             android:textColor="@color/black"
             android:textSize="@dimen/feed_heading_text"
             android:textStyle="bold"/>
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
 
                 android:maxLines="5"
-                android:text="@string/lorem_ipsum"
+                android:text="@string/chinese_lorem_ipsum"
                 android:textSize="@dimen/feed_body_text"/>
         </RelativeLayout>
         <RelativeLayout
@@ -98,7 +98,7 @@
                 android:layout_centerInParent="true"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:src="@drawable/video_icons"
+                android:src="@drawable/video_preview_icon"
                 android:visibility="visible"/>
         </RelativeLayout>
     </LinearLayout>

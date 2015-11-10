@@ -72,7 +72,6 @@ public class CreateMediaPostActivity extends BaseActivity {
         //camera_tumb = (LinearLayout) findViewById(R.id.camera_tumb);
         ibtn_select_image_from_gallery = (ImageView) findViewById(R.id
                 .ibtn_select_image_from_gallery);
-        img_bitmap = (ImageView) findViewById(R.id.image_bitmap);
     }
 
     private void setClickListeners() {
@@ -86,7 +85,6 @@ public class CreateMediaPostActivity extends BaseActivity {
         Intent intent;
         switch (v.getId()) {
             case R.id.ibtn_back:
-                Toast.makeText(this, "Child Activity", Toast.LENGTH_SHORT).show();
                 finish();
                 break;
             case R.id.ibtn_add_image:

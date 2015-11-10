@@ -10,10 +10,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
 import com.capstone.app24.adapters.ViewPagerAdapterHome;
+import com.capstone.app24.interfaces.OnScrolling;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
 import com.capstone.app24.utils.Utils;
 
@@ -31,7 +37,7 @@ public class HomeFragment extends Fragment {
     private static final String TAG = HomeFragment.class.getSimpleName();
     View mView;
     private ViewPager pager;
-    private SlidingTabLayout tabs;
+    private static SlidingTabLayout tabs;
     ViewPagerAdapterHome adapter_home;
     CharSequence home_titles[] = {"Latest", "Most Viewed"};
     SweetAlertDialog dialog;
@@ -43,7 +49,6 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         mView = inflater.inflate(R.layout.fragment_home, container, false);
-        new loaderHome().execute();
         initializeViews();
         setClickListeners();
         updateUI();
@@ -51,30 +56,32 @@ public class HomeFragment extends Fragment {
 
     }
 
-    class loaderHome extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            dialog = Utils.showSweetProgressDialog(getActivity(), getResources().getString(R.string
-                    .progress_loading));
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Utils.closeSweetProgressDialog(getActivity(), dialog);
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            return null;
-        }
-
-
+   /* @Override
+    public void ScrollUp(int up) {
+        showViews();
     }
 
+    @Override
+    public void ScrollDown(int down) {
+        hideViews();
+    }*/
+
+    private void hideViews() {
+        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tabs.getLayoutParams();
+        int fabTopMargin = lp.topMargin;
+        tabs.animate().translationY(tabs.getHeight() + fabTopMargin - 200).setInterpolator(new
+                AccelerateInterpolator(2)).start();
+    }
+
+    private void showViews() {
+        tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+    }
+
+    public static SlidingTabLayout getHeaderView() {
+        return tabs;
+    }
 
     private void updateUI() {
-
-        Utils.debug(TAG, "updateUI() start");
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
         adapter_home = new ViewPagerAdapterHome(getActivity().getSupportFragmentManager(), home_titles,
                 home_titles.length, dialog);
@@ -84,29 +91,25 @@ public class HomeFragment extends Fragment {
         tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
         // Setting Custom Color for the Scroll bar indicator of the Tab View
         tabs.setViewPager(pager);
-
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
                 return getResources().getColor(R.color.tabsScrollColor);
             }
         });
-
         // Setting the ViewPager For the SlidingTabsLayout
-        Utils.debug(TAG, "updateUI() End");
-
     }
 
     private void initializeViews() {
-        Utils.debug(TAG, "initializeViews() Start");
-
         // Assigning ViewPager View and setting the adapter
         pager = (ViewPager) mView.findViewById(R.id.pager);
-
+        ViewGroup.LayoutParams params = pager.getLayoutParams();
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+        pager.setLayoutParams(params);
     }
 
     private void setClickListeners() {
 
     }
-
 }

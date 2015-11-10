@@ -14,6 +14,21 @@
         android:background="@android:color/transparent"
         android:gravity="center"
         android:src="@drawable/search"/>
+    <com.capstone.app24.custom.CustomDrawablEditText
+        android:id="@+id/edit_search"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/cancel"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/search"
+        android:drawablePadding="5dp"
+        android:gravity="left|center_vertical"
+        android:hint="Search"
+        android:imeOptions="actionSearch"
+        android:paddingLeft="20dp"
+        android:singleLine="true"
+        android:visibility="gone"/>
 
 
     <TextView
@@ -36,6 +51,15 @@
         android:background="@android:color/transparent"
         android:gravity="center"
         android:src="@drawable/setting"/>
+    <TextView
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:gravity="center_vertical"
+        android:padding="5dp"
+        android:text="Cancel"
+        android:visibility="gone"/>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

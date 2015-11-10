@@ -3,6 +3,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
+    <include android:id="@+id/user_search_menu"
+             layout="@layout/user_profile_menu_bar">
+    </include>
 
     <com.capstone.app24.sliding_tabs.SlidingTabLayout
         android:id="@+id/tabs"
@@ -18,4 +21,18 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/tabs"
         android:layout_weight="1"/>
+    <!-- <com.capstone.app24.sliding_tabs.SlidingTabLayout
+         android:id="@+id/tabs"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:background="@android:color/white"
+         android:elevation="2dp"/>
+
+
+     <android.support.v4.view.ViewPager
+         android:id="@+id/pager"
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_below="@+id/tabs"
+         android:layout_weight="1"/>-->
 </LinearLayout>

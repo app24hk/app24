@@ -15,7 +15,7 @@
     <string name="created_time">6 Hours before</string>
     <string name="view_count">12005</string>
     <string name="profile_count_login_user">0.8700 HKD</string>
-    <string name="create_post">Create Post</string>
+    <string name="create_post">Title:</string>
 
     <string name="edit_post">Edit Post</string>
     <string name="edit">Edit</string>
@@ -31,6 +31,12 @@
     <string name="logout">Logout</string>
     <string name="setting">Setting</string>
 
+
+    <!--Create Post Screen -->
+
+    <string name="enter_the_title">Enter the title</string>
+
+
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
         tincidunt gravida libero, sed porttitor enim facilisis vitae. Aliquam in ultricies urna.
         Nunc cursus pellentesque nisl eget vulputate. Pellentesque faucibus purus leo, eu egestas
@@ -39,7 +45,54 @@
         purus non ornare. Donec pharetra quam augue. Sed vitae posuere mauris. Aliquam metus nibh,
         molestie sed fringilla sit amet, dapibus sit amet libero. Aenean vitae eleifend tellus, in
         consequat odio. Duis in nisi vel metus finibus semper. Aliquam imperdiet lectus sit amet
+        congue iaculis.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+        tincidunt gravida libero, sed porttitor enim facilisis vitae. Aliquam in ultricies urna.
+        Nunc cursus pellentesque nisl eget vulputate. Pellentesque faucibus purus leo, eu egestas
+        dolor pellentesque eu. Phasellus lobortis elementum sapien, eu aliquam libero scelerisque
+        sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. In ornare dictum
+        purus non ornare. Donec pharetra quam augue. Sed vitae posuere mauris. Aliquam metus nibh,
+        molestie sed fringilla sit amet, dapibus sit amet libero. Aenean vitae eleifend tellus, in
+        consequat odio. Duis in nisi vel metus finibus semper. Aliquam imperdiet lectus sit amet
+        congue iaculis.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+        tincidunt gravida libero, sed porttitor enim facilisis vitae. Aliquam in ultricies urna.
+        Nunc cursus pellentesque nisl eget vulputate. Pellentesque faucibus purus leo, eu egestas
+        dolor pellentesque eu. Phasellus lobortis elementum sapien, eu aliquam libero scelerisque
+        sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. In ornare dictum
+        purus non ornare. Donec pharetra quam augue. Sed vitae posuere mauris. Aliquam metus nibh,
+        molestie sed fringilla sit amet, dapibus sit amet libero. Aenean vitae eleifend tellus, in
+        consequat odio. Duis in nisi vel metus finibus semper. Aliquam imperdiet lectus sit amet
+        congue iaculis.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+        tincidunt gravida libero, sed porttitor enim facilisis vitae. Aliquam in ultricies urna.
+        Nunc cursus pellentesque nisl eget vulputate. Pellentesque faucibus purus leo, eu egestas
+        dolor pellentesque eu. Phasellus lobortis elementum sapien, eu aliquam libero scelerisque
+        sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. In ornare dictum
+        purus non ornare. Donec pharetra quam augue. Sed vitae posuere mauris. Aliquam metus nibh,
+        molestie sed fringilla sit amet, dapibus sit amet libero. Aenean vitae eleifend tellus, in
+        consequat odio. Duis in nisi vel metus finibus semper. Aliquam imperdiet lectus sit amet
+        congue iaculis.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+        tincidunt gravida libero, sed porttitor enim facilisis vitae. Aliquam in ultricies urna.
+        Nunc cursus pellentesque nisl eget vulputate. Pellentesque faucibus purus leo, eu egestas
+        dolor pellentesque eu. Phasellus lobortis elementum sapien, eu aliquam libero scelerisque
+        sit amet. Interdum et malesuada fames ac ante ipsum primis in faucibus. In ornare dictum
+        purus non ornare. Donec pharetra quam augue. Sed vitae posuere mauris. Aliquam metus nibh,
+        molestie sed fringilla sit amet, dapibus sit amet libero. Aenean vitae eleifend tellus, in
+        consequat odio. Duis in nisi vel metus finibus semper. Aliquam imperdiet lectus sit amet
         congue iaculis.
+    </string>
+
+    <string name="chinese_lorem_ipsum_title">器經美家了物開能使</string>
+    <string name="chinese_lorem_ipsum">
+        目技本銷心們竟哥時花小汽兒了難考是真事都房保大思水平舞我年效但為來氣他，
+        國明笑：解聲格：夜式我來母、看然那常畫觀嗎在卻眾為到在性不力我入，
+        跟體就火面亮散；筆長著，了關益，轉十始手是我式，業然的。
+        入嚴近排負身品代話的體成多，重不它的可研的案，我爸人前廣於建向去工原月制改室時，
+        政上油三些離、大公色應造引的展適什精勢了重和分為？用必體了細醫立舉醫金到環辦決前道中輪會裡！
+        會火小？病裡只例眼安中車沒！想理這科招起中最了才理本賽，價歷之全人數。告質二，
+        不間登離的上知地因整工真女機劇手管光個步速又王她有統的衣明色，求局機有你注破告了西懷小臺切們本。
+        英狀痛出月；以去光像是健：上節力女親在節趣！明的看小的響縣。同地起目進社以樣，興展義新我管近好！
+        望心當父用，水笑果覺不何立念舉中對條立清事、入時我意如大。出其力前我說。
+        下便空布溫型支地該死天可人發的燈次力身指竟此各大坐星長地名之入，是海科告河百德似在爭第軍還明團技！
+        共的功斯常
     </string>
     <string name="progress_loading">Loading</string>
 </resources>

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.capstone.app24"
-        minSdkVersion 11
+        minSdkVersion 14
         versionCode 1
         versionName "1.0"
     }

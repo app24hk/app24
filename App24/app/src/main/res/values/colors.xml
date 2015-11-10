@@ -12,10 +12,11 @@
     <color name="text_small_blue">#4F93E0</color>
     <color name="view_color">#BDBDBD</color>
     <color name="tabsScrollColor">#EE324A</color>
-
+    <color name="linear_background">#DDDDDD</color>
+    <color name="list_item_color">#F6F6F6</color>
     <!-- Arc Layout -->
     <color name="primary">#3c515c</color>
-    <color name="scrim">#42000000</color>
+    <color name="scrim">#CC000000</color>
     <color name="pressed">#33000000</color>
 
     <color name="light_blue_500">#03A9F4</color>

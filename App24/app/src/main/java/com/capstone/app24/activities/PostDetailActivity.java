@@ -112,7 +112,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.img_preview:
                 showImageDialog();
-                // AlertToastManager.showToast("Delete", this);
                 break;
             case R.id.img_video_preview:
                 edit_menu.setVisibility(View.GONE);

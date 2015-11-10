@@ -2,9 +2,10 @@ package com.capstone.app24.utils;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 
 import com.capstone.app24.R;
-import com.capstone.app24.interfaces.OnListUpdateListener;
+import com.capstone.app24.interfaces.OnScrolling;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -13,7 +14,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  */
 public class Utils {
 
-    public static OnListUpdateListener mListUpdateListener;
+    public static OnScrolling mScrolling;
 
     private Context _context;
 
@@ -50,13 +51,19 @@ public class Utils {
         }
     }
 
-    public static void setOnListUpdateListener(OnListUpdateListener listener) {
-        Utils.mListUpdateListener = listener;
+    public static void setOnScrolling(OnScrolling listener) {
+        Utils.mScrolling = listener;
+
     }
 
-    public static void onListUpdate() {
+    public static void setScrollDirection(int direction) {
         try {
-            mListUpdateListener.onListUpdate();
+            if (direction == Constants.SCROLL_UP) {
+                mScrolling.ScrollUp(direction);
+            }
+            if (direction == Constants.SCROLL_DOWN) {
+                mScrolling.ScrollDown(direction);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

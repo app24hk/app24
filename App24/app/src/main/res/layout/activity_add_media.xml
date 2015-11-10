@@ -14,9 +14,9 @@
             android:id="@+id/grid_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:horizontalSpacing="5dp"
-            android:numColumns="3"
-            android:verticalSpacing="5dp">
+            android:numColumns="3">
 
         </GridView>
     </RelativeLayout>

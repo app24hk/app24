@@ -4,40 +4,42 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
 import com.capstone.app24.animations.AnimatorUtils;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
+import com.capstone.app24.interfaces.OnScrolling;
+import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 import com.ogaclejapan.arclayout.ArcLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 /**
  * Created by amritpal on 3/11/15.
  */
-public class MainActivity extends FragmentActivity implements View.OnClickListener, View.OnTouchListener {
+public class MainActivity extends FragmentActivity implements View.OnClickListener, View
+        .OnTouchListener, OnScrolling {
     private static final String TAG = MainActivity.class.getSimpleName();
 
 
@@ -51,6 +53,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private FrameLayout main_frame;
     UserProfileDetailsFragment userProfileDetailsFragment;
     private FragmentManager manager;
+    boolean isFabOpened;
+    private LinearLayout layout_tab_buttons;
+    private RelativeLayout animated_layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         initializeViews();
         setClickListeners();
         setHomeFragment();
+
     }
 
 
@@ -76,6 +82,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         layout_profile.setOnTouchListener(this);
         btn_profile.setOnTouchListener(this);
         btn_home.setOnTouchListener(this);
+        Utils.setOnScrolling(this);
     }
 
     /**
@@ -94,7 +101,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         for (int i = 0, size = arcLayout.getChildCount(); i < size; i++) {
             arcLayout.getChildAt(i).setOnClickListener(this);
         }
-
+        layout_tab_buttons = (LinearLayout) findViewById(R.id.layout_tab_buttons);
+        animated_layout = (RelativeLayout) findViewById(R.id.animated_layout);
+        // Utils.setOnFABListener(this);
     }
 
 
@@ -110,13 +119,19 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }
             return;
         } else if (v.getId() == R.id.btn_add_post) {
+            finish();
             intent = new Intent(MainActivity.this, CreatePostActivity.class);
+            intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
             startActivity(intent);
         } else if (v.getId() == R.id.btn_add_image_post) {
-            intent = new Intent(MainActivity.this, CreateMediaPostActivity.class);
+            finish();
+            intent = new Intent(MainActivity.this, AddMediaActivity.class);
+            intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
             startActivity(intent);
         } else if (v.getId() == R.id.btn_add_video_post) {
-            intent = new Intent(MainActivity.this, CreateMediaPostActivity.class);
+            finish();
+            intent = new Intent(MainActivity.this, AddMediaActivity.class);
+            intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
             startActivity(intent);
         }
         if (v.getId() == R.id.layout_home) {
@@ -150,13 +165,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
         if (v.isSelected()) {
             btn_app_24.setImageResource(R.drawable.app_button);
-
+            isFabOpened = false;
         } else {
             btn_app_24.setImageResource(R.drawable.btn_app_24_close);
-
+            isFabOpened = true;
         }
         v.setSelected(!v.isSelected());
-
     }
 
     private void showToast(Button btn) {
@@ -311,4 +325,41 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         return false;
     }
+
+    @Override
+    public void ScrollUp(int up) {
+        hideViews();
+
+    }
+
+    @Override
+    public void ScrollDown(int down) {
+        showViews();
+
+    }
+
+    private void hideViews() {
+        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) animated_layout.getLayoutParams();
+        int fabBottomMargin = lp.bottomMargin;
+        animated_layout.animate().translationY(animated_layout.getHeight() + fabBottomMargin + 100).setInterpolator(new AccelerateInterpolator(2)).start();
+
+        /*SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+        LinearLayout.LayoutParams lp1 = (LinearLayout.LayoutParams) slidingTabLayout.getLayoutParams();
+        int fabTopMargin = lp1.topMargin;
+        slidingTabLayout.animate().translationY(slidingTabLayout.getHeight() + fabTopMargin - 200).setInterpolator(new
+                AccelerateInterpolator(2)).start();
+        if (slidingTabLayout.getVisibility() == View.VISIBLE)
+            slidingTabLayout.setVisibility(View.GONE);*/
+    }
+
+    private void showViews() {
+//        mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+        animated_layout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();/*
+        SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+        slidingTabLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+        if (slidingTabLayout.getVisibility() == View.GONE)
+            slidingTabLayout.setVisibility(View.VISIBLE);*/
+    }
+
+
 }

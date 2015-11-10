@@ -2,7 +2,6 @@ package com.capstone.app24.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,15 +9,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.AbsListView;
+import android.widget.FrameLayout;
 
 import com.capstone.app24.R;
-import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.adapters.LatestFeedsAdapter;
-import com.capstone.app24.interfaces.ClickListener;
-import com.capstone.app24.interfaces.OnListUpdateListener;
-import com.capstone.app24.utils.AlertToastManager;
-import com.capstone.app24.utils.GlobalClass;
+import com.capstone.app24.animations.HidingScrollListener;
+import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -26,7 +25,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 /**
  * Created by amritpal on 3/11/15.
  */
-public class LatestFragment extends Fragment implements OnListUpdateListener {
+public class LatestFragment extends Fragment {
 
     private static final String TAG = LatestFragment.class.getSimpleName();
     View mView;
@@ -35,6 +34,7 @@ public class LatestFragment extends Fragment implements OnListUpdateListener {
     private Context mContext;
     private Activity mActivity;
     SweetAlertDialog mDialog;
+    RecyclerView.OnItemTouchListener disabler;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,8 +43,12 @@ public class LatestFragment extends Fragment implements OnListUpdateListener {
         mActivity = getActivity();
         initializeViews();
         updateUI();
-        Utils.setOnListUpdateListener(this);
         return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     /**
@@ -52,14 +56,28 @@ public class LatestFragment extends Fragment implements OnListUpdateListener {
      */
     private void updateUI() {
 
-        Utils.debug(TAG, "setting LatestFeedsFragments in Main Activity start");
-
         mLatestFeedsAdapter = new LatestFeedsAdapter(getActivity());
         list_latest_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
         list_latest_feeds.setAdapter(mLatestFeedsAdapter);
 
-        Utils.debug(TAG, "setting LatestFeedsFragments in Main Activity end");
+    }
 
+    private void initRecyclerView() {
+
+
+        list_latest_feeds.addOnScrollListener(new HidingScrollListener() {
+            @Override
+            public void onHide() {
+                Utils.debug(TAG, "Scrolling up");
+                Utils.setScrollDirection(Constants.SCROLL_UP);
+            }
+
+            @Override
+            public void onShow() {
+                Utils.debug(TAG, "Scrolling Down");
+                Utils.setScrollDirection(Constants.SCROLL_DOWN);
+            }
+        });
     }
 
     /**
@@ -67,17 +85,6 @@ public class LatestFragment extends Fragment implements OnListUpdateListener {
      */
     private void initializeViews() {
         list_latest_feeds = (RecyclerView) mView.findViewById(R.id.list_latest_feeds);
-
-    }
-
-    @Override
-    public void onListUpdate() {
-        if (list_latest_feeds.getAdapter() != null) {
-            //list_latest_feeds.setAdapter(mLatestFeedsAdapter);
-            mLatestFeedsAdapter.notifyDataSetChanged();
-        } else {
-            list_latest_feeds.setAdapter(mLatestFeedsAdapter);
-            mLatestFeedsAdapter.notifyDataSetChanged();
-        }
+        initRecyclerView();
     }
 }
