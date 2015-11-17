@@ -2,66 +2,54 @@ package com.capstone.app24.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
 import com.capstone.app24.R;
+import com.capstone.app24.utils.Utils;
+
+import java.io.IOException;
 
 /**
  * Created by amritpal on 7/11/15.
  */
-public class VideoActivity extends Activity {
+public class VideoActivity extends Activity implements MediaPlayer.OnPreparedListener {
+    private static final String TAG = VideoActivity.class.getSimpleName();
     private ProgressDialog pDialog;
-    private VideoView myvideoview;
-    private String VideoURL = "http://www.androidbegin.com/tutorial/AndroidCommercial.3gp";
+    private VideoView mVideoView;
+    private MediaPlayer mp;
+    // private String VideoURL = "http://www.androidbegin.com/tutorial/AndroidCommercial.3gp";
 
     @Override
-    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-        myvideoview = (VideoView) findViewById(R.id.myvideoview);
-        // Execute StreamVideo AsyncTask
 
-        // Create a progressbar
-        pDialog = new ProgressDialog(VideoActivity.this);
-        // Set progressbar title
-        pDialog.setTitle("Android Video Streaming Tutorial");
-        // Set progressbar message
-        pDialog.setMessage("Buffering...");
-        pDialog.setIndeterminate(false);
+        Utils.debug("VideoActivity", "Inside Video Activity");
+        final VideoView video = (VideoView) findViewById(R.id.videoView);
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
         pDialog.setCancelable(false);
-        // Show progressbar
         pDialog.show();
+        video.setVideoPath("http://download.itcuties.com/teaser/itcuties-teaser-480.mp4");
+        video.start();
+        video.setOnPreparedListener(this);
+    }
 
-        try {
-            // Start the MediaController
-            MediaController mediacontroller = new MediaController(
-                    VideoActivity.this);
-            mediacontroller.setAnchorView(myvideoview);
-            // Get the URL from String VideoURL
-            Uri video = Uri.parse(VideoURL);
-            myvideoview.setMediaController(mediacontroller);
-            myvideoview.setVideoURI(video);
 
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-        }
-
-        myvideoview.requestFocus();
-        myvideoview.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            // Close the progress bar and play the video
-            public void onPrepared(MediaPlayer mp) {
-                pDialog.dismiss();
-                myvideoview.start();
-            }
-        });
-
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        pDialog.dismiss();
     }
 }
 

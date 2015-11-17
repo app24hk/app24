@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -22,7 +23,8 @@
     <FrameLayout
         android:id="@+id/main_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true">
 
     </FrameLayout>
 
@@ -30,127 +32,145 @@
 
 
     <RelativeLayout
-        android:id="@+id/animated_layout"
-        android:layout_width="match_parent"
+        android:id="@+id/layout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-
-
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
         <LinearLayout
-            android:id="@+id/layout_tab_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="30dp"
-            android:background="@color/white"
-            android:orientation="horizontal">
+            android:background="@android:color/transparent"
+            android:orientation="horizontal"
+            android:paddingTop="30dp"
+            android:weightSum="100">
 
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/layout_home"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+
+                android:layout_weight="50"
+                android:orientation="vertical"
+                >
 
                 <View
+                    android:id="@+id/view"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_alignParentTop="true"
                     android:background="@color/text_color_deselect"/>
 
                 <ImageButton
                     android:id="@+id/btn_home"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
+                    android:layout_below="@+id/view"
+                    android:layout_gravity="center_vertical"
+                    android:background="@color/white"
                     android:paddingBottom="20dp"
-                    android:paddingTop="16dp"
+                    android:paddingTop="20dp"
                     android:src="@drawable/home_selected"/>
-            </LinearLayout>
+            </RelativeLayout>
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/layout_profile"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <View
+                    android:id="@+id/view1"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_alignParentTop="true"
                     android:background="@color/text_color_deselect"/>
 
                 <ImageButton
                     android:id="@+id/btn_profile"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
+                    android:layout_below="@+id/view1"
+                    android:layout_weight="1"
+                    android:background="@color/white"
                     android:paddingBottom="20dp"
-                    android:paddingTop="16dp"
+                    android:paddingTop="20dp"
                     android:src="@drawable/user_unselected"/>
-            </LinearLayout>
+            </RelativeLayout>
+
         </LinearLayout>
 
-        <RelativeLayout
+        <FrameLayout
+            android:id="@+id/menu_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:background="@color/scrim"
+            android:clickable="true"
+            android:visibility="gone">
 
-            <FrameLayout
-                android:id="@+id/menu_layout"
+            <com.ogaclejapan.arclayout.ArcLayout
+                android:id="@+id/arc_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignBottom="@+id/btn_app_24"
-                android:background="@color/scrim"
-                android:visibility="gone">
+                android:layout_marginBottom="32dp"
+                app:arc_axisRadius="@dimen/layout_child_offset_path"
+                app:arc_freeAngle="true"
+                app:arc_origin="bottom"
+                app:arc_radius="@dimen/layout_radius_path"
+                >
 
-                <com.ogaclejapan.arclayout.ArcLayout
-                    android:id="@+id/arc_layout"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginBottom="32dp"
-                    app:arc_axisRadius="@dimen/layout_child_offset_path"
-                    app:arc_freeAngle="true"
-                    app:arc_origin="bottom"
-                    app:arc_radius="@dimen/layout_radius_path">
-                    <Button
-                        android:id="@+id/btn_add_post"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/btn_app_24_edit"
-                        app:arc_angle="30"
-                        />
-                    <Button
-                        android:id="@+id/btn_add_image_post"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/btn_app_24_photo"
-                        app:arc_angle="90"
-                        />
-                    <Button
-                        android:id="@+id/btn_add_video_post"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:background="@drawable/btn_app_24_video"
-                        app:arc_angle="150"
-                        />
-                </com.ogaclejapan.arclayout.ArcLayout>
+                <Button
+                    android:id="@+id/btn_add_post"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/btn_app_24_edit"
+                    app:arc_angle="30"
+                    />
 
-            </FrameLayout>
+                <Button
+                    android:id="@+id/btn_add_image_post"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/btn_app_24_photo"
+                    app:arc_angle="90"
+                    />
 
-            <ImageButton
-                android:id="@+id/btn_app_24"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:background="@android:color/transparent"
-                android:paddingBottom="20dp"
-                android:src="@drawable/app_button"/>
-        </RelativeLayout>
+                <Button
+                    android:id="@+id/btn_add_video_post"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/btn_app_24_video"
+                    app:arc_angle="150"
+                    />
+
+
+            </com.ogaclejapan.arclayout.ArcLayout>
+        </FrameLayout>
+        <ImageButton
+            android:id="@+id/btn_app_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="-20dp"
+            android:background="@android:color/transparent"
+            android:paddingBottom="20dp"
+            android:src="@drawable/app_button"/>
+
     </RelativeLayout>
-
+    <com.facebook.login.widget.LoginButton
+        android:id="@+id/login_button"
+        xmlns:fb="http://schemas.android.com/apk/res-auto"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical"
+        android:background="@android:color/transparent"
+        android:scaleType="centerInside"
+        />
 
 </RelativeLayout>

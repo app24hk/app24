@@ -25,6 +25,7 @@
         android:gravity="center"
         android:singleLine="true"
         android:text="@string/terms_of_use"
+        android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/white"
         android:textStyle="bold"/>
     <!-- Add Image Camera Button-->

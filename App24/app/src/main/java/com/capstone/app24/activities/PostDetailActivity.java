@@ -8,6 +8,8 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +20,8 @@ import com.capstone.app24.R;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 /**
  * Created by amritpal on 4/11/15.
@@ -38,6 +42,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         setHeader(null, true, true, false, false, true, null);
         type = getIntent().getIntExtra("type", 0);
         initializeViews();
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+
         setClickListeners();
         updateUI();
     }
@@ -93,10 +102,15 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 startActivity(sendIntent);
                 break;
             case R.id.ibtn_dots:
+
                 if (edit_menu.getVisibility() == View.VISIBLE) {
                     edit_menu.setVisibility(View.GONE);
+                    Animation fadeoutAnim = AnimationUtils.loadAnimation(this, R.anim.fadeout);
+                    edit_menu.startAnimation(fadeoutAnim);
                 } else {
                     edit_menu.setVisibility(View.VISIBLE);
+                    Animation fadeinAnim = AnimationUtils.loadAnimation(this, R.anim.fadein);
+                    edit_menu.startAnimation(fadeinAnim);
                 }
                 break;
             case R.id.ibtn_back:

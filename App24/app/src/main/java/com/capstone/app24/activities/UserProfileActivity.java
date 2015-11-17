@@ -7,6 +7,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.capstone.app24.R;
@@ -18,6 +19,7 @@ import com.capstone.app24.utils.AlertToastManager;
 public class UserProfileActivity extends Activity {
 
     private EditText edit_search;
+    private ImageButton ibtn_search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,8 @@ public class UserProfileActivity extends Activity {
     }
 
     private void initializeViews() {
+        ibtn_search = (ImageButton) findViewById(R.id.edit_search);
+        ibtn_search.setVisibility(View.GONE);
      /*   edit_search = (EditText) findViewById(R.id.edit_search);
         edit_search = (EditText) findViewById(R.id.edit_search);
         edit_search.setOnFocusChangeListener(new View.OnFocusChangeListener() {

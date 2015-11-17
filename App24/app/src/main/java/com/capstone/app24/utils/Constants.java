@@ -9,4 +9,5 @@ public class Constants {
     public static final int SCROLL_UP = 1;
     public static final int SCROLL_DOWN = 2;
 
+    public static final String KEY_IS_LOGGED_IN = "is_logged_in";
 }

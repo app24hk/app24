@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -29,7 +30,7 @@ import com.capstone.app24.utils.Utils;
 /**
  * Created by amritpal on 4/11/15.
  */
-public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.ViewHolder> implements View.OnClickListener {
+public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.ViewHolder> {
 
     private static final String TAG = LatestFeedsAdapter.class.getSimpleName();
     private Activity mActivity;
@@ -50,51 +51,33 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     }
 
     @Override
-    public void onBindViewHolder(final LatestFeedsAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final LatestFeedsAdapter.ViewHolder holder, final int position) {
         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
 
-        if (position == 0) {
+        if (position % 3 == 0) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
-            holder.txt_feed_body.setOnClickListener(this);
-            holder.img_preview.setOnClickListener(this);
-        } else if (position == 1) {
+            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.chinese_lorem_ipsum));
+        } else if (position % 3 == 1) {
             holder.img_preview.setVisibility(View.VISIBLE);
-            holder.txt_feed_body.setOnClickListener(this);
-            holder.img_preview.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showImageDialog();
-                }
-            });
             holder.img_video_preview.setVisibility(View.GONE);
+            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
         } else {
             holder.img_preview.setVisibility(View.GONE);
-            holder.txt_feed_body.setOnClickListener(this);
             holder.img_video_preview.setVisibility(View.GONE);
+            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
 
         }
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 10;
     }
 
-    @Override
-    public void onClick(View v) {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        switch (v.getId()) {
-            case R.id.img_preview:
-                //  Intent intent = new Intent(mActivity, VideoActivity.class);
-                //  mActivity.startActivity(intent);
-                AlertToastManager.showToast("Video Preview is not available", mActivity);
-                break;
-        }
-    }
-
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
+        private final LinearLayout layout_feed_body;
         TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
         ImageView img_preview, img_video_preview;
@@ -109,27 +92,48 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
             txt_seen = (TextView) itemView.findViewById(R.id.txt_seen);
             img_preview = (ImageView) itemView.findViewById(R.id.img_preview);
             img_video_preview = (ImageView) itemView.findViewById(R.id.img_video_preview);
+            layout_feed_body = (LinearLayout) itemView.findViewById(R.id.layout_feed_body);
 
-            itemView.setClickable(true);
-            itemView.setOnClickListener(this);
-            txt_feed_body.setOnClickListener(this);
-            txt_feed_body.setClickable(true);
+           /* itemView.setClickable(true);*/
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    intent = new Intent(mActivity, PostDetailActivity.class);
+                    intent.putExtra("type", getLayoutPosition());
+                    mActivity.startActivity(intent);
+                }
+            });
+
+            img_preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showImageDialog();
+                }
+            });
+            img_video_preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    intent = new Intent(mActivity, VideoActivity.class);
+                    mActivity.startActivity(intent);
+                }
+            });
         }
 
 
-        @Override
+     /*   @Override
         public void onClick(View v) {
-           /* switch (v.getId()) {
-                case R.id.txt_feed_body:*/
+            AlertToastManager.showToast("Clicked on adapter Item", mActivity);
+           *//* switch (v.getId()) {
+                case R.id.txt_feed_body:*//*
             intent = new Intent(mActivity, PostDetailActivity.class);
             intent.putExtra("type", getLayoutPosition());
             mActivity.startActivity(intent);
-                    /*break;
+                    *//*break;
             }
-*/
-            /*Intent intent = new Intent(mActivity, PostDetailActivity.class);
-            mActivity.startActivity(intent);*/
-        }
+*//*
+            *//*Intent intent = new Intent(mActivity, PostDetailActivity.class);
+            mActivity.startActivity(intent);*//*
+        }*/
     }
 
     //............FullView imageView..............

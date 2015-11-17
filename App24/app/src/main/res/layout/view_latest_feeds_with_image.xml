@@ -28,8 +28,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_heading"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:paddingLeft="@dimen/main_screen_padding"
+        android:paddingRight="@dimen/main_screen_padding">
 
         <TextView
             android:id="@+id/txt_creator"
@@ -53,6 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:paddingBottom="10dp"
             android:text="@string/profile_count_login_user"
             android:textColor="@color/text_small_blue"/>
     </RelativeLayout>
@@ -72,7 +74,9 @@
                 android:id="@+id/txt_feed_body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
+                android:layout_marginTop="10dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:maxLines="5"
                 android:text="@string/chinese_lorem_ipsum"
                 android:textSize="@dimen/feed_body_text"/>
@@ -80,17 +84,15 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_weight="3"
+            android:layout_marginLeft="10dp"
+            android:layout_weight="1.2"
             android:gravity="center">
             <ImageView
                 android:id="@+id/img_preview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
-                android:src="@drawable/pic_two"/>
+                android:background="@drawable/pic_two"/>
             <ImageView
                 android:id="@+id/img_video_preview"
                 android:layout_width="50dp"

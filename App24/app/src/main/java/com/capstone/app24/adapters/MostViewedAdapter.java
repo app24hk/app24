@@ -52,37 +52,50 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     public void onBindViewHolder(final MostViewedAdapter.ViewHolder holder, int position) {
         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
 
-        if (position == 0) {
+//        if (position == 0) {
+//            holder.img_preview.setVisibility(View.VISIBLE);
+//            holder.img_video_preview.setVisibility(View.VISIBLE);
+//            holder.txt_feed_body.setOnClickListener(this);
+//            holder.img_preview.setOnClickListener(this);
+//        } else if (position == 1) {
+//            holder.img_preview.setVisibility(View.VISIBLE);
+//            holder.txt_feed_body.setOnClickListener(this);
+//            holder.img_preview.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    showImageDialog();
+////                    Intent intent = new Intent(mActivity, GalleryActivity.class);
+////                    mActivity.startActivity(intent);
+//                }
+//            });
+//            holder.img_video_preview.setVisibility(View.GONE);
+//        } else {
+//            holder.img_preview.setVisibility(View.GONE);
+//            holder.txt_feed_body.setOnClickListener(this);
+//            holder.img_video_preview.setVisibility(View.GONE);
+//
+//        }
+        if (position % 3 == 0) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
-            holder.txt_feed_body.setOnClickListener(this);
-            holder.img_preview.setOnClickListener(this);
-        } else if (position == 1) {
+            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.chinese_lorem_ipsum));
+        } else if (position % 3 == 1) {
             holder.img_preview.setVisibility(View.VISIBLE);
-            holder.txt_feed_body.setOnClickListener(this);
-            holder.img_preview.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showImageDialog();
-//                    Intent intent = new Intent(mActivity, GalleryActivity.class);
-//                    mActivity.startActivity(intent);
-                }
-            });
             holder.img_video_preview.setVisibility(View.GONE);
+            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
         } else {
             holder.img_preview.setVisibility(View.GONE);
-            holder.txt_feed_body.setOnClickListener(this);
             holder.img_video_preview.setVisibility(View.GONE);
+            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
 
         }
-
         Utils.debug(TAG, "MostViewedAdapter Adapter onBindViewHolder ");
 
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 10;
     }
 
     @Override

@@ -9,11 +9,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.capstone.app24.R;
+import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.MostViewedAdapter;
 import com.capstone.app24.animations.HidingScrollListener;
-import com.capstone.app24.utils.Constants;
+import com.capstone.app24.sliding_tabs.SlidingTabLayout;
 import com.capstone.app24.utils.Utils;
 
 /**
@@ -51,8 +56,55 @@ public class MostViewedFragment extends Fragment {
 
     private void initRecyclerView() {
 
-
         most_viewed_feeds.addOnScrollListener(new HidingScrollListener() {
+            @Override
+            public void onHide() {
+                Utils.debug(TAG, "Scrolling up");
+                //Utils.setScrollDirection(Constants.SCROLL_UP);
+                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
+                int fabBottomMargin = lp.bottomMargin;
+                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
+                        .setInterpolator(new AccelerateInterpolator(2)).start();
+
+                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+                LinearLayout.LayoutParams lp1 = (LinearLayout.LayoutParams) slidingTabLayout.getLayoutParams();
+                int fabTopMargin = lp1.topMargin;
+                slidingTabLayout.animate().translationY(slidingTabLayout.getHeight() + fabTopMargin - 200).setInterpolator(new
+                        AccelerateInterpolator(2)).start();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(80);
+                            slidingTabLayout.setVisibility(View.GONE);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onShow() {
+                Utils.debug(TAG, "Scrolling Down");
+
+                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+                slidingTabLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start(); // Utils.setScrollDirection(Constants.SCROLL_DOWN);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(80);
+                            slidingTabLayout.setVisibility(View.VISIBLE);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        });
+       /* most_viewed_feeds.addOnScrollListener(new HidingScrollListener() {
             @Override
             public void onHide() {
 
@@ -65,6 +117,6 @@ public class MostViewedFragment extends Fragment {
                 Utils.debug(TAG, "Scrolling Down");
                 Utils.setScrollDirection(Constants.SCROLL_DOWN);
             }
-        });
+        });*/
     }
 }

@@ -19,7 +19,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.capstone.app24.R;
+import com.capstone.app24.utils.AlertToastManager;
+import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 
 import org.json.JSONObject;
 
@@ -37,22 +48,27 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     private TextView txt_terms_of_use;
     private Button btn_login_with_facebook;
     List<String> permissions = new ArrayList<String>();
-    //private LoginButton fb_btn;
+    private LoginButton fb_btn;
 
-    //CallbackManager callbackManager;
-    //AccessToken accessToken;
+    CallbackManager callbackManager;
+    AccessToken accessToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ///FacebookSdk.sdkInitialize(this);
+        FacebookSdk.sdkInitialize(this);
+        /*if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN)) {
+            finish();
+            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            startActivity(intent);
+        }*/
         setContentView(R.layout.activity_splash);
         txt_terms_of_use = (TextView) findViewById(R.id.txt_terms_of_use);
         btn_login_with_facebook = (Button) findViewById(R.id.btn_login_with_facebook);
-       /* callbackManager = CallbackManager.Factory.create();
+        callbackManager = CallbackManager.Factory.create();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);*/
-        //  initialize();
+        StrictMode.setThreadPolicy(policy);
+        initialize();
         setClickListeners();
         updateUI();
     }
@@ -62,8 +78,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         txt_terms_of_use = (TextView) findViewById(R.id.txt_terms_of_use);
         btn_login_with_facebook = (Button) findViewById(R.id.btn_login_with_facebook);
 
-        //  fb_btn = (LoginButton) findViewById(R.id.login_button);
-       /* getKeyHash();
+        fb_btn = (LoginButton) findViewById(R.id.login_button);
+        getKeyHash();
         permissions.add("public_profile");
         permissions.add("email");
         permissions.add("user_birthday");
@@ -76,7 +92,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         fb_btn.setText("");
         fb_btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
         fb_btn.setBackgroundResource(R.drawable.facebook);
-*/
+
     }
 
     private void setClickListeners() {
@@ -99,13 +115,13 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 startActivity(intent);
                 break;
             case R.id.btn_login_with_facebook:
-                //loginFacebook();
-                //Utils.debug(TAG, "Start Activity Main");
+                loginFacebook();
+                Utils.debug(TAG, "Start Activity Main");
                 //finish();
-                intent = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(intent);
+//                intent = new Intent(SplashActivity.this, MainActivity.class);
+//                startActivity(intent);
                 //finish();
-                //fb_btn.performClick();
+                fb_btn.performClick();
 
                 break;
             default:
@@ -114,13 +130,13 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     }
 
 
-    /*@Override
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
-*/
+
     //facebook Login
-   /* private void loginFacebook() {
+    private void loginFacebook() {
 
         fb_btn.registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
@@ -136,7 +152,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                             JSONObject object,
                                             GraphResponse response) {
                                         // Application code
-                                        Log.d("Facebook User Detail : ", response.getJSONObject().toString());
+                                        Log.d("Facebook User Detail >>########: ", response
+                                                .getJSONObject().toString());
                                         try {
                                             JSONObject obj = response.getJSONObject();
                                             String email = obj.getString("email");
@@ -153,6 +170,14 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                             Utils.debug("facebookid", " " + facebookid);
                                             Utils.debug("last_name", " " + last_name);
 
+                                            new Utils(SplashActivity.this).setPreferences
+                                                    (SplashActivity.this, Constants
+                                                            .KEY_IS_LOGGED_IN, true);
+
+
+                                            finish();
+                                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                            startActivity(intent);
                                         } catch (Exception e) {
                                             Log.d("error", e.getMessage());
                                             e.printStackTrace();
@@ -166,23 +191,23 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                         parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
                         request.setParameters(parameters);
                         request.executeAsync();
-                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                        startActivity(intent);
+                       /* Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(intent);*/
                         // displayProfile();
                     }
 
                     @Override
                     public void onCancel() {
-
+                        AlertToastManager.showToast("Please Try Again", SplashActivity.this);
                     }
 
                     @Override
                     public void onError(FacebookException e) {
-
+                        AlertToastManager.showToast("Error Occured", SplashActivity.this);
                     }
                 });
     }
-*/
+
     public void getKeyHash() {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(

@@ -2,6 +2,10 @@
     <string name="app_name">App24</string>
     <!-- Facebook Data-->
     <string name="app_id">1673090976236867</string>
+    <!--Banner ad unit-id-->
+    <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383
+    </string>
     <!-- Splash Screen-->
     <string name="terms_of_use">Terms of Use</string>
     <string name="by_continuing">By continuing, you accept the</string>
@@ -81,6 +85,8 @@
     </string>
 
     <string name="chinese_lorem_ipsum_title">器經美家了物開能使</string>
+    <string name="chinese_lorem_ipsum_title_long">目技本銷心們竟哥時花小汽兒了難考是真事都房保大思水平舞我年效但為來氣他</string>
+
     <string name="chinese_lorem_ipsum">
         目技本銷心們竟哥時花小汽兒了難考是真事都房保大思水平舞我年效但為來氣他，
         國明笑：解聲格：夜式我來母、看然那常畫觀嗎在卻眾為到在性不力我入，

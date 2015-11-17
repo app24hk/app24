@@ -4,6 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -18,7 +21,6 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -27,19 +29,24 @@ import com.capstone.app24.animations.AnimatorUtils;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
 import com.capstone.app24.interfaces.OnScrolling;
-import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
+import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.ogaclejapan.arclayout.ArcLayout;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
  * Created by amritpal on 3/11/15.
  */
 public class MainActivity extends FragmentActivity implements View.OnClickListener, View
-        .OnTouchListener, OnScrolling {
+        .OnTouchListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
 
@@ -47,23 +54,54 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private Toast toast = null;
     View menuLayout;
     private ArcLayout arcLayout;
-    private LinearLayout layout_home, layout_profile;
+    private RelativeLayout layout_home, layout_profile;
     private ImageButton btn_home, btn_profile;
     HomeFragment homeFragment;
     private FrameLayout main_frame;
     UserProfileDetailsFragment userProfileDetailsFragment;
     private FragmentManager manager;
     boolean isFabOpened;
-    private LinearLayout layout_tab_buttons;
-    private RelativeLayout animated_layout;
+    private RelativeLayout layout_tab_buttons;
+    private static RelativeLayout layout;
+    // private RelativeLayout animated_layout;
+    InterstitialAd mInterstitialAd;
+    private long lastTimeAdShown = System.currentTimeMillis();
+
+    private long lastTimeAdFail = System.currentTimeMillis();
+    private LoginButton fb_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        fb_btn = (LoginButton) findViewById(R.id.login_button);
         initializeViews();
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                beginPlayingGame();
+            }
+        });
+        requestNewInterstitial();
         setClickListeners();
         setHomeFragment();
+        //mInterstitialAd.show();
+    }
+
+    private void beginPlayingGame() {
+    }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice("SEE_YOUR_LOGCAT_TO_GET_YOUR_DEVICE_ID")
+                .build();
+        //Test Device Id
+        // "AFA12AE3A6981A0F0745048448E82F44"
+        mInterstitialAd.loadAd(adRequest);
 
     }
 
@@ -82,15 +120,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         layout_profile.setOnTouchListener(this);
         btn_profile.setOnTouchListener(this);
         btn_home.setOnTouchListener(this);
-        Utils.setOnScrolling(this);
     }
 
     /**
      * Initialize the View for the user Inaterface
      */
     private void initializeViews() {
-        layout_home = (LinearLayout) findViewById(R.id.layout_home);
-        layout_profile = (LinearLayout) findViewById(R.id.layout_profile);
+        layout_home = (RelativeLayout) findViewById(R.id.layout_home);
+        layout_profile = (RelativeLayout) findViewById(R.id.layout_profile);
         btn_home = (ImageButton) findViewById(R.id.btn_home);
         btn_profile = (ImageButton) findViewById(R.id.btn_profile);
         main_frame = (FrameLayout) findViewById(R.id.main_frame);
@@ -101,22 +138,37 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         for (int i = 0, size = arcLayout.getChildCount(); i < size; i++) {
             arcLayout.getChildAt(i).setOnClickListener(this);
         }
-        layout_tab_buttons = (LinearLayout) findViewById(R.id.layout_tab_buttons);
-        animated_layout = (RelativeLayout) findViewById(R.id.animated_layout);
+        layout = (RelativeLayout) findViewById(R.id.layout);
+        // animated_layout = (RelativeLayout) findViewById(R.id.animated_layout);
         // Utils.setOnFABListener(this);
     }
 
+    public void setAlarm() {
+        Utils.debug(TAG, "Setting Ad cAlarm");
+        AlarmManager alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        intent.setAction("com.capstone.app24.activities.START_ALARM");
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        Calendar time = Calendar.getInstance();
+        time.setTimeInMillis(System.currentTimeMillis());
+        time.add(Calendar.SECOND, 30);
+        alarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pendingIntent);
+    }
 
     @Override
     public void onClick(View v) {
-
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        }
         Intent intent;
         if (v.getId() == R.id.btn_app_24) {
+            setAlarm();
             onFabClick(v);
 
             if (v instanceof Button) {
                 showToast((Button) v);
             }
+
             return;
         } else if (v.getId() == R.id.btn_add_post) {
             finish();
@@ -300,7 +352,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Utils.debug(TAG, "OnTouch ");
-
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        }
+        if (v.getId() == R.id.btn_home) {
+            Utils.debug(TAG, "Inside OnClick home");
+            btn_home.setImageResource(R.drawable.home_selected);
+            btn_profile.setImageResource(R.drawable.user_unselected);
+            setHomeFragment();
+        } else if (v.getId() == R.id.btn_profile) {
+            Utils.debug(TAG, "Inside OnClick profile");
+            btn_home.setImageResource(R.drawable.home_unselected);
+            btn_profile.setImageResource(R.drawable.user_selected);
+            setUserProfileFragment();
+        }
         if (v.getId() == R.id.layout_home) {
             Utils.debug(TAG, "Inside OnClick home");
             btn_home.setImageResource(R.drawable.home_selected);
@@ -327,39 +392,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     @Override
-    public void ScrollUp(int up) {
-        hideViews();
+    public void onBackPressed() {
+        super.onBackPressed();
 
     }
 
-    @Override
-    public void ScrollDown(int down) {
-        showViews();
-
+    public static RelativeLayout getBottomLayout() {
+        return layout;
     }
 
-    private void hideViews() {
-        RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) animated_layout.getLayoutParams();
-        int fabBottomMargin = lp.bottomMargin;
-        animated_layout.animate().translationY(animated_layout.getHeight() + fabBottomMargin + 100).setInterpolator(new AccelerateInterpolator(2)).start();
-
-        /*SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
-        LinearLayout.LayoutParams lp1 = (LinearLayout.LayoutParams) slidingTabLayout.getLayoutParams();
-        int fabTopMargin = lp1.topMargin;
-        slidingTabLayout.animate().translationY(slidingTabLayout.getHeight() + fabTopMargin - 200).setInterpolator(new
-                AccelerateInterpolator(2)).start();
-        if (slidingTabLayout.getVisibility() == View.VISIBLE)
-            slidingTabLayout.setVisibility(View.GONE);*/
+    public View getAppMenu() {
+        return menuLayout;
     }
-
-    private void showViews() {
-//        mToolbar.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-        animated_layout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();/*
-        SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
-        slidingTabLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-        if (slidingTabLayout.getVisibility() == View.GONE)
-            slidingTabLayout.setVisibility(View.VISIBLE);*/
-    }
-
-
 }

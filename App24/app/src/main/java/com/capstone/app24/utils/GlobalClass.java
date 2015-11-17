@@ -6,17 +6,20 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.capstone.app24.interfaces.ClickListener;
-
 /**
  * Created by amritpal on 4/11/15.
  */
 public class GlobalClass {
     // Show Alert Toast
-    static boolean debuging = true;
+    static boolean debuging = false;
     //Show Logs
-    static boolean showComment = true;
+    static boolean showComment = false;
 
+    public static interface ClickListener {
+        public void onClick(View view, int position);
+
+        public void onLongClick(View view, int position);
+    }
 
     public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
 
@@ -61,5 +64,4 @@ public class GlobalClass {
         }
 
     }
-
 }

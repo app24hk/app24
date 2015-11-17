@@ -36,7 +36,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 public class HomeFragment extends Fragment {
     private static final String TAG = HomeFragment.class.getSimpleName();
     View mView;
-    private ViewPager pager;
+    private static ViewPager pager;
     private static SlidingTabLayout tabs;
     ViewPagerAdapterHome adapter_home;
     CharSequence home_titles[] = {"Latest", "Most Viewed"};
@@ -52,6 +52,9 @@ public class HomeFragment extends Fragment {
         initializeViews();
         setClickListeners();
         updateUI();
+/*
+        Utils.setOnScrolling(this);
+*/
         return mView;
 
     }
@@ -88,7 +91,8 @@ public class HomeFragment extends Fragment {
         pager.setAdapter(adapter_home);
         // Assiging the Sliding Tab Layout View
         tabs = (SlidingTabLayout) mView.findViewById(R.id.tabs);
-        tabs.setDistributeEvenly(true); // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
+        tabs.setDistributeEvenly(true);
+        // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
         // Setting Custom Color for the Scroll bar indicator of the Tab View
         tabs.setViewPager(pager);
         tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
@@ -109,7 +113,21 @@ public class HomeFragment extends Fragment {
         pager.setLayoutParams(params);
     }
 
+    public static ViewPager getPager() {
+        return pager;
+    }
+
     private void setClickListeners() {
 
     }
+/*
+    @Override
+    public void ScrollUp(int direction) {
+        tabs.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void ScrollDown(int up) {
+        tabs.setVisibility(View.VISIBLE);
+    }*/
 }

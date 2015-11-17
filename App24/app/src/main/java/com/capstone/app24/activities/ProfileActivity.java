@@ -1,5 +1,6 @@
 package com.capstone.app24.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -9,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -20,11 +22,12 @@ import com.capstone.app24.custom.CustomDrawablEditText;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UsersFragment;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.utils.Utils;
 
 /**
  * Created by amritpal on 5/11/15.
  */
-public class ProfileActivity extends FragmentActivity {
+public class ProfileActivity extends FragmentActivity implements View.OnClickListener {
     View mView;
     private ViewPager pager;
     private SlidingTabLayout tabs;
@@ -41,6 +44,7 @@ public class ProfileActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fragment_activity);
         initializeViews();
+        setClickListeners();
         updateUI();
 
     }
@@ -62,19 +66,28 @@ public class ProfileActivity extends FragmentActivity {
                 return getResources().getColor(R.color.tabsScrollColor);
             }
         });
+        // Utils.showKeyboard(this, editSearch);
+
     }
 
     private void initializeViews() {
         pager = (ViewPager) findViewById(R.id.pager);
+
         ibtn_settings = (ImageButton) findViewById(R.id.ibtn_setting);
-        ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
         ibtn_settings.setVisibility(View.GONE);
+
+        ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
+        ibtn_search.setVisibility(View.GONE);
+
         editSearch = (CustomDrawablEditText) findViewById(R.id.edit_search);
         editSearch.setVisibility(View.VISIBLE);
+
         cancel = (TextView) findViewById(R.id.cancel);
         cancel.setVisibility(View.VISIBLE);
+
         txt_profile_header = (TextView) findViewById(R.id.txt_profile_header);
         txt_profile_header.setVisibility(View.GONE);
+
         ViewGroup.LayoutParams params = pager.getLayoutParams();
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -82,9 +95,29 @@ public class ProfileActivity extends FragmentActivity {
 
     }
 
+
+    private void setClickListeners() {
+        cancel.setOnClickListener(this);
+    }
+
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.cancel:
+                Utils.hideKeyboard(this);
+                finish();
+                Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                break;
+        }
     }
 }

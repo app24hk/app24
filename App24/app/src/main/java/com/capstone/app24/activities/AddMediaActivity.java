@@ -72,14 +72,14 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor myCursor = (Cursor) parent.getAdapter().getItem(position);
 
-                AlertToastManager.showToast("Clicked Item : " + position, AddMediaActivity.this);
+              //  AlertToastManager.showToast("Clicked Item : " + position, AddMediaActivity.this);
                 String picturePath = myCursor.getString(columnIndex);
                 AlertToastManager.showToast("Image Path : " + picturePath, AddMediaActivity.this);
-                File file = new File(picturePath);
+                /*File file = new File(picturePath);
                 Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
                 AlertToastManager.showToast("Image Bitmap : " + myBitmap, AddMediaActivity.this);
 
-                cursor.close();
+                cursor.close();*/
                /* String filePath = (String) parent.getAdapter().getItem(position);
                 Utils.debug("info", "filePath:" + filePath);
                 File file = new File(filePath);

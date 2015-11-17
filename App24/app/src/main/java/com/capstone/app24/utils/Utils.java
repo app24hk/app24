@@ -1,8 +1,11 @@
 package com.capstone.app24.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.capstone.app24.R;
 import com.capstone.app24.interfaces.OnScrolling;
@@ -51,12 +54,12 @@ public class Utils {
         }
     }
 
-    public static void setOnScrolling(OnScrolling listener) {
+    private static void setOnScrolling(OnScrolling listener) {
         Utils.mScrolling = listener;
 
     }
 
-    public static void setScrollDirection(int direction) {
+    private static void setScrollDirection(int direction) {
         try {
             if (direction == Constants.SCROLL_UP) {
                 mScrolling.ScrollUp(direction);
@@ -87,5 +90,63 @@ public class Utils {
         }
     }
 
+    public static void showKeyboard(Activity activity, View v) {
+        InputMethodManager imm = (InputMethodManager) activity
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        // If no view currently has focus, create a new one, just
+        // so
+        // we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        if (imm.isAcceptingText()) {
+            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+        }
+
+    }
+
+    public static void showKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        View view = activity.getCurrentFocus();
+        // If no view currently has focus, create a new one, just
+        // so
+        // we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        if (imm.isAcceptingText()) {
+            imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
+        }
+
+    }
+
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        View view = activity.getCurrentFocus();
+        // If no view currently has focus, create a new one, just
+        // so
+        // we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public void setPreferences(Activity activity, String key, boolean value) {
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
+    public boolean getSharedPreferences(Activity activity, String key) {
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        boolean b = sharedPref.getBoolean(key, false);
+        return b;
+    }
 
 }
