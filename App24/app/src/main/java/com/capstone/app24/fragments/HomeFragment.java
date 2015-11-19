@@ -1,9 +1,14 @@
 package com.capstone.app24.fragments;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -21,7 +26,9 @@ import com.capstone.app24.R;
 import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.ViewPagerAdapterHome;
 import com.capstone.app24.interfaces.OnScrolling;
+import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.Utils;
 
 import java.text.SimpleDateFormat;
@@ -101,7 +108,39 @@ public class HomeFragment extends Fragment {
                 return getResources().getColor(R.color.tabsScrollColor);
             }
         });
-        // Setting the ViewPager For the SlidingTabsLayout
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        //Setting Alarm
+        //setAlarm();
+    }
+
+    private void setAlarm() {
+        try {
+            Utils.debug(TAG, "Setting Alarm");
+            //Create a new PendingIntent and add it to the AlarmManager
+            Intent intent = new Intent(getActivity(), AlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(),
+                    12345, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager am =
+                    (AlarmManager) getActivity().getSystemService(Activity.ALARM_SERVICE);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),
+                    10 * 1000, pendingIntent);
+        } catch (Exception e) {
+        }
     }
 
     private void initializeViews() {
@@ -130,4 +169,14 @@ public class HomeFragment extends Fragment {
     public void ScrollDown(int up) {
         tabs.setVisibility(View.VISIBLE);
     }*/
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

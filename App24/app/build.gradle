@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.capstone.app24"
-        minSdkVersion 14
+        minSdkVersion 16
         versionCode 1
         versionName "1.0"
     }
@@ -32,4 +32,5 @@ dependencies {
     compile 'cn.pedant.sweetalert:library:1.3'
     compile 'com.google.android.gms:play-services-ads:8.3.0'
     compile files('libs/PayPalAndroidSDK.jar')
+    compile 'com.shamanland:facebook-like-button:0.1.8'
 }

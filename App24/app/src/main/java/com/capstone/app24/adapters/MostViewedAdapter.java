@@ -3,8 +3,12 @@ package com.capstone.app24.adapters;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +22,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.capstone.app24.R;
+import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.LatestFeedsModel;
@@ -53,7 +58,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     @Override
     public void onBindViewHolder(final MostViewedAdapter.ViewHolder holder, int position) {
         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
-        if (position == 0) {
+        if (position == 0 && MainActivity.tabs.getVisibility() == View.VISIBLE) {
             holder.xtra_layout.setVisibility(View.VISIBLE);
         } else {
             holder.xtra_layout.setVisibility(View.GONE);
@@ -63,10 +68,19 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             holder.img_video_preview.setVisibility(View.VISIBLE);
             holder.layout_img_video_preview.setVisibility(View.VISIBLE);
             holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.chinese_lorem_ipsum));
+            Uri videoURI = Uri.parse("android.resource://" + mActivity.getPackageName() + "/"
+                    + R.raw.itcuties);
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(mActivity, videoURI);
+            Bitmap bitmap = retriever
+                    .getFrameAtTime(10, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
+            Drawable drawable = new BitmapDrawable(mActivity.getResources(), bitmap);
+            holder.img_preview.setImageDrawable(drawable);
         } else if (position % 3 == 1) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.GONE);
             holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
+            holder.img_preview.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
         } else {
             holder.img_preview.setVisibility(View.GONE);
             holder.img_video_preview.setVisibility(View.GONE);
@@ -220,7 +234,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
         final TouchImageView custom_image = (TouchImageView) (dialog.findViewById(R.id.custom_image));
         custom_image.setLayoutParams(params);
-        custom_image.setImageResource(R.drawable.ads);
+        custom_image.setImageResource(R.drawable.pic_two);
 
         custom_image.setOnTouchImageViewListener(new TouchImageView.OnTouchImageViewListener() {
             @Override

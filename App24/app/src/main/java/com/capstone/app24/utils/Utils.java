@@ -3,11 +3,13 @@ package com.capstone.app24.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.capstone.app24.R;
+import com.capstone.app24.adapters.LatestFeedsAdapter;
 import com.capstone.app24.interfaces.OnScrolling;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -20,6 +22,7 @@ public class Utils {
     public static OnScrolling mScrolling;
 
     private Context _context;
+    public static RecyclerView mRecyclerView;
 
     // constructor
     public Utils(Context context) {
@@ -134,6 +137,16 @@ public class Utils {
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static RecyclerView getRecyclerView() {
+
+        return mRecyclerView;
+    }
+
+    public static RecyclerView setRecyclerView(RecyclerView recyclerView) {
+        mRecyclerView = recyclerView;
+        return mRecyclerView;
     }
 
     public void setPreferences(Activity activity, String key, boolean value) {

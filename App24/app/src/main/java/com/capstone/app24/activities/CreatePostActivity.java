@@ -1,37 +1,27 @@
 package com.capstone.app24.activities;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridView;
+import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.capstone.app24.R;
 import com.capstone.app24.custom.SquareImageView;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 
-import org.w3c.dom.Text;
-
 /**
  * Created by amritpal on 5/11/15.
  */
-public class CreatePostActivity extends BaseActivity {
+public class CreatePostActivity extends BaseActivity implements View.OnFocusChangeListener {
     private static final String TAG = CreatePostActivity.class.getSimpleName();
     private static final int REQUEST_IMAGE_CAPTURE = 12;
     private LinearLayout save;
@@ -41,6 +31,8 @@ public class CreatePostActivity extends BaseActivity {
     private ImageView image_bitmap;
     private LinearLayout camera_tumb;
     private boolean isFromMediaActivity;
+    private ScrollView sv;
+    private EditText edit_post_title, edit_write_post;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +71,7 @@ public class CreatePostActivity extends BaseActivity {
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
                 else
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-            } else if (intent1 !=null && intent1.hasExtra("come_from")) {
+            } else if (intent1 != null && intent1.hasExtra("come_from")) {
 
 
                 bundle = extras.getBundle("gallery_bundle");
@@ -97,6 +89,19 @@ public class CreatePostActivity extends BaseActivity {
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
             }
         }
+        sv.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver
+                .OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                sv.post(new Runnable() {
+                    public void run() {
+                        sv.scrollTo(0, sv.getBottom() + sv.getScrollY());
+                    }
+                });
+            }
+        });
+
+
     }
 
     /**
@@ -106,12 +111,17 @@ public class CreatePostActivity extends BaseActivity {
         ibtn_select_image_from_gallery = (ImageButton) findViewById(R.id
                 .ibtn_select_image_from_gallery);
         camera_tumb = (LinearLayout) findViewById(R.id.camera_tumb);
+        sv = (ScrollView) findViewById(R.id.sv);
+        edit_post_title = (EditText) findViewById(R.id.edit_post_title);
+        edit_write_post = (EditText) findViewById(R.id.edit_write_post);
 
     }
 
     private void setClickListeners() {
         ibtn_back.setOnClickListener(this);
         ibtn_select_image_from_gallery.setOnClickListener(this);
+        edit_post_title.setOnFocusChangeListener(this);
+        edit_write_post.setOnFocusChangeListener(this);
     }
 
     @Override
@@ -148,8 +158,6 @@ public class CreatePostActivity extends BaseActivity {
             imageView.setScaleType(ImageView.ScaleType.FIT_XY);
             imageView.setImageBitmap(imageBitmap);
             camera_tumb.addView(imageView);
-
-
             if (camera_tumb.getChildCount() <= 0)
                 ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
             else
@@ -165,5 +173,20 @@ public class CreatePostActivity extends BaseActivity {
         intent = new Intent(CreatePostActivity.this, MainActivity.class);
         intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
         startActivity(intent);
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+
+        // sv.scrollTo(0, sv.getBottom() + sv.getScrollY());
+//        switch (v.getId()) {
+//            case R.id.edit_write_post:
+//                edit_write_post.requestFocus();
+//                break;
+//            case R.id.edit_post_title:X
+//                edit_post_title.requestFocus();
+//
+//                break;
+//        }
     }
 }

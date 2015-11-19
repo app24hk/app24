@@ -80,6 +80,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-basement/8.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.ogaclejapan.arclayout/library/1.0.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.pnikosis/materialish-progress/1.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.shamanland/facebook-like-button/0.1.8/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/javaResources" />
@@ -99,6 +100,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="play-services-ads-8.3.0" level="project" />
     <orderEntry type="library" exported="" name="PayPalAndroidSDK-2.11.2" level="project" />
+    <orderEntry type="library" exported="" name="facebook-like-button-0.1.8" level="project" />
     <orderEntry type="library" exported="" name="PayPalAndroidSDK" level="project" />
     <orderEntry type="library" exported="" name="materialish-progress-1.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.0" level="project" />

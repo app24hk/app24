@@ -42,7 +42,7 @@ public class LatestFragment extends Fragment {
     private static final String TAG = LatestFragment.class.getSimpleName();
     View mView;
     private RecyclerView list_latest_feeds;
-    private LatestFeedsAdapter mLatestFeedsAdapter;
+    public LatestFeedsAdapter mLatestFeedsAdapter;
     private Context mContext;
     private Activity mActivity;
     SweetAlertDialog mDialog;

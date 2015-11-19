@@ -2,27 +2,18 @@ package com.capstone.app24.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
-import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.Display;
 import android.view.SurfaceHolder;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.capstone.app24.R;
 import com.capstone.app24.utils.Utils;
-import com.paypal.android.sdk.f;
-
-import java.io.IOException;
 
 /**
  * Created by amritpal on 7/11/15.
@@ -115,7 +106,7 @@ public class VideoActivity extends Activity /*implements MediaPlayer.OnPreparedL
 
     public void doLayout() {
         // pan_tilt_zoom_rl
-        RelativeLayout.LayoutParams playerParams = (android.widget.RelativeLayout.LayoutParams) video
+        RelativeLayout.LayoutParams playerParams = (RelativeLayout.LayoutParams) video
                 .getLayoutParams();
 
         Display display = getWindowManager().getDefaultDisplay();

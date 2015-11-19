@@ -42,7 +42,7 @@ public class PaypalActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paypal);
-        setHeader("Paypal Details", true, false, false, false, false, "Save");
+        setHeader("帳戶資料", true, false, false, false, false, "完成");
 //        Intent intent = new Intent(this, PayPalService.class);
 //        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
 //        startService(intent);

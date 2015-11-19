@@ -66,6 +66,15 @@
         <activity
             android:name=".activities.PaypalActivity"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name="com.shamanland.facebook.likebutton.FacebookLikeActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Facebook.Like"
+            />
+
+        <receiver
+            android:name=".receiver.AlarmReceiver">
+        </receiver>
         <!--Paypal Classes-->
 
         <service

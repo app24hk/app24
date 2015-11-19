@@ -1,10 +1,14 @@
 package com.capstone.app24.activities;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
@@ -12,14 +16,12 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.capstone.app24.R;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.TouchImageView;
-import com.capstone.app24.utils.Utils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -34,6 +36,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private int type;
     private RelativeLayout layout_media_preview;
     private ImageView img_preview, img_video_preview;
+    private RelativeLayout layout_img_video_preview;
+    private Intent intent;
+    //private LikeView likeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +50,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-
-
         setClickListeners();
         updateUI();
     }
@@ -57,17 +60,30 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             img_preview.setVisibility(View.VISIBLE);
             img_video_preview.setVisibility(View.VISIBLE);
             layout_media_preview.setVisibility(View.VISIBLE);
+            layout_img_video_preview.setVisibility(View.VISIBLE);
             img_video_preview.setOnClickListener(this);
             img_preview.setOnClickListener(this);
+            Uri videoURI = Uri.parse("android.resource://" + getPackageName() + "/"
+                    + R.raw.itcuties);
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(this, videoURI);
+            Bitmap bitmap = retriever
+                    .getFrameAtTime(10, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
+            Drawable drawable = new BitmapDrawable(getResources(), bitmap);
+            img_preview.setImageDrawable(drawable);
         } else if (type == 1) {
             img_preview.setVisibility(View.VISIBLE);
             layout_media_preview.setVisibility(View.VISIBLE);
             img_video_preview.setVisibility(View.GONE);
+            layout_img_video_preview.setVisibility(View.GONE);
             img_preview.setOnClickListener(this);
+            img_preview.setBackground(getResources().getDrawable(R.drawable.pic_two));
         } else {
             layout_media_preview.setVisibility(View.GONE);
             img_preview.setVisibility(View.GONE);
             img_video_preview.setVisibility(View.GONE);
+            layout_img_video_preview.setVisibility(View.GONE);
+
         }
     }
 
@@ -80,7 +96,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         img_preview = (ImageView) findViewById(R.id.img_preview);
         img_video_preview = (ImageView) findViewById(R.id.img_video_preview);
         layout_media_preview = (RelativeLayout) findViewById(R.id.layout_media_preview);
+        layout_img_video_preview = (RelativeLayout) findViewById(R.id.layout_img_video_preview);
 
+        //Facebook like button
+        // likeView = (LikeView) findViewById(R.id.like_view);
+        // Set the object for which you want to get likes from your users (Photo, Link or even your FB Fan page)
+        //likeView.setObjectId("https://www.facebook.com/AndroidProgrammerGuru");
+        // Set foreground color fpr Like count text
+        //likeView.setForegroundColor(-256);
     }
 
     private void setClickListeners() {
@@ -89,6 +112,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         ibtn_back.setOnClickListener(this);
         txt_edit.setOnClickListener(this);
         txt_delete.setOnClickListener(this);
+        img_video_preview.setOnClickListener(this);
+        layout_img_video_preview.setOnClickListener(this);
     }
 
     @Override
@@ -128,8 +153,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 showImageDialog();
                 break;
             case R.id.img_video_preview:
+                intent = new Intent(PostDetailActivity.this, VideoActivity.class);
+                startActivity(intent);
                 edit_menu.setVisibility(View.GONE);
                 AlertToastManager.showToast("Video Preview is not available", this);
+                break;
+            case R.id.layout_img_video_preview:
+                intent = new Intent(PostDetailActivity.this, VideoActivity.class);
+                startActivity(intent);
                 break;
         }
     }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:ads="http://schemas.android.com/apk/res-auto"
                 xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
@@ -42,7 +43,8 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/layout_post_detail_heading"
                     android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical">
 
                     <com.capstone.app24.custom.CustomTextView
                         android:id="@+id/txt_creator"
@@ -61,45 +63,45 @@
                         android:text="@string/created_time"
                         android:textSize="10sp"/>
 
-                    <com.capstone.app24.custom.CustomTextView
-                        android:id="@+id/txt_profile_count_login_user"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="5dp"
-                        android:layout_toLeftOf="@+id/fb_likes"
-                        android:background="@drawable/round_rect_shape"
-                        android:drawableLeft="@drawable/comment"
-                        android:drawablePadding="2dp"
-                        android:padding="2dp"
-                        android:text="28"
-                        android:textColor="@color/fb_color"
-                        android:textSize="10sp"/>
-                    <com.capstone.app24.custom.CustomTextView
-                        android:id="@+id/fb_likes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="5dp"
-                        android:layout_toLeftOf="@+id/fb_likes_count"
-                        android:background="@drawable/round_rect_shape_fb"
-                        android:drawableLeft="@drawable/fb"
-                        android:drawablePadding="5dp"
-                        android:padding="2dp"
-                        android:text="+1"
-                        android:textColor="@color/white"
-                        android:textSize="10sp"/>
-                    <com.capstone.app24.custom.CustomTextView
-                        android:id="@+id/fb_likes_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:background="@drawable/round_rect_shape_fb_count"
-                        android:drawablePadding="5dp"
-                        android:padding="2dp"
-                        android:text="412"
-                        android:textColor="@color/fb_like_count"
-                        android:textSize="10sp"/>
+                    <!--<com.capstone.app24.custom.CustomTextView-->
+                    <!--android:id="@+id/txt_profile_count_login_user"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginRight="5dp"-->
+                    <!--android:layout_toLeftOf="@+id/fb_likes"-->
+                    <!--android:background="@drawable/round_rect_shape"-->
+                    <!--android:drawableLeft="@drawable/comment"-->
+                    <!--android:drawablePadding="2dp"-->
+                    <!--android:padding="2dp"-->
+                    <!--android:text="28"-->
+                    <!--android:textColor="@color/fb_color"-->
+                    <!--android:textSize="10sp"/>-->
+                    <!--<com.capstone.app24.custom.CustomTextView-->
+                    <!--android:id="@+id/fb_likes"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginRight="5dp"-->
+                    <!--android:layout_toLeftOf="@+id/fb_likes_count"-->
+                    <!--android:background="@drawable/round_rect_shape_fb"-->
+                    <!--android:drawableLeft="@drawable/fb"-->
+                    <!--android:drawablePadding="5dp"-->
+                    <!--android:padding="2dp"-->
+                    <!--android:text="+1"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="10sp"/>-->
+                    <!--<com.capstone.app24.custom.CustomTextView-->
+                    <!--android:id="@+id/fb_likes_count"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:background="@drawable/round_rect_shape_fb_count"-->
+                    <!--android:drawablePadding="5dp"-->
+                    <!--android:padding="2dp"-->
+                    <!--android:text="412"-->
+                    <!--android:textColor="@color/fb_like_count"-->
+                    <!--android:textSize="10sp"/>-->
 
-                    <com.capstone.app24.custom.CustomTextView
+                    <TextView
                         android:id="@+id/txt_seen"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -109,6 +111,31 @@
                         android:drawablePadding="5dp"
                         android:text="3,027"
                         android:textSize="10dp"/>
+                    <!--<com.facebook.share.widget.LikeView-->
+                    <!--android:id="@+id/like_view"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="center_horizontal"-->
+                    <!--android:layout_toRightOf="@+id/txt_seen"-->
+                    <!--android:text="Like"/>-->
+                    <!--<com.shamanland.facebook.likebutton.FacebookLikePlugin-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_toRightOf="@+id/txt_seen"-->
+                    <!--android:orientation="horizontal"-->
+                    <!-->-->
+                    <!--<com.shamanland.facebook.likebutton.FacebookLikeButton-->
+                    <!--style="@style/Widget.FacebookLikeButton"-->
+                    <!--app:pagePicture="@drawable/ic_launcher"-->
+                    <!--app:pageText="This is blog about Android development."-->
+                    <!--app:pageTitle="Developer's notes"-->
+                    <!--app:pageUrl="http://blog.shamanland.com/"-->
+                    <!--/>-->
+                    <!--<com.shamanland.facebook.likebutton.FacebookLikeBox-->
+                    <!--style="@style/Widget.FacebookLikeBox"-->
+                    <!--app:calloutMarker="left"-->
+                    <!--/>-->
+                    <!--</com.shamanland.facebook.likebutton.FacebookLikePlugin>-->
                 </RelativeLayout>
 
 
@@ -126,20 +153,25 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_centerHorizontal="true"
-                            android:background="@drawable/pic_two"
                             android:gravity="fill"/>
-                        <ImageView
-                            android:id="@+id/img_video_preview"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_centerInParent="true"
-                            android:src="@drawable/video_icons"
-                            />
+                        <RelativeLayout
+                            android:id="@+id/layout_img_video_preview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true">
+                            <ImageView
+                                android:id="@+id/img_video_preview"
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/video_preview_icon"
+                                />
+                        </RelativeLayout>
                     </RelativeLayout>
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-                        <com.capstone.app24.custom.CustomTextView
+                        <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_alignParentLeft="true"

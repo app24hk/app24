@@ -12,19 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--<android.support.v4.widget.SwipeRefreshLayout-->
-        <!--android:id="@+id/swipeRefreshLayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent">-->
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/most_viewed_feeds"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"/>
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/most_viewed_feeds"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"/>
 
 
-        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
+        </android.support.v4.widget.SwipeRefreshLayout>
     </FrameLayout>
     <!--<ListView
         android:id="@+id/list_latest_feeds"

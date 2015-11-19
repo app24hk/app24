@@ -34,7 +34,7 @@
     <string name="about">About</string>
     <string name="logout">Logout</string>
     <string name="setting">Setting</string>
-
+    <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
 
     <!--Create Post Screen -->
 
