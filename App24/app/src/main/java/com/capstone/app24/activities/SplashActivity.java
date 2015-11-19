@@ -57,11 +57,11 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(this);
-        /*if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN)) {
+        if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN)) {
             finish();
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(intent);
-        }*/
+        }
         setContentView(R.layout.activity_splash);
         txt_terms_of_use = (TextView) findViewById(R.id.txt_terms_of_use);
         btn_login_with_facebook = (Button) findViewById(R.id.btn_login_with_facebook);

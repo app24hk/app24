@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
+import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.ViewPagerAdapterHome;
 import com.capstone.app24.interfaces.OnScrolling;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
@@ -37,7 +38,6 @@ public class HomeFragment extends Fragment {
     private static final String TAG = HomeFragment.class.getSimpleName();
     View mView;
     private static ViewPager pager;
-    private static SlidingTabLayout tabs;
     ViewPagerAdapterHome adapter_home;
     CharSequence home_titles[] = {"Latest", "Most Viewed"};
     SweetAlertDialog dialog;
@@ -69,20 +69,20 @@ public class HomeFragment extends Fragment {
         hideViews();
     }*/
 
-    private void hideViews() {
-        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tabs.getLayoutParams();
-        int fabTopMargin = lp.topMargin;
-        tabs.animate().translationY(tabs.getHeight() + fabTopMargin - 200).setInterpolator(new
-                AccelerateInterpolator(2)).start();
-    }
+//    private void hideViews() {
+//        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) MainActivity.tabs.getLayoutParams();
+//        int fabTopMargin = lp.topMargin;
+//        MainActivity.tabs.animate().translationY(MainActivity.tabs.getHeight() + fabTopMargin - 200).setInterpolator(new
+//                AccelerateInterpolator(2)).start();
+//    }
+//
+//    private void showViews() {
+//        MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//    }
 
-    private void showViews() {
-        tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-    }
-
-    public static SlidingTabLayout getHeaderView() {
-        return tabs;
-    }
+//    public static SlidingTabLayout getHeaderView() {
+//        return MainActivity.tabs;
+//    }
 
     private void updateUI() {
         // Creating The ViewPagerAdapter and Passing Fragment Manager, Titles fot the Tabs and Number Of Tabs.
@@ -90,12 +90,12 @@ public class HomeFragment extends Fragment {
                 home_titles.length, dialog);
         pager.setAdapter(adapter_home);
         // Assiging the Sliding Tab Layout View
-        tabs = (SlidingTabLayout) mView.findViewById(R.id.tabs);
-        tabs.setDistributeEvenly(true);
+
+        MainActivity.tabs.setDistributeEvenly(true);
         // To make the Tabs Fixed set this true, This makes the tabs Space Evenly in Available width
         // Setting Custom Color for the Scroll bar indicator of the Tab View
-        tabs.setViewPager(pager);
-        tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+        MainActivity.tabs.setViewPager(pager);
+        MainActivity.tabs.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
                 return getResources().getColor(R.color.tabsScrollColor);

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
+import com.capstone.app24.utils.Utils;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
@@ -25,7 +26,7 @@ import java.math.BigDecimal;
 /**
  * Created by amritpal on 16/11/15.
  */
-public class PaypalActivity extends Activity {
+public class PaypalActivity extends BaseActivity {
 
     private WebView webview;
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
@@ -41,20 +42,20 @@ public class PaypalActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_paypal);
+        setHeader("Paypal Details", true, false, false, false, false, "Save");
+//        Intent intent = new Intent(this, PayPalService.class);
+//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//        startService(intent);
+//        payPal = (Button) findViewById(R.id.payPal);
+//        payPal.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                onBuyPressed();
+//            }
+//        });
 
-        Intent intent = new Intent(this, PayPalService.class);
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-        startService(intent);
-        payPal = (Button) findViewById(R.id.payPal);
-        payPal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBuyPressed();
-            }
-        });
-
-        //webview = (WebView) findViewById(R.id.webview);
-        //loadWebViewLoad(webview);
+//        webview = (WebView) findViewById(R.id.webview);
+//        loadWebViewLoad(webview, "https://www.paypal.com/signup/account?locale.x=en_US");
     }
 
     public void onBuyPressed() {
@@ -106,13 +107,13 @@ public class PaypalActivity extends Activity {
         super.onDestroy();
     }
 
-    private void loadWebViewLoad(WebView webview) {
+    private void loadWebViewLoad(WebView webview, String url) {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
         webview.getSettings().setSupportMultipleWindows(true);
         webview.setWebViewClient(new WebViewClient());
         webview.setWebChromeClient(new WebChromeClient());
-        webview.loadUrl("https://www.paypal.com/signin/");
+        webview.loadUrl(url);
 
     }
 }

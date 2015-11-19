@@ -3,9 +3,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
-    <include
-        android:id="@+id/layout_user_profle"
-        layout="@layout/user_profile_menu_bar"/>
+    <!--<include-->
+        <!--android:id="@+id/layout_user_profle"-->
+        <!--layout="@layout/user_profile_menu_bar"/>-->
   <!--  <ScrollView android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 

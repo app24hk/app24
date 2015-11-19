@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,6 +27,10 @@ import com.capstone.app24.sliding_tabs.SlidingTabLayout;
 import com.capstone.app24.utils.GlobalClass;
 import com.capstone.app24.utils.RecyclerViewDisabler;
 import com.capstone.app24.utils.Utils;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -50,6 +55,8 @@ public class LatestFragment extends Fragment {
         mActivity = getActivity();
         initializeViews();
         updateUI();
+        MainActivity.tabs.setVisibility(View.VISIBLE);
+        MainActivity.layout_user_profle.setVisibility(View.GONE);
         return mView;
     }
 
@@ -67,7 +74,6 @@ public class LatestFragment extends Fragment {
         list_latest_feeds.setHasFixedSize(true);
         list_latest_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
         list_latest_feeds.setAdapter(mLatestFeedsAdapter);
-
       /*  list_latest_feeds.addOnItemTouchListener(new GlobalClass.RecyclerTouchListener(getActivity(),
                 list_latest_feeds, new GlobalClass.ClickListener() {
             @Override
@@ -97,28 +103,30 @@ public class LatestFragment extends Fragment {
                 MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
                         .setInterpolator(new AccelerateInterpolator(2)).start();
 
-                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
-                LinearLayout.LayoutParams lp1 = (LinearLayout.LayoutParams) slidingTabLayout.getLayoutParams();
+//                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
+                        .getLayoutParams();
                 int fabTopMargin = lp1.topMargin;
-                slidingTabLayout.animate().translationY(slidingTabLayout.getHeight() + fabTopMargin - 200).setInterpolator(new
-                        AccelerateInterpolator(2)).start();
+                MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
+                        fabTopMargin).setInterpolator(new
+                        AccelerateInterpolator(2));
                 /*ListAnimation.settranslationofArrow(0.0f, 0.0f, 0.0f, -1.0f,
                         100, slidingTabLayout);*/
                /* if (!list_latest_feeds.isAnimating()) {
                     slidingTabLayout.setVisibility(View.GONE);
                 }*/
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(80);
-                            slidingTabLayout.setVisibility(View.GONE);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            Thread.sleep(80);
+//                            slidingTabLayout.setVisibility(View.GONE);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
 
 
                 // slidingTabLayout.setVisibility(View.GONE);
@@ -129,21 +137,21 @@ public class LatestFragment extends Fragment {
                 Utils.debug(TAG, "Scrolling Down");
 
                 MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+//                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
                /* ListAnimation.settranslationofArrow(0.0f, 0.0f, -1.0f, 0.0f,
                         300, slidingTabLayout);*/
-                slidingTabLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(80);
-                            slidingTabLayout.setVisibility(View.VISIBLE);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            Thread.sleep(80);
+//                            slidingTabLayout.setVisibility(View.VISIBLE);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
                 /*if (!list_latest_feeds.isAnimating()) {
                     slidingTabLayout.setVisibility(View.VISIBLE);
                 }*/
@@ -160,8 +168,11 @@ public class LatestFragment extends Fragment {
      */
     private void initializeViews() {
         list_latest_feeds = (RecyclerView) mView.findViewById(R.id.list_latest_feeds);
-        disabler = new RecyclerViewDisabler();
+        //swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
+        disabler = new
+                RecyclerViewDisabler();
 
         initRecyclerView();
     }
+
 }

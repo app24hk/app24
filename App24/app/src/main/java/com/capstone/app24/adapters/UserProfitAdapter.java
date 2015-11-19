@@ -47,11 +47,17 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
     @Override
     public void onBindViewHolder(final UserProfitAdapter.ViewHolder holder, final int position) {
         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
-
+        if (position == 0) {
+            holder.xtra_layout.setVisibility(View.VISIBLE);
+        } else {
+            holder.xtra_layout.setVisibility(View.GONE);
+        }
         if (position == 0) {
             holder.view_profit_and_feeds.setVisibility(View.VISIBLE);
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
+            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
+
         } else if (position == 1) {
             holder.view_profit_and_feeds.setVisibility(View.GONE);
             holder.img_preview.setVisibility
@@ -60,9 +66,11 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
         } else {
             holder.view_profit_and_feeds.setVisibility(View.GONE);
             holder.img_preview.setVisibility(View.GONE);
+            holder.layout_img_video_preview.setVisibility(View.GONE);
             holder.img_video_preview.setVisibility(View.GONE);
 
         }
+
     }
 
     @Override
@@ -77,6 +85,7 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
         TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
         ImageView img_preview, img_video_preview;
+        RelativeLayout layout_img_video_preview, xtra_layout;
 
         public ViewHolder(View itemView, Activity act) {
             super(itemView);
@@ -90,7 +99,9 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
             img_video_preview = (ImageView) itemView.findViewById(R.id.img_video_preview);
             layout_feed_body = (LinearLayout) itemView.findViewById(R.id.layout_feed_body);
             view_profit_and_feeds = (LinearLayout) itemView.findViewById(R.id.view_profit_and_feeds);
-           /* itemView.setClickable(true);*/
+            layout_img_video_preview = (RelativeLayout) itemView.findViewById(R.id.layout_img_video_preview);
+            xtra_layout = (RelativeLayout) itemView.findViewById(R.id.xtra_layout);
+      /* itemView.setClickable(true);*/
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -109,8 +120,46 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
             img_video_preview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+//                    video.setVisibility(View.VISIBLE);
+//                    img_preview.setVisibility(View.GONE);
+//                    img_video_preview.setVisibility(View.GONE);
+//                    String UrlPath = "android.resource://" + mActivity.getPackageName() + "/" + R
+//                            .raw
+//                            .itcuties;
+//                    video.setVideoURI(Uri.parse(UrlPath));
+//                    video.start();
+//                    intent = new Intent(mActivity, VideoActivity.class);
+//                    mActivity.startActivity(intent);
                     intent = new Intent(mActivity, VideoActivity.class);
                     mActivity.startActivity(intent);
+                }
+            });
+            layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (img_video_preview.getVisibility() == View.VISIBLE) {
+//                        video.setVisibility(View.VISIBLE);
+//                        img_preview.setVisibility(View.GONE);
+//                        img_video_preview.setVisibility(View.GONE);
+//                        String UrlPath = "android.resource://" + mActivity.getPackageName() + "/" + R.raw.itcuties;
+//                        video.setVideoURI(Uri.parse(UrlPath));
+//                        video.start();
+                        intent = new Intent(mActivity, VideoActivity.class);
+                        mActivity.startActivity(intent);
+                    } else if (img_video_preview
+                            .getVisibility() == View.GONE && img_preview.getVisibility() == View.VISIBLE) {
+                        showImageDialog();
+                    }
+//                    else if (img_video_preview
+//                            .getVisibility() == View.GONE) {
+//                        video.pause();
+//                        video.setVisibility(View.GONE);
+//                        img_preview.setVisibility(View.VISIBLE);
+//                        img_preview.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
+//                        img_video_preview.setVisibility(View.VISIBLE);
+//                    }
+//                    intent = new Intent(mActivity, VideoActivity.class);
+//                    mActivity.startActivity(intent);
                 }
             });
         }

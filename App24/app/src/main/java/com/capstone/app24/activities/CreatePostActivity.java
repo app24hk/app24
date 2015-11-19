@@ -79,6 +79,22 @@ public class CreatePostActivity extends BaseActivity {
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
                 else
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+            } else if (intent1 !=null && intent1.hasExtra("come_from")) {
+
+
+                bundle = extras.getBundle("gallery_bundle");
+                Uri uri = Uri.parse(bundle.getString("path"));
+                SquareImageView imageView = new SquareImageView(this);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                params.setMargins(5, 10, 5, 10);
+                imageView.setLayoutParams(params);
+                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                imageView.setImageURI(uri);
+                camera_tumb.addView(imageView);
+                if (camera_tumb.getChildCount() <= 0)
+                    ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                else
+                    ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
             }
         }
     }

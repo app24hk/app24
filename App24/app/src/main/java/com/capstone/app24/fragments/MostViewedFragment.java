@@ -39,6 +39,8 @@ public class MostViewedFragment extends Fragment {
         mActivity = getActivity();
         initializeViews();
         updateUI();
+        MainActivity.tabs.setVisibility(View.VISIBLE);
+        MainActivity.layout_user_profle.setVisibility(View.GONE);
         return mView;
     }
 
@@ -66,22 +68,23 @@ public class MostViewedFragment extends Fragment {
                 MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
                         .setInterpolator(new AccelerateInterpolator(2)).start();
 
-                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
-                LinearLayout.LayoutParams lp1 = (LinearLayout.LayoutParams) slidingTabLayout.getLayoutParams();
+//                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
+                        .getLayoutParams();
                 int fabTopMargin = lp1.topMargin;
-                slidingTabLayout.animate().translationY(slidingTabLayout.getHeight() + fabTopMargin - 200).setInterpolator(new
-                        AccelerateInterpolator(2)).start();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(80);
-                            slidingTabLayout.setVisibility(View.GONE);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                MainActivity.tabs.animate().translationY(MainActivity.tabs.getHeight() + fabTopMargin - 200).setInterpolator(new
+                        AccelerateInterpolator(2));
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            Thread.sleep(80);
+//                            MainActivity.tabs.setVisibility(View.GONE);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
             }
 
             @Override
@@ -89,19 +92,19 @@ public class MostViewedFragment extends Fragment {
                 Utils.debug(TAG, "Scrolling Down");
 
                 MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
-                slidingTabLayout.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start(); // Utils.setScrollDirection(Constants.SCROLL_DOWN);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(80);
-                            slidingTabLayout.setVisibility(View.VISIBLE);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+//                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start(); // Utils.setScrollDirection(Constants.SCROLL_DOWN);
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        try {
+//                            Thread.sleep(80);
+//                            MainActivity.tabs.setVisibility(View.VISIBLE);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
             }
         });
        /* most_viewed_feeds.addOnScrollListener(new HidingScrollListener() {

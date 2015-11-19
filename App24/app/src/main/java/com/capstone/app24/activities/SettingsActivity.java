@@ -76,13 +76,13 @@ public class SettingsActivity extends BaseActivity {
             case R.id.layout_paypal:
                 // AlertToastManager.showToast("Paypal ", this);
 
-                intent = new Intent(this, PayPalService.class);
-                intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-                startService(intent);
-
-                onBuyPressed();
-               /* intent = new Intent(this, PaypalActivity.class);
-                startActivity(intent);*/
+//                intent = new Intent(this, PayPalService.class);
+//                intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//                startService(intent);
+//
+//                onBuyPressed();
+                intent = new Intent(this, PaypalActivity.class);
+                startActivity(intent);
                 break;
             case R.id.layout_about:
                 intent = new Intent(this, AboutActivity.class);

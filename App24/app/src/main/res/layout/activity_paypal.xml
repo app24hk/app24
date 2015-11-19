@@ -4,17 +4,72 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <Button
+    <!--<Button
         android:id="@+id/payPal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#1565C0"
         android:text="Payment"
         android:textColor="#fff"
-        android:textSize="16sp"/>
-    <!--
-        <WebView
-            android:id="@+id/webview"
+        android:textSize="16sp"/>-->
+    <include layout="@layout/base_main_toolbar"></include>
+
+    <!-- -->
+    <!--<WebView-->
+    <!--android:id="@+id/webview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+        <RelativeLayout android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center">
+            <ImageView
+                android:id="@+id/img_paypal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:padding="20dp"
+                android:src="@drawable/paypal"/>
+        </RelativeLayout>
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>-->
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/rect_corners_edit_text"
+                android:drawableLeft="@drawable/mail"
+                android:drawablePadding="10dp"
+                android:ems="10"
+                android:inputType="textEmailAddress"
+                android:padding="10dp"/>
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/editText"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Or"/>
+            <TextView
+                android:id="@+id/paypal_sign_up"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Sign up with Paypal"/>
+        </RelativeLayout>
+    </LinearLayout>
+
 </LinearLayout>

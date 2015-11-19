@@ -3,11 +3,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
     <include
         android:id="@+id/view_profit_and_feeds"
         layout="@layout/view_user_profit_details"
         android:visibility="gone"/>
-
     <RelativeLayout
         android:id="@+id/layout_heading"
         android:layout_width="match_parent"
@@ -101,15 +101,22 @@
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:background="@drawable/pic_two"/>
-            <ImageView
-                android:id="@+id/img_video_preview"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_centerInParent="true"
-                android:layout_marginBottom="5dp"
-                android:layout_marginTop="5dp"
-                android:src="@drawable/video_preview_icon"
-                android:visibility="visible"/>
+            <RelativeLayout
+                android:id="@+id/layout_img_video_preview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true">
+                <ImageView
+                    android:id="@+id/img_video_preview"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerInParent="true"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/video_preview_icon"
+                    android:visibility="visible"/>
+
+            </RelativeLayout>
         </RelativeLayout>
     </LinearLayout>
 

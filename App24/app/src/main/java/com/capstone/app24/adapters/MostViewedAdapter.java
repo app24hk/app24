@@ -5,6 +5,8 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -13,12 +15,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.capstone.app24.R;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.LatestFeedsModel;
-import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
@@ -51,33 +53,15 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     @Override
     public void onBindViewHolder(final MostViewedAdapter.ViewHolder holder, int position) {
         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
-
-//        if (position == 0) {
-//            holder.img_preview.setVisibility(View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.VISIBLE);
-//            holder.txt_feed_body.setOnClickListener(this);
-//            holder.img_preview.setOnClickListener(this);
-//        } else if (position == 1) {
-//            holder.img_preview.setVisibility(View.VISIBLE);
-//            holder.txt_feed_body.setOnClickListener(this);
-//            holder.img_preview.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    showImageDialog();
-////                    Intent intent = new Intent(mActivity, GalleryActivity.class);
-////                    mActivity.startActivity(intent);
-//                }
-//            });
-//            holder.img_video_preview.setVisibility(View.GONE);
-//        } else {
-//            holder.img_preview.setVisibility(View.GONE);
-//            holder.txt_feed_body.setOnClickListener(this);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//
-//        }
+        if (position == 0) {
+            holder.xtra_layout.setVisibility(View.VISIBLE);
+        } else {
+            holder.xtra_layout.setVisibility(View.GONE);
+        }
         if (position % 3 == 0) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
+            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
             holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.chinese_lorem_ipsum));
         } else if (position % 3 == 1) {
             holder.img_preview.setVisibility(View.VISIBLE);
@@ -86,11 +70,10 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         } else {
             holder.img_preview.setVisibility(View.GONE);
             holder.img_video_preview.setVisibility(View.GONE);
+            holder.layout_img_video_preview.setVisibility(View.GONE);
             holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
 
         }
-        Utils.debug(TAG, "MostViewedAdapter Adapter onBindViewHolder ");
-
     }
 
     @Override
@@ -105,7 +88,6 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             case R.id.img_preview:
                 Intent intent = new Intent(mActivity, VideoActivity.class);
                 mActivity.startActivity(intent);
-                //AlertToastManager.showToast("Video Preview is not available", mActivity);
                 break;
         }
     }
@@ -114,7 +96,9 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
 
         TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
+        //        private final VideoView video;
         ImageView img_preview, img_video_preview;
+        RelativeLayout layout_img_video_preview, xtra_layout;
 
         public ViewHolder(View itemView, Activity act) {
             super(itemView);
@@ -126,11 +110,85 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             txt_seen = (TextView) itemView.findViewById(R.id.txt_seen);
             img_preview = (ImageView) itemView.findViewById(R.id.img_preview);
             img_video_preview = (ImageView) itemView.findViewById(R.id.img_video_preview);
+            xtra_layout = (RelativeLayout) itemView.findViewById(R.id.xtra_layout);
+            layout_img_video_preview = (RelativeLayout) itemView.findViewById(R.id.layout_img_video_preview);
+            // video = (VideoView) itemView.findViewById(R.id.video);
 
-            itemView.setClickable(true);
-            itemView.setOnClickListener(this);
-            txt_feed_body.setOnClickListener(this);
-            txt_feed_body.setClickable(true);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    intent = new Intent(mActivity, PostDetailActivity.class);
+                    intent.putExtra("type", getLayoutPosition());
+                    mActivity.startActivity(intent);
+                }
+            });
+
+            img_preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showImageDialog();
+                }
+            });
+            img_video_preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//                    video.setVisibility(View.VISIBLE);
+//                    img_preview.setVisibility(View.GONE);
+//                    img_video_preview.setVisibility(View.GONE);
+//                    String UrlPath = "android.resource://" + mActivity.getPackageName() + "/" + R
+//                            .raw
+//                            .itcuties;
+//                    video.setVideoURI(Uri.parse(UrlPath));
+//                    video.start();
+                    intent = new Intent(mActivity, VideoActivity.class);
+                    mActivity.startActivity(intent);
+                }
+            });
+            layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (img_video_preview.getVisibility() == View.VISIBLE) {
+//                        video.setVisibility(View.VISIBLE);
+//                        img_preview.setVisibility(View.GONE);
+//                        img_video_preview.setVisibility(View.GONE);
+//                        String UrlPath = "android.resource://" + mActivity.getPackageName() + "/" + R.raw.itcuties;
+//                        video.setVideoURI(Uri.parse(UrlPath));
+//                        video.start();
+//                        video.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+//                            @Override
+//                            public boolean onError(MediaPlayer mp, int what, int extra) {
+//                                return false;
+//                            }
+//                        });
+                        intent = new Intent(mActivity, VideoActivity.class);
+                        mActivity.startActivity(intent);
+                    } else if (img_video_preview
+                            .getVisibility() == View.GONE && img_preview.getVisibility() == View.VISIBLE) {
+                        showImageDialog();
+                    }
+//                    else if (img_video_preview
+//                            .getVisibility() == View.GONE) {
+//                        video.pause();
+//                        video.setVisibility(View.GONE);
+//                        img_preview.setVisibility(View.VISIBLE);
+//                        img_preview.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
+//                        img_video_preview.setVisibility(View.VISIBLE);
+                }
+//                }
+            });
+//            video.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (video.isPlaying()) {
+//                        video.stopPlayback();
+//                        video.setVisibility(View.GONE);
+//                        img_preview.setVisibility(View.VISIBLE);
+//                        img_preview.setBackgroundDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
+//                        img_video_preview.setVisibility(View.VISIBLE);
+//                    }
+//                }
+//            });
+
         }
 
 

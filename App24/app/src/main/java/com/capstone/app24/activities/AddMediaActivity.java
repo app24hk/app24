@@ -70,22 +70,15 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor myCursor = (Cursor) parent.getAdapter().getItem(position);
 
-              //  AlertToastManager.showToast("Clicked Item : " + position, AddMediaActivity.this);
-                String picturePath = myCursor.getString(columnIndex);
-                AlertToastManager.showToast("Image Path : " + picturePath, AddMediaActivity.this);
-                /*File file = new File(picturePath);
-                Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                AlertToastManager.showToast("Image Bitmap : " + myBitmap, AddMediaActivity.this);
-
-                cursor.close();*/
-               /* String filePath = (String) parent.getAdapter().getItem(position);
-                Utils.debug("info", "filePath:" + filePath);
-                File file = new File(filePath);
-
-                Bitmap myBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                Utils.debug(TAG, "Image Path : " + myBitmap);*/
+                Bundle bundle = new Bundle();
+                bundle.putString("path", view.getTag().toString());
+                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                intent.putExtra("come_from", "gallery");
+                intent.putExtra("gallery_bundle", bundle);
+                finish();
+                startActivity(intent);
             }
         });
     }
@@ -101,8 +94,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         Utils.debug(TAG, "" + isFromMediaActivity);
 
     }
-    // Image adapter to link images to the gridview
-
 
     @Override
     public void onClick(View v) {
@@ -133,20 +124,21 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             extras = data.getExtras();
             Utils.debug(TAG, extras + "Inside OnactivityResult");
-        }
-        if (isFromMediaActivity) {
 
-            Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-            intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-            intent.putExtra("bundle", extras);
-            finish();
-            startActivity(intent);
-        } else {
+            if (isFromMediaActivity) {
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtras(extras);
-            setResult(Activity.RESULT_OK, resultIntent);
-            finish();
+                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                intent.putExtra("bundle", extras);
+                finish();
+                startActivity(intent);
+            } else {
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtras(extras);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+            }
         }
 
 
@@ -182,6 +174,8 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                 int imageID = cursor.getInt(columnIndex);
                 // Set the content of the image based on the provided URI
                 picturesView.setImageURI(Uri.withAppendedPath(
+                        MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI, "" + imageID));
+                picturesView.setTag(Uri.withAppendedPath(
                         MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI, "" + imageID));
                 picturesView.setScaleType(ImageView.ScaleType.FIT_XY);
                 picturesView.setPadding(5, 5, 5, 5);

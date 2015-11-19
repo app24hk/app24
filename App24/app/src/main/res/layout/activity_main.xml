@@ -2,23 +2,23 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-    <!-- <com.capstone.app24.sliding_tabs.SlidingTabLayout
-         android:id="@+id/tabs"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:background="@android:color/white"
-         android:elevation="2dp"/>
+    <com.capstone.app24.sliding_tabs.SlidingTabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:elevation="2dp"/>
 
+    <!--
+         <android.support.v4.view.ViewPager
+             android:id="@+id/pager"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:layout_below="@+id/tabs"
+             android:layout_weight="1"/>-->
 
-     <android.support.v4.view.ViewPager
-         android:id="@+id/pager"
-         android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:layout_below="@+id/tabs"
-         android:layout_weight="1"/>-->
 
     <FrameLayout
         android:id="@+id/main_frame"
@@ -172,5 +172,8 @@
         android:background="@android:color/transparent"
         android:scaleType="centerInside"
         />
-
+    <include
+        android:id="@+id/layout_user_profle"
+        layout="@layout/user_profile_menu_bar"
+        android:elevation="2dp"/>
 </RelativeLayout>

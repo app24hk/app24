@@ -14,9 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AnticipateInterpolator;
-import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -28,8 +26,8 @@ import com.capstone.app24.R;
 import com.capstone.app24.animations.AnimatorUtils;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
-import com.capstone.app24.interfaces.OnScrolling;
 import com.capstone.app24.receiver.AlarmReceiver;
+import com.capstone.app24.sliding_tabs.SlidingTabLayout;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 import com.facebook.login.widget.LoginButton;
@@ -65,10 +63,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private static RelativeLayout layout;
     // private RelativeLayout animated_layout;
     InterstitialAd mInterstitialAd;
-    private long lastTimeAdShown = System.currentTimeMillis();
-
-    private long lastTimeAdFail = System.currentTimeMillis();
     private LoginButton fb_btn;
+    public static SlidingTabLayout tabs;
+    public static RelativeLayout layout_user_profle;
+    private ImageButton ibtn_setting, ibtn_search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,12 +118,21 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         layout_profile.setOnTouchListener(this);
         btn_profile.setOnTouchListener(this);
         btn_home.setOnTouchListener(this);
+        ibtn_setting.setOnClickListener(this);
+        ibtn_search.setOnClickListener(this);
+
     }
 
     /**
      * Initialize the View for the user Inaterface
      */
     private void initializeViews() {
+
+        tabs = (SlidingTabLayout) findViewById(R.id.tabs);
+        layout_user_profle = (RelativeLayout) findViewById(R.id.layout_user_profle);
+        MainActivity.layout_user_profle.setVisibility(View.VISIBLE);
+        MainActivity.tabs.setVisibility(View.VISIBLE);
+
         layout_home = (RelativeLayout) findViewById(R.id.layout_home);
         layout_profile = (RelativeLayout) findViewById(R.id.layout_profile);
         btn_home = (ImageButton) findViewById(R.id.btn_home);
@@ -139,6 +146,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             arcLayout.getChildAt(i).setOnClickListener(this);
         }
         layout = (RelativeLayout) findViewById(R.id.layout);
+
+        ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
+        ibtn_setting = (ImageButton) findViewById(R.id.ibtn_setting);
+
+
         // animated_layout = (RelativeLayout) findViewById(R.id.animated_layout);
         // Utils.setOnFABListener(this);
     }
@@ -199,6 +211,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             setUserProfileFragment();
             // new loaderPrfile().execute();
 
+        } else if (v.getId() == R.id.ibtn_search) {
+            intent = new Intent(this, ProfileActivity.class);
+            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else if (v.getId() == R.id.ibtn_setting) {
+            intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
 
     }

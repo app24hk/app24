@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.capstone.app24.R;
 
@@ -12,6 +13,7 @@ import com.capstone.app24.R;
  */
 public class AboutActivity extends Activity implements View.OnClickListener {
     private ImageButton ibtn_back;
+    private TextView txt_activity_header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +26,7 @@ public class AboutActivity extends Activity implements View.OnClickListener {
 
     private void initializeViews() {
         ibtn_back = (ImageButton) findViewById(R.id.ibtn_back);
+        txt_activity_header = (TextView) findViewById(R.id.txt_activity_header);
     }
 
     private void setClickListeners() {
@@ -31,7 +34,7 @@ public class AboutActivity extends Activity implements View.OnClickListener {
     }
 
     private void updateUI() {
-
+        txt_activity_header.setText(getResources().getString(R.string.about));
     }
 
     @Override

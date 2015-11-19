@@ -57,7 +57,8 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".activities.VideoActivity"
-            android:screenOrientation="portrait"></activity>
+            android:configChanges="orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity
             android:name=".activities.ProfileActivity"
             android:screenOrientation="portrait"
