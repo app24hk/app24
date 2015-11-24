@@ -2,8 +2,11 @@ package com.capstone.app24.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
@@ -38,7 +41,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
-        setHeader(null, true, false, false, false, false, "Post");
+        setHeader(null, true, false, false, false, false, getResources().getString(R.string.post));
         initializeViews();
         setClickListeners();
         UpdateUI();
@@ -50,16 +53,40 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
      * Update UI with Data
      */
     private void UpdateUI() {
+        if (AddMediaActivity.imageSelectedPosition == -1 && AddMediaActivity.videoSelectedPosition == -1) {
+            camera_tumb.removeAllViews();
+        }
+
+
         Intent intent = getIntent();
+        edit_post_title.setText(intent.getStringExtra(Constants.POST_TITLE));
+        edit_write_post.setText(intent.getStringExtra(Constants.POST_BODY));
         isFromMediaActivity = intent.getBooleanExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
         Utils.debug(TAG, "" + isFromMediaActivity);
         Intent intent1 = getIntent();
         Bundle extras = intent1.getExtras();
         Utils.debug(TAG, extras + "");
+        if (intent1.hasExtra("capturedVideo")) {
+            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(
+                    intent1.getStringExtra("path"), MediaStore.Video.Thumbnails.MINI_KIND);
+            SquareImageView imageView = new SquareImageView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+            params.setMargins(5, 10, 5, 10);
+            imageView.setLayoutParams(params);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setImageBitmap(bitmap);
+            camera_tumb.addView(imageView);
+            if (camera_tumb.getChildCount() <= 0)
+                ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+            else
+                ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+        }
+
+
         if (extras != null) {
-            Bundle bundle = extras.getBundle("bundle");
+            Bundle bundle = extras.getBundle(Constants.KEY_BUNDLE);
             if (bundle != null) {
-                Bitmap imageBitmap = (Bitmap) bundle.get("data");
+                Bitmap imageBitmap = (Bitmap) bundle.get(Constants.KEY_DATA);
                 SquareImageView imageView = new SquareImageView(this);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
                 params.setMargins(5, 10, 5, 10);
@@ -71,22 +98,45 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
                 else
                     ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-            } else if (intent1 != null && intent1.hasExtra("come_from")) {
+            } else if (intent1 != null && intent1.hasExtra(Constants.KEY_COME_FROM)) {
+                if (intent1.getStringExtra("media_type").equalsIgnoreCase(Constants.KEY_VIDEOS)) {
 
+                    bundle = extras.getBundle(Constants.KEY_GALLERY_BUNDLE);
+                    int id = Integer.parseInt(bundle.getString(Constants.KEY_PATH));
+                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                    bmOptions.inSampleSize = 4;
+                    bmOptions.inPurgeable = true;
 
-                bundle = extras.getBundle("gallery_bundle");
-                Uri uri = Uri.parse(bundle.getString("path"));
-                SquareImageView imageView = new SquareImageView(this);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-                params.setMargins(5, 10, 5, 10);
-                imageView.setLayoutParams(params);
-                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                imageView.setImageURI(uri);
-                camera_tumb.addView(imageView);
-                if (camera_tumb.getChildCount() <= 0)
-                    ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-                else
-                    ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                    SquareImageView imageView = new SquareImageView(this);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                    params.setMargins(5, 10, 5, 10);
+                    imageView.setLayoutParams(params);
+                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(
+                            getContentResolver(), id,
+                            MediaStore.Video.Thumbnails.MINI_KIND, bmOptions);
+                    imageView.setImageBitmap(bitmap);
+                    camera_tumb.addView(imageView);
+                    if (camera_tumb.getChildCount() <= 0)
+                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                    else
+                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                } else {
+                    bundle = extras.getBundle(Constants.KEY_GALLERY_BUNDLE);
+                    Uri uri = Uri.parse(bundle.getString(Constants.KEY_PATH));
+                    SquareImageView imageView = new SquareImageView(this);
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                    params.setMargins(5, 10, 5, 10);
+                    imageView.setLayoutParams(params);
+                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    imageView.setImageURI(uri);
+                    camera_tumb.addView(imageView);
+                    if (camera_tumb.getChildCount() <= 0)
+                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                    else
+                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                }
+
             }
         }
         sv.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver
@@ -135,8 +185,43 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 startActivity(intent);
                 break;
             case R.id.ibtn_select_image_from_gallery:
-                intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                Intent intentLauncher = null;
+                if (getIntent() != null) {
+                    intentLauncher = getIntent();
+                    if (intentLauncher.hasExtra("media_type")) {
+                        Utils.debug(TAG, "HAS MEDIA TYPE : " + intentLauncher.getStringExtra("media_type"));
+                        if (intentLauncher.getStringExtra("media_type").equalsIgnoreCase(Constants
+                                .KEY_VIDEOS)) {
+                            Utils.debug(TAG, "HAS MEDIA TYPE Video OK: " + intentLauncher
+                                    .getStringExtra("media_type"));
+
+                            intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
+                            intent.putExtra(Constants.POST_TITLE, edit_post_title.getText()
+                                    .toString().trim());
+                            intent.putExtra(Constants.POST_BODY, edit_write_post.getText()
+                                    .toString().trim());
+                            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
+                            startActivity(intent);
+                        } else if (intentLauncher.getStringExtra("media_type").equalsIgnoreCase(Constants
+                                .KEY_IMAGES)) {
+                            Utils.debug(TAG, "HAS MEDIA TYPE Image OK: " + intentLauncher
+                                    .getStringExtra("media_type"));
+                            intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
+                            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
+                            intent.putExtra(Constants.POST_BODY, edit_write_post.getText()
+                                    .toString().trim());
+                            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
+                            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                        }
+                    } else {
+                        intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
+                        intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
+                        intent.putExtra(Constants.POST_BODY, edit_write_post.getText()
+                                .toString().trim());
+                        intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
+                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    }
+                }
                 break;
         }
     }
@@ -150,7 +235,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             // TODO Extract the data returned from the child Activity.
             Bundle extras = data.getExtras();
             Utils.debug(TAG, extras + "");
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Bitmap imageBitmap = (Bitmap) extras.get(Constants.KEY_DATA);
             SquareImageView imageView = new SquareImageView(this);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
             params.setMargins(5, 10, 5, 10);
@@ -172,6 +257,8 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         Intent intent;
         intent = new Intent(CreatePostActivity.this, MainActivity.class);
         intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
+        AddMediaActivity.videoSelectedPosition = -1;
+        AddMediaActivity.imageSelectedPosition = -1;
         startActivity(intent);
     }
 

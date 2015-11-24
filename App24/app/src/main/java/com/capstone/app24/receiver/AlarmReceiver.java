@@ -19,10 +19,28 @@ import java.util.Calendar;
  * Created by amritpal on 16/11/15.
  */
 public class AlarmReceiver extends BroadcastReceiver {
+    private static final String TAG = AlarmReceiver.class.getSimpleName();
+    private static AlarmReceiver alarmReceiver;
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        Utils.debug(TAG, "Alarm Triggered");
         Toast.makeText(context, "AlarmTriggered", Toast.LENGTH_SHORT).show();
     }
+
+    public static AlarmReceiver getInstance() {
+        if (alarmReceiver == null) {
+            alarmReceiver = new AlarmReceiver();
+        }
+        return alarmReceiver;
+    }
+//
+//    @Override
+//    public void onReceive(Context context, Intent intent) {
+//        Utils.debug(TAG, "Alarm Triggered");
+//        Toast.makeText(context, "AlarmTriggered", Toast.LENGTH_SHORT).show();
+//
+//    }
 //    private static final String TAG = AlarmReceiver.class.getSimpleName();
 //    public static InterstitialAd mInterstitialAd;
 //

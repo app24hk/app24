@@ -25,12 +25,14 @@ import com.capstone.app24.utils.Utils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
+import com.facebook.FacebookDialog;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONObject;
 
@@ -122,7 +124,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 //                startActivity(intent);
                 //finish();
                 fb_btn.performClick();
-
                 break;
             default:
                 break;
@@ -143,6 +144,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                     @Override
                     public void onSuccess(LoginResult loginResult) {
                         accessToken = loginResult.getAccessToken();
+                        btn_login_with_facebook.setOnClickListener(null);
                         Log.d("accesstoken", loginResult.getAccessToken() + "");
                         GraphRequest request = GraphRequest.newMeRequest(
                                 loginResult.getAccessToken(),
@@ -156,19 +158,20 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                                 .getJSONObject().toString());
                                         try {
                                             JSONObject obj = response.getJSONObject();
-                                            String email = obj.getString("email");
+                                            String email = obj.getString(Constants.KEY_EMAIL);
 
-                                            String username = obj.getString("name");
-                                            JSONObject pictureobj = obj.getJSONObject("picture").getJSONObject("data");
-                                            String url = pictureobj.getString("url");
+                                            String username = obj.getString(Constants.KEY_NAME);
+                                            JSONObject pictureobj = obj.getJSONObject(Constants.KEY_PICTURE)
+                                                    .getJSONObject(Constants.KEY_DATA);
+                                            String url = pictureobj.getString(Constants.KEY_URL);
 
-                                            String facebookid = obj.getString("id");
-                                            String last_name = obj.getString("last_name");
-                                            Utils.debug("email", " " + email);
-                                            Utils.debug("url", " " + url);
-                                            Utils.debug("username", " " + username);
-                                            Utils.debug("facebookid", " " + facebookid);
-                                            Utils.debug("last_name", " " + last_name);
+                                            String facebookid = obj.getString(Constants.KEY_ID);
+                                            String last_name = obj.getString(Constants.KEY_LAST_NAME);
+                                            Utils.debug("e1", " " + email);
+                                            Utils.debug("e1", " " + url);
+                                            Utils.debug("e1", " " + username);
+                                            Utils.debug("e1", " " + facebookid);
+                                            Utils.debug("e1", " " + last_name);
 
                                             new Utils(SplashActivity.this).setPreferences
                                                     (SplashActivity.this, Constants
@@ -198,12 +201,15 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
                     @Override
                     public void onCancel() {
-                        AlertToastManager.showToast("Please Try Again", SplashActivity.this);
+                        AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
+                                SplashActivity
+                                        .this);
                     }
 
                     @Override
                     public void onError(FacebookException e) {
-                        AlertToastManager.showToast("Error Occured", SplashActivity.this);
+                        AlertToastManager.showToast(getResources().getString(R.string
+                                .error_occured), SplashActivity.this);
                     }
                 });
     }

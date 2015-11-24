@@ -35,7 +35,11 @@
     <string name="logout">Logout</string>
     <string name="setting">Setting</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
+    <string name="post">Post</string>
 
+    <!--Toasts to Users-->
+    <string name="please_try_again">Please Try Again</string>
+    <string name="error_occured">Error Occured</string>
     <!--Create Post Screen -->
 
     <string name="enter_the_title">Enter the title</string>

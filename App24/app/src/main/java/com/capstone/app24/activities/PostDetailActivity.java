@@ -156,7 +156,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 intent = new Intent(PostDetailActivity.this, VideoActivity.class);
                 startActivity(intent);
                 edit_menu.setVisibility(View.GONE);
-                AlertToastManager.showToast("Video Preview is not available", this);
+                //AlertToastManager.showToast("Video Preview is not available", this);
                 break;
             case R.id.layout_img_video_preview:
                 intent = new Intent(PostDetailActivity.this, VideoActivity.class);

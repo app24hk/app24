@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
+import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
@@ -129,7 +130,7 @@ public class CreateMediaPostActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            Bitmap imageBitmap = (Bitmap) extras.get(Constants.KEY_DATA);
        /*     ImageView imageView = new ImageView(this);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100);
             imageView.setLayoutParams(params);

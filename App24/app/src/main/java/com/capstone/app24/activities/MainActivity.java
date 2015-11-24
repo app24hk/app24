@@ -68,6 +68,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public static RelativeLayout layout_user_profle;
     private ImageButton ibtn_setting, ibtn_search;
 
+    //Setting Alarm
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +92,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         setClickListeners();
         setHomeFragment();
         //mInterstitialAd.show();
+        // registerReceiver(AlarmReceiver.getInstance(),)
+        setAlarm();
     }
 
     private void beginPlayingGame() {
@@ -107,6 +113,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
+
     }
 
     /**
@@ -149,32 +156,63 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
         ibtn_setting = (ImageButton) findViewById(R.id.ibtn_setting);
-
-
-        // animated_layout = (RelativeLayout) findViewById(R.id.animated_layout);
-        // Utils.setOnFABListener(this);
     }
 
-    public void setAlarm() {
-        Utils.debug(TAG, "Setting Ad cAlarm");
-        AlarmManager alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+    private void setAlarm() {
+        alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmReceiver.class);
-        intent.setAction("com.capstone.app24.activities.START_ALARM");
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-        Calendar time = Calendar.getInstance();
-        time.setTimeInMillis(System.currentTimeMillis());
-        time.add(Calendar.SECOND, 30);
-        alarmMgr.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), pendingIntent);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+// Set the alarm to start at 8:30 a.m.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        //calendar.set(Calendar.HOUR_OF_DAY, 8);
+        //calendar.set(Calendar.MINUTE, 30);
+
+// setRepeating() lets you specify a precise custom interval--in this case,
+// 20 minutes.
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                1000 * 30, alarmIntent);
+
     }
+
+//    private void setAlarm() {
+//        try {
+//            if (alarmMgr != null) {
+//                Utils.debug(TAG, "Cancelling Alarm");
+//                alarmMgr.cancel(alarmIntent);
+//                Utils.debug(TAG, "Alarm Cancelled");
+//
+//            }
+//            Utils.debug(TAG, "Setting Alarm");
+//            alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//            Intent intent = new Intent(this, AlarmReceiver.class);
+//            alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+//
+//            // Set the alarm to start at 8:30 a.m.
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTimeInMillis(System.currentTimeMillis());
+//            //calendar.set(Calendar.HOUR_OF_DAY, 8);
+//            calendar.set(Calendar.SECOND, 30);
+//
+//            // setRepeating() lets you specify a precise custom interval--in this case,
+//            // 20 minutes.
+//            alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                    1000 * 10, alarmIntent);
+//
+//            Utils.debug(TAG, "Setting Alarm");
+//        } catch (Exception e) {
+//        }
+//    }
 
     @Override
     public void onClick(View v) {
         if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
+            //   mInterstitialAd.show();
         }
         Intent intent;
         if (v.getId() == R.id.btn_app_24) {
-            setAlarm();
+            // setAlarm();
             onFabClick(v);
 
             if (v instanceof Button) {
@@ -191,10 +229,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             finish();
             intent = new Intent(MainActivity.this, AddMediaActivity.class);
             intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
             startActivity(intent);
         } else if (v.getId() == R.id.btn_add_video_post) {
             finish();
             intent = new Intent(MainActivity.this, AddMediaActivity.class);
+            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
             intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
             startActivity(intent);
         }
@@ -413,6 +453,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
 
     }
 
