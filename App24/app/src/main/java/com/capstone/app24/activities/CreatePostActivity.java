@@ -21,6 +21,10 @@ import com.capstone.app24.custom.SquareImageView;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by amritpal on 5/11/15.
  */
@@ -36,6 +40,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private boolean isFromMediaActivity;
     private ScrollView sv;
     private EditText edit_post_title, edit_write_post;
+    private Bitmap mIcon_val;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +50,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         initializeViews();
         setClickListeners();
         UpdateUI();
-
-
     }
 
     /**
@@ -59,8 +62,14 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
 
         Intent intent = getIntent();
-        edit_post_title.setText(intent.getStringExtra(Constants.POST_TITLE));
-        edit_write_post.setText(intent.getStringExtra(Constants.POST_BODY));
+        try {
+            edit_post_title.setText(intent.getStringExtra(Constants.POST_TITLE));
+            edit_write_post.setText(intent.getStringExtra(Constants.POST_BODY));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         isFromMediaActivity = intent.getBooleanExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
         Utils.debug(TAG, "" + isFromMediaActivity);
         Intent intent1 = getIntent();
@@ -265,15 +274,5 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
 
-        // sv.scrollTo(0, sv.getBottom() + sv.getScrollY());
-//        switch (v.getId()) {
-//            case R.id.edit_write_post:
-//                edit_write_post.requestFocus();
-//                break;
-//            case R.id.edit_post_title:X
-//                edit_post_title.requestFocus();
-//
-//                break;
-//        }
     }
 }

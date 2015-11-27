@@ -8,6 +8,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +38,9 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.ogaclejapan.arclayout.ArcLayout;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -71,6 +76,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     //Setting Alarm
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
+    private Bitmap mIcon_val;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -19,9 +19,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.capstone.app24.R;
+import com.capstone.app24.api_services.IApiMethods;
+import com.capstone.app24.callback.MyAsyncTask;
+import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
+import com.capstone.app24.webservices_model.UserLoginModel;
+import com.crittercism.app.Crittercism;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -36,17 +41,28 @@ import com.facebook.share.widget.ShareDialog;
 
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.http.Field;
 
 /**
  * Created by amritpal on 2/11/15.
  */
-public class SplashActivity extends Activity implements View.OnClickListener {
+public class SplashActivity extends Activity implements View.OnClickListener, MyAsyncTask.MyAsyncTaskListener {
 
     private static final String TAG = SplashActivity.class.getSimpleName();
+    private static final String API_TAG = "WebServices";
     private TextView txt_terms_of_use;
     private Button btn_login_with_facebook;
     List<String> permissions = new ArrayList<String>();
@@ -54,10 +70,14 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
     CallbackManager callbackManager;
     AccessToken accessToken;
+    private RestAdapter mRestAdapter;
+    private UserLoginModel userModel;
+    private UserLoginModel mUserBeanResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         FacebookSdk.sdkInitialize(this);
 //        if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN)) {
 //            finish();
@@ -118,10 +138,9 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btn_login_with_facebook:
                 loginFacebook();
-                Utils.debug(TAG, "Start Activity Main");
                 //finish();
-//                intent = new Intent(SplashActivity.this, MainActivity.class);
-//                startActivity(intent);
+                // intent = new Intent(SplashActivity.this, MainActivity.class);
+                //startActivity(intent);
                 //finish();
                 fb_btn.performClick();
                 break;
@@ -136,7 +155,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    //facebook Login
+    //Facebook Login
     private void loginFacebook() {
 
         fb_btn.registerCallback(callbackManager,
@@ -154,7 +173,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                             JSONObject object,
                                             GraphResponse response) {
                                         // Application code
-                                        Log.d("Facebook User Detail >>########: ", response
+                                        Log.d("Facebook User Detail ", response
                                                 .getJSONObject().toString());
                                         try {
                                             JSONObject obj = response.getJSONObject();
@@ -167,20 +186,18 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
                                             String facebookid = obj.getString(Constants.KEY_ID);
                                             String last_name = obj.getString(Constants.KEY_LAST_NAME);
-                                            Utils.debug("e1", " " + email);
-                                            Utils.debug("e1", " " + url);
-                                            Utils.debug("e1", " " + username);
-                                            Utils.debug("e1", " " + facebookid);
-                                            Utils.debug("e1", " " + last_name);
+                                            String first_name = obj.getString(Constants
+                                                    .KEY_FIRST_NAME);
+                                            String gender = obj.getString(Constants.KEY_GENDER);
+                                            userModel = new UserLoginModel(facebookid, email,
+                                                    first_name, last_name, gender, "android",
+                                                    "djsfhjdbsbfsdbkjlsfd", "facebook", "", "");
 
-                                            new Utils(SplashActivity.this).setPreferences
-                                                    (SplashActivity.this, Constants
-                                                            .KEY_IS_LOGGED_IN, true);
+                                            MyAsyncTask task = new MyAsyncTask();
+                                            task.setListener(SplashActivity.this);
+                                            task.execute();
 
 
-                                            finish();
-                                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                            startActivity(intent);
                                         } catch (Exception e) {
                                             Log.d("error", e.getMessage());
                                             e.printStackTrace();
@@ -190,13 +207,9 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                     }
                                 });
                         Bundle parameters = new Bundle();
-//                @"email,name,first_name,last_name,gender,picture,albums"}];
                         parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
                         request.setParameters(parameters);
                         request.executeAsync();
-                       /* Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                        startActivity(intent);*/
-                        // displayProfile();
                     }
 
                     @Override
@@ -230,4 +243,82 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
         }
     }
+
+    @Override
+    public void onPreExecuteConcluded() {
+        Utils.debug(API_TAG, "Inside OnPreExecute");
+        mRestAdapter = new RestAdapter.Builder()
+                .setEndpoint(APIsConstants.API_BASE_URL)
+                .build();
+    }
+
+
+    @Override
+    public Object doInBackground(String... params) {
+        IApiMethods methods = mRestAdapter.create(IApiMethods.class);
+        Utils.debug(API_TAG, "Inside doInBackground");
+        methods.getUserLoginModel(userModel.getUser_social_id(), userModel.getUser_email(),
+                userModel.getUser_fname(), userModel.getUser_lname(), userModel.getUser_gender
+                        (), userModel.getUser_deviceType(), userModel.getUser_deviceToken(),
+                userModel.getUser_loginType(), new
+                        Callback<UserLoginModel>() {
+
+                            @Override
+                            public void success(UserLoginModel languageBean, Response response) {
+                                Utils.debug(API_TAG, "Inside success");
+                                Utils.debug(API_TAG, "Inside success" + response);
+                                Utils.debug(API_TAG, "Inside success" + languageBean);
+
+                                mUserBeanResponse = new UserLoginModel();
+                                mUserBeanResponse = languageBean;
+                                setUserData();
+                            }
+
+
+                            @Override
+                            public void failure(RetrofitError error) {
+                                error.printStackTrace();
+                            }
+                        }
+        );
+        return null;
+    }
+
+    private void setUserData() {
+        if (mUserBeanResponse != null) {
+            Utils.debug(API_TAG, mUserBeanResponse.getUser_social_id() +
+                    "\n " + "mUserBeanResponse.getUser_loginType()" + mUserBeanResponse.getUser_loginType() +
+                    "\n " + "mUserBeanResponse.getUser_loginType()" + mUserBeanResponse.getUser_loginType() +
+                    "\n" + "mUserBeanResponse.getUser_loginType()" + mUserBeanResponse.getUser_loginType() +
+                    "\n" + "mUserBeanResponse.getUser_loginType()" + mUserBeanResponse.getUser_loginType() +
+                    "\n" + "mUserBeanResponse.getUser_loginType()" + mUserBeanResponse.getUser_loginType() +
+                    "\n" + "mUserBeanResponse.getUser_loginType()" + mUserBeanResponse.getUser_loginType() +
+                    "\n" + "mUserBeanResponse.getUser_gender()" + mUserBeanResponse.getUser_gender() +
+                    "\n" + "mUserBeanResponse.getUser_lname()" + mUserBeanResponse.getUser_lname() +
+                    "\n" + "mUserBeanResponse.getUser_fname()" + mUserBeanResponse.getUser_fname() +
+                    "\n" + "mUserBeanResponse.getResponse()" + mUserBeanResponse.getResponse() +
+                    "\n" + "mUserBeanResponse.getUser_email()" + mUserBeanResponse.getUser_email());
+
+
+            if (mUserBeanResponse.getResult().equalsIgnoreCase("true")) {
+                new Utils(SplashActivity
+                        .this).setPreferences
+                        (SplashActivity.this, Constants
+                                .KEY_IS_LOGGED_IN, true);
+                finish();
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                Utils.debug(API_TAG, mUserBeanResponse.getResponse());
+            }
+        } else {
+            AlertToastManager.showToast("Error Occured", SplashActivity.this);
+        }
+    }
+
+    @Override
+    public void onPostExecuteConcluded(Object result) {
+
+    }
+
 }

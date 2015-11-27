@@ -18,6 +18,7 @@ public class Constants {
     public static final String KEY_URL = "url";
     public static final String KEY_ID = "id";
     public static final String KEY_LAST_NAME = "last_name";
+    public static final String KEY_FIRST_NAME = "first_name";
     //    public static final String KEY_DATA = "data";
 //    public static final String KEY_DATA = "data";
 //    public static final String KEY_DATA = "data";
@@ -30,4 +31,6 @@ public class Constants {
     public static final String KEY_GALLERY_TYPE = "gallery_type";
     public static final String POST_TITLE = "post_title";
     public static final String POST_BODY = "post_body";
+    public static final java.lang.String CRITTERCISM_APP_ID = "56555a2fd224ac0a00ed43fe";
+    public static final String KEY_GENDER = "gender";
 }
