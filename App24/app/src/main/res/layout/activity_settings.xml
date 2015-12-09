@@ -69,14 +69,14 @@
         </RelativeLayout>
     </RelativeLayout>
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
-        xmlns:fb="http://schemas.android.com/apk/res-auto"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_gravity="center_vertical"
-        android:background="@android:color/transparent"
-        android:scaleType="centerInside"
-        />
+    <!--<com.facebook.login.widget.LoginButton-->
+    <!--android:id="@+id/login_button"-->
+    <!--xmlns:fb="http://schemas.android.com/apk/res-auto"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="0dp"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:background="@android:color/transparent"-->
+    <!--android:scaleType="centerInside"-->
+    <!--/>-->
 
 </RelativeLayout>

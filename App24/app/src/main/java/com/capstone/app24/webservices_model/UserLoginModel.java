@@ -2,10 +2,13 @@ package com.capstone.app24.webservices_model;
 
 import com.facebook.AccessToken;
 
+import java.util.List;
+
 /**
  * Created by amritpal on 25/11/15.
  */
 public class UserLoginModel {
+
     String user_social_id;
     String user_email;
     String user_fname;
@@ -14,17 +17,13 @@ public class UserLoginModel {
     String user_deviceType;
     String user_deviceToken;
     String user_loginType;
-    String result;
-    String response;
 
     public UserLoginModel() {
-
     }
 
-
-    public UserLoginModel(String user_social_id, String user_email, String user_fname,
-                          String user_lname, String user_gender, String user_deviceType,
-                          String user_deviceToken, String user_loginType, String result, String response) {
+    public UserLoginModel(String user_social_id, String user_email, String user_fname, String
+            user_lname, String user_gender, String user_deviceType, String user_deviceToken,
+                          String user_loginType) {
         this.user_social_id = user_social_id;
         this.user_email = user_email;
         this.user_fname = user_fname;
@@ -33,10 +32,7 @@ public class UserLoginModel {
         this.user_deviceType = user_deviceType;
         this.user_deviceToken = user_deviceToken;
         this.user_loginType = user_loginType;
-        this.result = result;
-        this.response = response;
     }
-
 
     public String getUser_social_id() {
         return user_social_id;
@@ -100,21 +96,5 @@ public class UserLoginModel {
 
     public void setUser_loginType(String user_loginType) {
         this.user_loginType = user_loginType;
-    }
-
-    public String getResult() {
-        return result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
     }
 }

@@ -2,11 +2,8 @@ package com.capstone.app24.activities;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,14 +11,20 @@ import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.capstone.app24.R;
+import com.capstone.app24.bean.LatestFeedsModel;
 import com.capstone.app24.utils.AlertToastManager;
+import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
+import com.capstone.app24.utils.Utils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -32,13 +35,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private static final String TAG = PostDetailActivity.class.getSimpleName();
     private RelativeLayout menu_layout;
     private RelativeLayout edit_menu;
-    private TextView txt_edit, txt_delete;
+    private TextView txt_edit, txt_delete, txt_post_title, txt_description, txt_seen, txt_creator, txt_created_time;
     private int type;
     private RelativeLayout layout_media_preview;
     private ImageView img_preview, img_video_preview;
     private RelativeLayout layout_img_video_preview;
     private Intent intent;
     //private LikeView likeView;
+    LatestFeedsModel latestFeedsModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,34 +60,60 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
     private void updateUI() {
 
-        if (type == 0) {
-            img_preview.setVisibility(View.VISIBLE);
-            img_video_preview.setVisibility(View.VISIBLE);
-            layout_media_preview.setVisibility(View.VISIBLE);
-            layout_img_video_preview.setVisibility(View.VISIBLE);
-            img_video_preview.setOnClickListener(this);
-            img_preview.setOnClickListener(this);
-            Uri videoURI = Uri.parse("android.resource://" + getPackageName() + "/"
-                    + R.raw.itcuties);
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(this, videoURI);
-            Bitmap bitmap = retriever
-                    .getFrameAtTime(10, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
-            Drawable drawable = new BitmapDrawable(getResources(), bitmap);
-            img_preview.setImageDrawable(drawable);
-        } else if (type == 1) {
-            img_preview.setVisibility(View.VISIBLE);
-            layout_media_preview.setVisibility(View.VISIBLE);
-            img_video_preview.setVisibility(View.GONE);
-            layout_img_video_preview.setVisibility(View.GONE);
-            img_preview.setOnClickListener(this);
-            img_preview.setBackground(getResources().getDrawable(R.drawable.pic_two));
-        } else {
-            layout_media_preview.setVisibility(View.GONE);
-            img_preview.setVisibility(View.GONE);
-            img_video_preview.setVisibility(View.GONE);
-            layout_img_video_preview.setVisibility(View.GONE);
+        latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
+        if (latestFeedsModel != null) {
+            if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
+                layout_media_preview.setVisibility(View.GONE);
+                img_preview.setVisibility(View.GONE);
+                img_video_preview.setVisibility(View.GONE);
+                layout_img_video_preview.setVisibility(View.GONE);
 
+            }
+            if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
+                img_preview.setVisibility(View.VISIBLE);
+                layout_media_preview.setVisibility(View.VISIBLE);
+                img_video_preview.setVisibility(View.GONE);
+                layout_img_video_preview.setVisibility(View.GONE);
+                img_preview.setOnClickListener(this);
+
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
+                        .LayoutParams.MATCH_PARENT, (Utils.getHeight(this) / 2) - 100); // (width,
+                // height)
+                img_preview.setLayoutParams(params);
+                Glide.with(this).load(latestFeedsModel.getMedia()).centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
+                        .into(img_preview);
+
+            }
+            if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
+
+
+                img_preview.setVisibility(View.VISIBLE);
+                img_video_preview.setVisibility(View.VISIBLE);
+                layout_media_preview.setVisibility(View.VISIBLE);
+                layout_img_video_preview.setVisibility(View.VISIBLE);
+                img_video_preview.setOnClickListener(this);
+                img_preview.setOnClickListener(this);
+
+                Uri videoURI = Uri.parse("android.resource://" + getPackageName() + "/"
+                        + R.raw.itcuties);
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(this, videoURI);
+
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
+                        .LayoutParams.MATCH_PARENT, (Utils.getHeight(this) / 2) - 100); // (width,
+                // height)
+                img_preview.setLayoutParams(params);
+                Glide.with(this).load(latestFeedsModel.getThumbnail()).centerCrop()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
+                        .into(img_preview);
+
+            }
+            txt_post_title.setText(latestFeedsModel.getTitle());
+            txt_description.setText(latestFeedsModel.getDescription());
+            txt_seen.setText(latestFeedsModel.getViewcount());
+            txt_creator.setText(latestFeedsModel.getUser_name());
+            txt_created_time.setText(latestFeedsModel.getModified());
         }
     }
 
@@ -98,6 +128,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         layout_media_preview = (RelativeLayout) findViewById(R.id.layout_media_preview);
         layout_img_video_preview = (RelativeLayout) findViewById(R.id.layout_img_video_preview);
 
+        txt_post_title = (TextView) findViewById(R.id.txt_post_title);
+        txt_description = (TextView) findViewById(R.id.txt_description);
+        txt_seen = (TextView) findViewById(R.id.txt_seen);
+        txt_creator = (TextView) findViewById(R.id.txt_creator);
+        txt_created_time = (TextView) findViewById(R.id.txt_created_time);
         //Facebook like button
         // likeView = (LikeView) findViewById(R.id.like_view);
         // Set the object for which you want to get likes from your users (Photo, Link or even your FB Fan page)
@@ -150,7 +185,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 AlertToastManager.showToast("Delete", this);
                 break;
             case R.id.img_preview:
-                showImageDialog();
+                showImageDialog(latestFeedsModel.getMedia());
                 break;
             case R.id.img_video_preview:
                 intent = new Intent(PostDetailActivity.this, VideoActivity.class);
@@ -166,8 +201,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     //............FullView imageView..............
-    public void showImageDialog() {
-        Display display = getWindowManager().getDefaultDisplay();
+    public void showImageDialog(String media) {
+        Display display = this.getWindowManager().getDefaultDisplay();
         int width = display.getWidth();
         int height = display.getHeight();
 
@@ -178,8 +213,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
         final TouchImageView custom_image = (TouchImageView) (dialog.findViewById(R.id.custom_image));
         custom_image.setLayoutParams(params);
-        custom_image.setImageResource(R.drawable.ads);
+        custom_image.setImageResource(R.drawable.pic_two);
 
+        Glide.with(this).load(media).centerCrop()
+                .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
+                .into(custom_image);
         custom_image.setOnTouchImageViewListener(new TouchImageView.OnTouchImageViewListener() {
             @Override
             public void onMove() {
@@ -191,4 +229,5 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         });
         dialog.show();
     }
+
 }

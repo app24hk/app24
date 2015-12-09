@@ -1,61 +1,127 @@
 package com.capstone.app24.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by amritpal on 4/11/15.
  */
-public class LatestFeedsModel {
-    private String feedHeading;
-    private String feedBody;
-    private String creatorName;
-    private String createdTime;
-    private String profileCountLoginUser;
-    private String seen;
+public class LatestFeedsModel implements Serializable {
+    private String id;
+    private String title;
+    private String description;
+    private String media;
+    private String type;
+    private String user_id;
+    private String created;
+    private String modified;
+    private String user_name;
+    private String viewcount;
+    private String thumbnail;
 
-    public String getFeedHeading() {
-        return feedHeading;
+    public LatestFeedsModel() {
     }
 
-    public void setFeedHeading(String feedHeading) {
-        this.feedHeading = feedHeading;
+    public LatestFeedsModel(String id, String title, String description, String media, String
+            type, String user_id, String created, String modified, String user_name, String
+                                    viewcount, String thumbnail) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.media = media;
+        this.type = type;
+        this.user_id = user_id;
+        this.created = created;
+        this.modified = modified;
+        this.user_name = user_name;
+        this.viewcount = viewcount;
+        this.thumbnail = thumbnail;
     }
 
-    public String getFeedBody() {
-        return feedBody;
+    public String getId() {
+        return id;
     }
 
-    public void setFeedBody(String feedBody) {
-        this.feedBody = feedBody;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getCreatorName() {
-        return creatorName;
+    public String getTitle() {
+        return title;
     }
 
-    public void setCreatorName(String creatorName) {
-        this.creatorName = creatorName;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getCreatedTime() {
-        return createdTime;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getProfileCountLoginUser() {
-        return profileCountLoginUser;
+    public String getMedia() {
+        return media;
     }
 
-    public void setProfileCountLoginUser(String profileCountLoginUser) {
-        this.profileCountLoginUser = profileCountLoginUser;
+    public void setMedia(String media) {
+        this.media = media;
     }
 
-    public String getSeen() {
-        return seen;
+    public String getType() {
+        return type;
     }
 
-    public void setSeen(String seen) {
-        this.seen = seen;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
+    }
+
+    public String getModified() {
+        return modified;
+    }
+
+    public void setModified(String modified) {
+        this.modified = modified;
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getViewcount() {
+        return viewcount;
+    }
+
+    public void setViewcount(String viewcount) {
+        this.viewcount = viewcount;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

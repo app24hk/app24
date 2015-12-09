@@ -1,7 +1,7 @@
-<manifest
-    package="com.capstone.app24"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tool="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.capstone.app24"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
@@ -12,13 +12,20 @@
     <uses-permission
         android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
+        android:name=".utils.AppController"
         android:allowBackup="true"
         android:icon="@drawable/logo_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tool:replace="android:icon">
+        tools:replace="@android:icon">
+
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/app_id"/>
+
         <activity
             android:name=".activities.SplashActivity"
             android:label="@string/app_name"
@@ -45,9 +52,6 @@
             android:name=".activities.CreatePostActivity"
             android:screenOrientation="portrait"></activity>
         <activity
-            android:name=".activities.CreateMediaPostActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity
             android:name=".activities.SettingsActivity"
             android:screenOrientation="portrait"></activity>
         <activity
@@ -67,11 +71,6 @@
         <activity
             android:name=".activities.PaypalActivity"
             android:screenOrientation="portrait"></activity>
-        <activity
-            android:name="com.shamanland.facebook.likebutton.FacebookLikeActivity"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.Facebook.Like"
-            />
 
         <receiver android:name=".receiver.AlarmReceiver"
                   android:enabled="false">
@@ -98,12 +97,12 @@
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+            android:screenOrientation="portrait"/>
 
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/app_id"/>
+        <!--  <provider android:name="com.facebook.FacebookContentProvider"
+                    android:authorities="com.facebook.app.FacebookContentProvider1673090976236867"
+                    android:exported="true"/>-->
+
     </application>
 
 </manifest>

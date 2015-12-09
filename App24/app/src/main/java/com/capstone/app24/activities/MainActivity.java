@@ -9,11 +9,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnticipateInterpolator;
@@ -24,26 +25,43 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.animations.AnimatorUtils;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
 import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.ogaclejapan.arclayout.ArcLayout;
+import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.entities.Feed;
+import com.sromku.simple.fb.entities.Story;
+import com.sromku.simple.fb.listeners.OnCreateStoryObject;
+import com.sromku.simple.fb.listeners.OnPublishListener;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.ConsoleHandler;
 
 /**
  * Created by amritpal on 3/11/15.
@@ -77,6 +95,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private AlarmManager alarmMgr;
     private PendingIntent alarmIntent;
     private Bitmap mIcon_val;
+    private SimpleFacebook mSimpleFacebook;
+    OnPublishListener onPublishListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +104,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         setContentView(R.layout.activity_main);
         fb_btn = (LoginButton) findViewById(R.id.login_button);
         initializeViews();
+        mSimpleFacebook = SimpleFacebook.getInstance(this);
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
 
@@ -100,6 +121,21 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         //mInterstitialAd.show();
         // registerReceiver(AlarmReceiver.getInstance(),)
         setAlarm();
+
+//        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+//        Date past = new Date();
+//        try {
+//            past = format.parse("01/10/2010");
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        Date now = new Date();
+//        System.out.println(TimeUnit.MILLISECONDS.toMillis(now.getTime() - past.getTime()) + " milliseconds ago");
+//        System.out.println(TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + " minutes ago");
+//        System.out.println(TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + " hours ago");
+//        System.out.println(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + " days ago");
+
     }
 
     private void beginPlayingGame() {
@@ -119,7 +155,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     /**
@@ -162,6 +197,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
         ibtn_setting = (ImageButton) findViewById(R.id.ibtn_setting);
+
+
+        onPublishListener = new OnPublishListener() {
+            @Override
+            public void onComplete(String id) {
+                Utils.info(TAG, "Published successfully. id = " + id);
+            }
+        };
     }
 
     private void setAlarm() {
@@ -169,55 +212,27 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         Intent intent = new Intent(this, AlarmReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
-// Set the alarm to start at 8:30 a.m.
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        //calendar.set(Calendar.HOUR_OF_DAY, 8);
-        //calendar.set(Calendar.MINUTE, 30);
-
-// setRepeating() lets you specify a precise custom interval--in this case,
-// 20 minutes.
         alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 1000 * 30, alarmIntent);
 
     }
 
-//    private void setAlarm() {
-//        try {
-//            if (alarmMgr != null) {
-//                Utils.debug(TAG, "Cancelling Alarm");
-//                alarmMgr.cancel(alarmIntent);
-//                Utils.debug(TAG, "Alarm Cancelled");
-//
-//            }
-//            Utils.debug(TAG, "Setting Alarm");
-//            alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//            Intent intent = new Intent(this, AlarmReceiver.class);
-//            alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-//
-//            // Set the alarm to start at 8:30 a.m.
-//            Calendar calendar = Calendar.getInstance();
-//            calendar.setTimeInMillis(System.currentTimeMillis());
-//            //calendar.set(Calendar.HOUR_OF_DAY, 8);
-//            calendar.set(Calendar.SECOND, 30);
-//
-//            // setRepeating() lets you specify a precise custom interval--in this case,
-//            // 20 minutes.
-//            alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                    1000 * 10, alarmIntent);
-//
-//            Utils.debug(TAG, "Setting Alarm");
-//        } catch (Exception e) {
-//        }
-//    }
 
     @Override
     public void onClick(View v) {
         if (mInterstitialAd.isLoaded()) {
             //   mInterstitialAd.show();
         }
+
+
         Intent intent;
-        if (v.getId() == R.id.btn_app_24) {
+        if (v.getId() == R.id.btn_app_24)
+
+        {
+            postStory();
+
             // setAlarm();
             onFabClick(v);
 
@@ -226,45 +241,95 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             }
 
             return;
-        } else if (v.getId() == R.id.btn_add_post) {
+        } else if (v.getId() == R.id.btn_add_post)
+
+        {
             finish();
             intent = new Intent(MainActivity.this, CreatePostActivity.class);
             intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
+            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_TEXT);
             startActivity(intent);
-        } else if (v.getId() == R.id.btn_add_image_post) {
+        } else if (v.getId() == R.id.btn_add_image_post)
+
+        {
             finish();
             intent = new Intent(MainActivity.this, AddMediaActivity.class);
             intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
             intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
             startActivity(intent);
-        } else if (v.getId() == R.id.btn_add_video_post) {
+        } else if (v.getId() == R.id.btn_add_video_post)
+
+        {
             finish();
             intent = new Intent(MainActivity.this, AddMediaActivity.class);
             intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
             intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
             startActivity(intent);
         }
-        if (v.getId() == R.id.layout_home) {
+
+        if (v.getId() == R.id.layout_home)
+
+        {
             Utils.debug(TAG, "Inside OnClick home");
             btn_home.setImageResource(R.drawable.home_selected);
             btn_profile.setImageResource(R.drawable.user_unselected);
             setHomeFragment();
             //new loaderHome().execute();
-        } else if (v.getId() == R.id.layout_profile) {
+        } else if (v.getId() == R.id.layout_profile)
+
+        {
             Utils.debug(TAG, "Inside OnClick profile");
             btn_home.setImageResource(R.drawable.home_unselected);
             btn_profile.setImageResource(R.drawable.user_selected);
             setUserProfileFragment();
             // new loaderPrfile().execute();
 
-        } else if (v.getId() == R.id.ibtn_search) {
+        } else if (v.getId() == R.id.ibtn_search)
+
+        {
             intent = new Intent(this, ProfileActivity.class);
             //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-        } else if (v.getId() == R.id.ibtn_setting) {
+        } else if (v.getId() == R.id.ibtn_setting)
+
+        {
             intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
+
+    }
+
+    private void postStory() {
+
+        // set object to be shared
+        Story.StoryObject storyObject = new Story.StoryObject.Builder()
+                .setUrl("http://romkuapps.com/github/simple-facebook/object-apple.html")
+                .setNoun("food")
+                .build();
+
+// set action to be done
+        Story.StoryAction storyAction = new Story.StoryAction.Builder()
+                .setAction("eat")
+                .addProperty("taste", "sweet")
+                .build();
+
+// build story
+        Story story = new Story.Builder()
+                .setObject(storyObject)
+                .setAction(storyAction)
+                .build();
+
+
+//        mSimpleFacebook.create(storyObject, new OnCreateStoryObject() {
+//            @Override
+//            public void onComplete(String response) {
+//                super.onComplete(response);
+//                Utils.debug(TAG, "response : " + response);
+//            }
+//        });
+// publish
+        mSimpleFacebook.publish(story, onPublishListener);
+
 
     }
 
@@ -280,6 +345,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         } else {
             showMenu();
         }
+
         if (v.isSelected()) {
             btn_app_24.setImageResource(R.drawable.app_button);
             isFabOpened = false;
@@ -301,7 +367,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    @SuppressWarnings("NewApi")
     private void showMenu() {
         menuLayout.setVisibility(View.VISIBLE);
 
@@ -318,7 +383,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         animSet.start();
     }
 
-    @SuppressWarnings("NewApi")
     private void hideMenu() {
 
         List<Animator> animList = new ArrayList<>();

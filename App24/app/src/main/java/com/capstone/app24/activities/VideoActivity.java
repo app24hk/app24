@@ -4,21 +4,26 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.SurfaceHolder;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.capstone.app24.R;
+import com.capstone.app24.bean.LatestFeedsModel;
 import com.capstone.app24.utils.Utils;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 /**
  * Created by amritpal on 7/11/15.
  */
-public class VideoActivity extends Activity /*implements MediaPlayer.OnPreparedListener */ {
+public class VideoActivity extends Activity implements MediaPlayer.OnPreparedListener, MediaPlayer.OnInfoListener /*implements MediaPlayer.OnPreparedListener */ {
     private static final String TAG = VideoActivity.class.getSimpleName();
     private ProgressDialog pDialog;
     public SurfaceHolder sholder;
@@ -30,6 +35,8 @@ public class VideoActivity extends Activity /*implements MediaPlayer.OnPreparedL
     // URL = "http://www.androidbegin.com/tutorial/AndroidCommercial.3gp";
 
     Bundle newBundy = new Bundle();
+    private MediaController videoMediaController;
+    private SweetAlertDialog mDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,22 +44,23 @@ public class VideoActivity extends Activity /*implements MediaPlayer.OnPreparedL
         setContentView(R.layout.activity_video);
 
 //        UrlPath = "android.resource://" + getPackageName() + "/" + R.raw.itc;
-
+        LatestFeedsModel latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
         Utils.debug("VideoActivity", "Inside Video Activity");
         video = (VideoView) findViewById(R.id.videoView);
-//        pDialog = new ProgressDialog(this);
-//        pDialog.setMessage("Loading...");
-//        pDialog.setCancelable(false);
-//        pDialog.show();
-//        video.setVideoPath("http://download.itcuties.com/teaser/itcuties-teaser-480.mp4");
-//        video.start();
-//        video.setOnPreparedListener(this);
-//        getSurfacehHolder(sholder);
-//
-//
-        String UrlPath = "android.resource://" + getPackageName() + "/" + R.raw.itcuties;
-        video.setVideoURI(Uri.parse(UrlPath));
+
+        String mUrl = latestFeedsModel.getMedia();
+        Utils.debug(TAG, "mUrl : " + mUrl);
+        videoMediaController = new MediaController(this);
+        video.setVideoPath(mUrl);
+        videoMediaController.setMediaPlayer(video);
+        video.setMediaController(videoMediaController);
+        video.requestFocus();
         video.start();
+        mDialog = Utils.showSweetProgressDialog(this, "Please wait...", SweetAlertDialog
+                .PROGRESS_TYPE);
+        mDialog.setCancelable(true);
+        video.setOnPreparedListener(this);
+        video.setOnInfoListener(this);
         RelativeLayout.LayoutParams playerParams = (android.widget.RelativeLayout.LayoutParams) video
                 .getLayoutParams();
         actualHeight = playerParams.height;
@@ -147,7 +155,20 @@ public class VideoActivity extends Activity /*implements MediaPlayer.OnPreparedL
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         finish();
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+    }
+
+    @Override
+    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+        if (mp.isPlaying()) {
+            Utils.closeSweetProgressDialog(this, mDialog);
+        }
+        return false;
     }
 }
 

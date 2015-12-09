@@ -92,6 +92,7 @@
                     android:background="@android:color/transparent"
                     android:padding="@dimen/text_row_height"
                     android:src="@drawable/camera"/>
+
             </RelativeLayout>
         </RelativeLayout>
     </ScrollView>

@@ -3,14 +3,22 @@ package com.capstone.app24.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 
 import com.capstone.app24.R;
-import com.capstone.app24.adapters.LatestFeedsAdapter;
+import com.capstone.app24.bean.LatestFeedsModel;
 import com.capstone.app24.interfaces.OnScrolling;
+import com.capstone.app24.webservices_model.FeedRequestModel;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -19,10 +27,12 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  */
 public class Utils {
 
+    private static final String TAG = Utils.class.getSimpleName();
     public static OnScrolling mScrolling;
 
     private Context _context;
     public static RecyclerView mRecyclerView;
+    private static FeedRequestModel mFeedModel;
 
     // constructor
     public Utils(Context context) {
@@ -76,8 +86,9 @@ public class Utils {
     }
 
     //..........Common method for showing Sweet progress Dialog.........
-    public static SweetAlertDialog showSweetProgressDialog(Context context, String loadingtext) {
-        final SweetAlertDialog pDialog = new SweetAlertDialog(context, SweetAlertDialog.PROGRESS_TYPE)
+    public static SweetAlertDialog showSweetProgressDialog(Context context, String loadingtext,
+                                                           int progressType) {
+        final SweetAlertDialog pDialog = new SweetAlertDialog(context, progressType)
                 .setTitleText(loadingtext == null ? context.getResources().getString(
                         R.string.progress_loading) : loadingtext);
         pDialog.setCancelable(false);
@@ -139,6 +150,20 @@ public class Utils {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    public static FeedRequestModel getFeed() {
+        if (mFeedModel == null)
+            mFeedModel = new FeedRequestModel();
+        return mFeedModel;
+    }
+
+    public static void setFeed(FeedRequestModel feedModel) {
+        if (mFeedModel == null)
+            mFeedModel = new FeedRequestModel();
+        mFeedModel = feedModel;
+        Utils.debug(TAG, "FeedRequestModel Saved Successfully");
+    }
+
+
     public static RecyclerView getRecyclerView() {
 
         return mRecyclerView;
@@ -150,16 +175,64 @@ public class Utils {
     }
 
     public void setPreferences(Activity activity, String key, boolean value) {
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putBoolean(key, value);
         editor.commit();
     }
 
-    public boolean getSharedPreferences(Activity activity, String key) {
-        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-        boolean b = sharedPref.getBoolean(key, false);
+    public boolean getSharedPreferences(Activity activity, String key, boolean defaultValue) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        boolean b = sharedPref.getBoolean(key, defaultValue);
         return b;
+    }
+
+    public void setPreferences(Activity activity, String key, String value) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    public String getSharedPreferences(Activity activity, String key, String defaultValue) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        String s = sharedPref.getString(key, defaultValue);
+        return s;
+    }
+
+    public static int getHeight(Activity activity) {
+        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        return height;
+
+    }
+
+    public void setLatestFeedPreferences(Activity activity, LatestFeedsModel model) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = sharedPref.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(model);
+        prefsEditor.putString(Constants.LATEST_FEED_MODEL, json);
+        prefsEditor.commit();
+        Log.e("Saved Model", "LatestModelSaved ");
+    }
+
+    public LatestFeedsModel getLatestFeedPreferences(Activity activity) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPref.getString(Constants.LATEST_FEED_MODEL, "");
+        LatestFeedsModel feedsModel = gson.fromJson(json, LatestFeedsModel.class);
+        return feedsModel;
     }
 
 }

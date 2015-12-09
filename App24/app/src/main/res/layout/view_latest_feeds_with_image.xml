@@ -35,7 +35,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/layout_heading"
         android:layout_marginTop="10dp"
-        android:paddingLeft="@dimen/main_screen_padding"
         android:paddingRight="@dimen/main_screen_padding">
 
         <TextView
@@ -74,15 +73,16 @@
         android:orientation="horizontal">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1">
             <TextView
                 android:id="@+id/txt_feed_body"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:gravity="center_vertical|left"
                 android:maxLines="5"
                 android:text="@string/chinese_lorem_ipsum"
                 android:textSize="@dimen/feed_body_text"/>
@@ -93,12 +93,25 @@
             android:layout_marginLeft="10dp"
             android:layout_weight="1.2"
             android:gravity="center">
-            <ImageView
-                android:id="@+id/img_preview"
+
+            <FrameLayout
+                android:id="@+id/progress_dialog"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true"
-                />
+                android:layout_height="match_parent">
+
+                <ProgressBar android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:layout_gravity="center"/>
+
+                <ImageView
+                    android:id="@+id/img_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    />
+            </FrameLayout>
+
+
             <RelativeLayout
                 android:id="@+id/layout_img_video_preview"
                 android:layout_width="match_parent"
@@ -117,7 +130,7 @@
                     android:layout_marginBottom="5dp"
                     android:layout_marginTop="5dp"
                     android:src="@drawable/video_preview_icon"
-                    android:visibility="visible"/>
+                    android:visibility="gone"/>
 
 
             </RelativeLayout>

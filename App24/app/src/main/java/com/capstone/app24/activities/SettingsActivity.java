@@ -11,9 +11,14 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.capstone.app24.R;
+import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AlertToastManager;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
+import com.capstone.app24.webservices_model.UserLoginResponseModel;
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
@@ -22,8 +27,17 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 6/11/15.
@@ -42,6 +56,11 @@ public class SettingsActivity extends BaseActivity {
             .clientId(CONFIG_CLIENT_ID);
 
     private LoginButton fb_btn;
+
+    /* Volley Request Tags */
+    private String res = "";
+    private String tag_string_req = "feeds_req";
+    /* End of Volley Request Tags */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +109,9 @@ public class SettingsActivity extends BaseActivity {
                 break;
             case R.id.layout_logout:
                 AlertToastManager.showToast("Logout ", this);
+                logout();
+                LoginManager.getInstance().logOut();
+                // finishAffinity();
                 /*if (!new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN)) {
                     Utils.debug(TAG, "Inside If Condition");
                     fb_btn.performClick();
@@ -101,6 +123,81 @@ public class SettingsActivity extends BaseActivity {
                 break;
 
         }
+    }
+
+    private boolean logout() {
+        final SweetAlertDialog pd = Utils.showSweetProgressDialog(SettingsActivity.this,
+                getResources
+                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_LOGOUT,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+                        Utils.closeSweetProgressDialog(SettingsActivity.this, pd);
+                        res = response.toString();
+                        try {
+                            logoutResponse(res);
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Utils.closeSweetProgressDialog(SettingsActivity.this, pd);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+//                        user_id(int)
+                Map<String, String> params = new HashMap<String, String>();
+                Utils.debug("acc", new Utils().getSharedPreferences(SettingsActivity.this, Constants
+                        .KEY_FACEBOOK_ACCESS_TOKEN, Constants.EMPTY));
+                new Utils().getSharedPreferences(SettingsActivity.this, Constants
+                        .KEY_FACEBOOK_ACCESS_TOKEN, Constants.EMPTY);
+                params.put("user_deviceToken", new Utils().getSharedPreferences(SettingsActivity.this, Constants
+                        .KEY_FACEBOOK_ACCESS_TOKEN, Constants.EMPTY));
+                Utils.info("params...", params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void logoutResponse(String res) throws JSONException {
+        JSONObject jsonObject = new JSONObject(res);
+        if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+            new Utils(SettingsActivity
+                    .this).setPreferences
+                    (SettingsActivity.this, Constants
+                            .KEY_IS_LOGGED_IN, false);
+
+            //LoginManager.getInstance().logOut();
+//            AccessToken accessToken = AccessToken.getCurrentAccessToken();
+//            if (accessToken != null) {
+//                LoginManager.getInstance().logOut();
+//            }
+//            Utils.showSweetProgressDialog(this, jsonObject.getString(APIsConstants.KEY_MESSAGE),
+//                    SweetAlertDialog.SUCCESS_TYPE);
+            Intent intent = new Intent(SettingsActivity.this, SplashActivity.class);
+            startActivity(intent);
+        } else {
+            try {
+                Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
+                Utils.showSweetProgressDialog(SettingsActivity.this, jsonObject.getString(APIsConstants
+                        .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     public void onBuyPressed() {
