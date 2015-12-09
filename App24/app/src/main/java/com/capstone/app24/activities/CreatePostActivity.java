@@ -29,13 +29,19 @@ import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.ShareApi;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.ShareButton;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.entities.Feed;
 import com.sromku.simple.fb.entities.Photo;
-import com.sromku.simple.fb.entities.Story;
 import com.sromku.simple.fb.entities.Video;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
@@ -86,24 +92,26 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private ShareButton shareButton;
     private SimpleFacebook mSimpleFacebook;
     private Intent intent;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
-//        callbackManager = CallbackManager.Factory.create();
-//        Permission[] permissions = new Permission[]{
-//                Permission.USER_PHOTOS,
-//                Permission.EMAIL,
-//                Permission.PUBLISH_ACTION
-//        };
-//
-//        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-//                .setAppId("1673090976236867")
-//                .setNamespace("com_capstone_app")
-//                .setPermissions(permissions)
-//                .build();
-//        SimpleFacebook.setConfiguration(configuration);
+        mSimpleFacebook = SimpleFacebook.getInstance(this);
+        callbackManager = CallbackManager.Factory.create();
+        Permission[] permissions = new Permission[]{
+                Permission.USER_PHOTOS,
+                Permission.EMAIL,
+                Permission.PUBLISH_ACTION
+        };
+
+        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
+                .setAppId("1673090976236867")
+                .setNamespace("com_capstone_app")
+                .setPermissions(permissions)
+                .build();
+        SimpleFacebook.setConfiguration(configuration);
 
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.post));
         initializeViews();
@@ -446,9 +454,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 startActivity(intent);
                 break;
             case R.id.txt_save:
-//                MyAsyncTask task = new MyAsyncTask();
-//                task.setListener(this);
-//                task.execute();
                 if (NetworkUtils.isOnline(this)) {
                     makePostFeedRequest();
                 } else {
@@ -486,38 +491,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
                     startActivity(intent);
                 }
-//                if (getIntent() != null) {
-//                    intentLauncher = getIntent();
-//                    if (intentLauncher.hasExtra("media_type")) {
-//                        Utils.debug(TAG, "HAS MEDIA TYPE : " + intentLauncher.getStringExtra("media_type"));
-//                        if (intentLauncher.getStringExtra("media_type").equalsIgnoreCase(Constants
-//                                .KEY_VIDEOS)) {
-//                            Utils.debug(TAG, "HAS MEDIA TYPE Video OK: " + intentLauncher
-//                                    .getStringExtra("media_type"));
-//
-//                            intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
-//                            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
-//                            startActivity(intent);
-//                        } else if (intentLauncher.getStringExtra("media_type").equalsIgnoreCase(Constants
-//                                .KEY_IMAGES)) {
-//                            Utils.debug(TAG, "HAS MEDIA TYPE Image OK: " + intentLauncher
-//                                    .getStringExtra("media_type"));
-//                            intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
-//                            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
-//                            intent.putExtra(Constants.POST_BODY, edit_write_post.getText()
-//                                    .toString().trim());
-//                            intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
-//                            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-//                        }
-//                    } else {
-//                        intent = new Intent(CreatePostActivity.this, AddMediaActivity.class);
-//                        intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
-//                        intent.putExtra(Constants.POST_BODY, edit_write_post.getText()
-//                                .toString().trim());
-//                        intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
-//                        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-//                    }
-//                }
                 break;
         }
     }
@@ -579,18 +552,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     }
 
-//    @Override
-//    public void onPreExecuteConcluded() {
-//        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, "Please wait...");
-//        Utils.debug(Constants.API_TAG, "Inside OnPreExecute");
-//        mRestAdapter = new RestAdapter.Builder()
-//                .setEndpoint(APIsConstants.API_BASE_URL)
-//                .build();
-//    }
-
-//    @Override
-//    public void onPostExecuteConcluded(Object result) {
-//    }
 
     private boolean makePostFeedRequest() {
         final SweetAlertDialog pd = Utils.showSweetProgressDialog(CreatePostActivity.this,
@@ -659,24 +620,23 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private void postToWall() {
 
         // set object to be shared
-        Story.StoryObject storyObject = new Story.StoryObject.Builder()
-                .setUrl("http://romkuapps.com/github/simple-facebook/object-apple.html")
-                .setNoun("post")
-                .build();
-
-// set action to be done
-        Story.StoryAction storyAction = new Story.StoryAction.Builder()
-                .setAction("post")
-                        //.addProperty("taste", "sweet")
-                .build();
-
-// build story
-        Story story = new Story.Builder()
-                .setObject(storyObject)
-                .setAction(storyAction)
-                .build();
-
-// publish
+//        Story.StoryObject storyObject = new Story.StoryObject.Builder()
+//                .setUrl("http://romkuapps.com/github/simple-facebook/object-apple.html")
+//                .setNoun("post")
+//                .build();
+//        // set action to be done
+//        Story.StoryAction storyAction = new Story.StoryAction.Builder()
+//                .setAction("post")
+//                        //.addProperty("taste", "sweet")
+//                .build();
+//
+//        // build story
+//        Story story = new Story.Builder()
+//                .setObject(storyObject)
+//                .setAction(storyAction)
+//                .build();
+//
+//// publish
 //        mSimpleFacebook.publish(story, onPublishListener);
 
 
@@ -713,20 +673,20 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 //        mSimpleFacebook.publish(story, onPublishListener);
 
         //create(StoryObject, OnCreateStoryObject)
-//        // Create an object
-//        Utils.debug("fb", "inside Post to wall ");
-//
-//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-//                .putString("og:type", "books.book")//613292//
-//                .putString("og:title", "A Game of Thrones")
-//                .putString("og:description", "In the frozen wastes to the north of Winterfell, sinister and supernatural forces are mustering.")
-//                .putString("books:isbn", "0-553-57340-3")
-//                .build();
-//
-////        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-////                .setActionType("books.reads")
-////                .putObject("book", object)
-////                .build();
+        // Create an object
+        Utils.debug("fb", "inside Post to wall ");
+
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "books.book")//613292//
+                .putString("og:title", "A Game of Thrones")
+                .putString("og:description", "In the frozen wastes to the north of Winterfell, sinister and supernatural forces are mustering.")
+                .putString("books:isbn", "0-553-57340-3")
+                .build();
+
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("com_capstone_app.eat")
+                .putObject("book", object)
+                .build();
 ////        Create an action
 //        Bitmap bitmap = null;
 //        try {
@@ -748,31 +708,31 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 //                .putPhoto("image", photo)
 //                .build();//
 //        Utils.debug("fb", "Setting Content ");
-//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-//                .setPreviewPropertyName("book")
-//                .setAction(action)
-//                .build();
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("book")
+                .setAction(action)
+                .build();
 //        Utils.debug("fb", "Showing Dialog ");
 //        shareButton.setShareContent(content);
 
 //        ShareDialog.show(this, content);
 //        Utils.debug("fb", "GOint to share feed on facebook with call back ");
-//        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
-//            @Override
-//            public void onSuccess(Sharer.Result result) {
-//                Utils.debug("fb", "facebook Result  : " + result);
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                Utils.debug("fb", "facebook Cancel  : ");
-//            }
-//
-//            @Override
-//            public void onError(FacebookException error) {
-//                Utils.debug("fb", "facebook Error  : " + error);
-//            }
-//        });
+        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Utils.debug("fb", "facebook Result  : " + result);
+            }
+
+            @Override
+            public void onCancel() {
+                Utils.debug("fb", "facebook Cancel  : ");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Utils.debug("fb", "facebook Error  : " + error);
+            }
+        });
 //
 
     }
@@ -819,6 +779,10 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         Utils.showSweetProgressDialog(CreatePostActivity.this, jsonObject
                                 .getString(APIsConstants.KEY_MESSAGE), SweetAlertDialog
                                 .SUCCESS_TYPE);
+
+                        postStoryToWall();
+
+
                         finish();
                         Intent intent;
                         intent = new Intent(CreatePostActivity.this, MainActivity.class);
@@ -844,6 +808,55 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void postStoryToWall() {
+        Utils.debug(TAG, "Inside Post to Wall ");
+        String userId = new Utils().getSharedPreferences(CreatePostActivity.this, Constants
+                .KEY_USER_DETAILS, "");
+        String title = edit_post_title.getText().toString().trim();
+        String description = edit_write_post.getText().toString().trim();
+        if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
+            Feed feed = new Feed.Builder()
+                    .setName(title)
+                    .setDescription(description)
+                    .setPicture("http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1449576680_.jpg")
+                    .build();
+            mSimpleFacebook.publish(feed, onPublishListener);
+        }
+        if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
+            Feed feed = new Feed.Builder()
+                    .setName(title)
+                    .setDescription(description)
+                    .setPicture("http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1449576680_.jpg")
+                    .build();
+            mSimpleFacebook.publish(feed, onPublishListener);
+
+        }
+        if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+            Feed feed = new Feed.Builder()
+                    .setName(title)
+                    .setDescription(description)
+                    .setPicture("http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1449576680_.jpg")
+                    .build();
+            mSimpleFacebook.publish(feed, onPublishListener);
+        }
+
+
+        /*Feed feed = new Feed.Builder()
+//                .setMessage(title)
+                .setName(title)
+//                .setCaption(description)
+                .setDescription(description)
+                .setPicture("http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1449576680_.jpg")
+//                .setLink("https://www.facebook.com/games/?app_id=1673090976236867&fb_object_id=178413342510329&fb_action_ids=1705467516354449&fb_action_types=books.reads&pnref=story")
+                        //.addAction("Clone", "https://github.com/sromku/android-simple-facebook")
+                        //.addProperty("Full documentation", "http://sromku.github" +
+                        //".io/android-simple-facebook", "http://sromku.github.io/android-simple-facebook")
+                        // .addProperty("Stars", "14")
+
+                .build();*/
+
     }
 
 //    private String getvideoFilePathFromUri(Uri uri) {

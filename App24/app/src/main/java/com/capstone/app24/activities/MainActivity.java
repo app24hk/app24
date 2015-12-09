@@ -48,7 +48,9 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.ogaclejapan.arclayout.ArcLayout;
+import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.entities.Feed;
 import com.sromku.simple.fb.entities.Story;
 import com.sromku.simple.fb.listeners.OnCreateStoryObject;
@@ -105,6 +107,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         fb_btn = (LoginButton) findViewById(R.id.login_button);
         initializeViews();
         mSimpleFacebook = SimpleFacebook.getInstance(this);
+        Permission[] permissions = new Permission[]{
+                Permission.USER_PHOTOS,
+                Permission.EMAIL,
+                Permission.PUBLISH_ACTION
+        };
+
+        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
+                .setAppId("1673090976236867")
+                .setNamespace("com_capstone_app")
+                .setPermissions(permissions)
+                .build();
+        SimpleFacebook.setConfiguration(configuration);
+
+
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
 
@@ -198,13 +214,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
         ibtn_setting = (ImageButton) findViewById(R.id.ibtn_setting);
 
-
-        onPublishListener = new OnPublishListener() {
-            @Override
-            public void onComplete(String id) {
-                Utils.info(TAG, "Published successfully. id = " + id);
-            }
-        };
     }
 
     private void setAlarm() {
@@ -301,35 +310,56 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private void postStory() {
 
-        // set object to be shared
-        Story.StoryObject storyObject = new Story.StoryObject.Builder()
-                .setUrl("http://romkuapps.com/github/simple-facebook/object-apple.html")
-                .setNoun("food")
+     /*   ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "food.food")//613292//
+                .putString("og:title", "A Game of Thrones")
+                .putString("og:description", "In the frozen wastes to the north of Winterfell, sinister and supernatural forces are mustering.")
                 .build();
 
-// set action to be done
-        Story.StoryAction storyAction = new Story.StoryAction.Builder()
-                .setAction("eat")
-                .addProperty("taste", "sweet")
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("eat:food")
+                .putObject("food", object)
+                .build();*/
+
+//        Feed feed = new Feed.Builder()
+//                .setMessage("Clone it out...")
+//                .setName("Simple Facebook SDK for Android")
+//                .setCaption("Code less, do the same.")
+//                .setDescription("Login, publish feeds and stories, invite friends and more...")
+//                .setPicture("https://raw.github.com/sromku/android-simple-facebook/master/Refs/android_facebook_sdk_logo.png")
+//                .setLink("https://github.com/sromku/android-simple-facebook")
+//                .addAction("Clone", "https://github.com/sromku/android-simple-facebook")
+//                .addProperty("Full documentation", "http://sromku.github.io/android-simple-facebook", "http://sromku.github.io/android-simple-facebook")
+//                .addProperty("Stars", "14")
+//                .build();
+//        mSimpleFacebook.publish(feed, onPublishListener);
+//
+
+        /*ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("food")
+                .setAction(action)
                 .build();
 
-// build story
-        Story story = new Story.Builder()
-                .setObject(storyObject)
-                .setAction(storyAction)
-                .build();
+        ShareDialog.show(this, content);
 
+        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Utils.debug("fb", "facebook Result  : " + result);
+                Utils.debug("fb", "facebook Post Id  : " + result.getPostId());
 
-//        mSimpleFacebook.create(storyObject, new OnCreateStoryObject() {
-//            @Override
-//            public void onComplete(String response) {
-//                super.onComplete(response);
-//                Utils.debug(TAG, "response : " + response);
-//            }
-//        });
-// publish
-        mSimpleFacebook.publish(story, onPublishListener);
+            }
 
+            @Override
+            public void onCancel() {
+                Utils.debug("fb", "facebook Cancel  : ");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Utils.debug("fb", "facebook Error  : " + error);
+            }
+        });*/
 
     }
 
