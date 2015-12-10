@@ -11,6 +11,7 @@ public class APIsConstants {
     public static final String API_SAVE_FEEDS = "/saveFeeds";
     public static final String API_RECENT_FEEDS = "/recentFeed";
     public static final String API_LOGOUT = "/logout";
+    public static final String API_FEED_SEEN = "/feedSeen";
 
 
     public static final String KEY_RESULT = "result";
@@ -42,4 +43,5 @@ public class APIsConstants {
     public static final String KEY_MODIFIED = "modified";
     public static final String KEY_VIEWCOUNT = "viewcount";
     public static final String KEY_THUMBNAIL = "thumbnail";
+    public static final String KEY_FEED_ID = "feed_id";
 }

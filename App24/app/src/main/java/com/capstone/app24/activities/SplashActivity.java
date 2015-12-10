@@ -24,7 +24,6 @@ import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.UserLoginModel;
 import com.capstone.app24.webservices_model.UserLoginResponseModel;
-import com.crittercism.app.Crittercism;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -79,7 +78,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
+        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
@@ -112,6 +111,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         permissions.add("public_profile");
         permissions.add("email");
         permissions.add("user_birthday");
+        permissions.add("publish_actions");
 
       /*  //Facebook Button Initialization
         fb_btn.setReadPermissions(permissions);
@@ -169,7 +169,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
     //------------------------------Facebook SignIn or SignUp---------------------
     public void FacebookIntegration() {
-        fb_btn.setReadPermissions(Arrays.asList("public_profile, email, user_birthday, user_friends"));
+        fb_btn.setReadPermissions(Arrays.asList("public_profile, email, user_birthday, " +
+                "user_friends"));
         fb_btn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {

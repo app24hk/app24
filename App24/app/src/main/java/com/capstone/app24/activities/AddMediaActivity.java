@@ -30,6 +30,7 @@ import com.capstone.app24.utils.Base64;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
+import com.sromku.simple.fb.entities.Feed;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -224,9 +225,8 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                 finish();
                 Intent intent;
                 intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                intent.putExtra(Constants.POST_TITLE, getIntent().getStringExtra(Constants.POST_TITLE));
-                intent.putExtra(Constants.POST_BODY, getIntent().getStringExtra(Constants.POST_TITLE));
                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
+                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
                 startActivity(intent);
                 break;
         }
@@ -246,13 +246,15 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             Utils.debug(TAG, extras + "Inside OnactivityResult");
 
             if (isFromMediaActivity) {
-
+                FeedRequestModel feedModel = Utils.getFeed();
+                feedModel.setType(mType);
+                Utils.setFeed(feedModel);
                 Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
                 intent.putExtra("media_type", Constants.KEY_IMAGES);
+                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
                 intent.putExtra("bundle", extras);
-                intent.putExtra(Constants.POST_TITLE, getIntent().getStringExtra(Constants.POST_TITLE));
-                intent.putExtra(Constants.POST_BODY, getIntent().getStringExtra(Constants.POST_TITLE));
+                Bitmap image = (Bitmap) extras.get("data");
                 finish();
                 startActivity(intent);
             } else {
@@ -516,8 +518,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         finish();
         Intent intent;
         intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-        intent.putExtra(Constants.POST_TITLE, getIntent().getStringExtra(Constants.POST_TITLE));
-        intent.putExtra(Constants.POST_BODY, getIntent().getStringExtra(Constants.POST_TITLE));
         intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
         intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
         startActivity(intent);

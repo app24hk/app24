@@ -24,12 +24,24 @@ import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.utils.APIsConstants;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 4/11/15.
@@ -42,6 +54,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     private LayoutInflater mInflater;
     Intent intent;
     List<LatestFeedsModel> mLatestFeedList = new ArrayList<>();
+    private String res = "";
 
     public LatestFeedsAdapter(Activity activity, List<LatestFeedsModel> latestFeedList) {
         mActivity = activity;
@@ -161,45 +174,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         });
 
 
-//        if (position % 3 == 0) {
-//            holder.img_preview.setVisibility(View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.VISIBLE);
-//            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
-//            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.chinese_lorem_ipsum));
-//            Uri videoURI = Uri.parse("android.resource://" + mActivity.getPackageName() + "/"
-//                    + R.raw.itcuties);
-//            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-//            retriever.setDataSource(mActivity, videoURI);
-//            Bitmap bitmap = retriever
-//                    .getFrameAtTime(10, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
-//            Drawable drawable = new BitmapDrawable(mActivity.getResources(), bitmap);
-//            holder.img_preview.setImageDrawable(drawable);
-//        } else if (position % 3 == 1) {
-//            holder.img_preview.setVisibility(View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
-//            holder.img_preview.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
-//        } else {
-//            holder.img_preview.setVisibility(View.GONE);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//            holder.layout_img_video_preview.setVisibility(View.GONE);
-//            holder.txt_feed_body.setText(mActivity.getResources().getString(R.string.lorem_ipsum));
-//
-//        }
-//        String UrlPath = "android.resource://" + mActivity.getPackageName() + "/" + R.raw.itcuties;
-//        Utils.debug(TAG, "Url Path > > > " + UrlPath);            //new MediaMetadataRetriever()
-//        // .getFrameAtTime()
-//        Bitmap thumb = ThumbnailUtils.createVideoThumbnail("http://download.itcuties.com/teaser/itcuties-teaser-480.mp4", MediaStore.Images.Thumbnails
-//                .MICRO_KIND);
-//        holder.img_preview.setImageBitmap(thumb);
-
-//        ContentResolver crThumb = mActivity.getContentResolver();
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inSampleSize = 1;
-//        Bitmap curThumb = MediaStore.Video.Thumbnails.getThumbnail(crThumb, R.raw.itcuties,
-//                MediaStore.Video.Thumbnails.MINI_KIND, options);
-//        holder.img_preview.setImageBitmap(curThumb);
-
     }
 
     @Override
@@ -240,6 +214,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                             (getLayoutPosition()));
                     Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
                             .getLatestFeedPreferences(mActivity));
+                    makeSeenPostRequest(mLatestFeedList.get(getLayoutPosition()).getUser_id(), mLatestFeedList.get(getLayoutPosition()).getId());
                     intent = new Intent(mActivity, PostDetailActivity.class);
                     //intent.putExtra("type", getLayoutPosition());
                     mActivity.startActivity(intent);
@@ -280,5 +255,52 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         dialog.show();
     }
 
+    private boolean makeSeenPostRequest(final String user_id, final String id) {
+        final SweetAlertDialog pd = Utils.showSweetProgressDialog(mActivity,
+                mActivity.getResources
+                        ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+                        Utils.closeSweetProgressDialog(mActivity, pd);
+                        res = response.toString();
+                        try {
+                            //  setFeedData(res);
+                            Utils.debug("fb", "Now going to post on Facebook");
+                            handleResponse(res);
+                            //  postToWall();
+                        } catch (Exception e) {
+                            //TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Utils.closeSweetProgressDialog(mActivity, pd);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, user_id);
+                params.put(APIsConstants.KEY_FEED_ID, id);
+                Utils.info("params...", params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleResponse(String res) {
+        Utils.debug(TAG, "Response :  " + res);
+    }
 }
 
