@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by amritpal on 4/11/15.
  */
-public class MostViewedModel implements Serializable {
+public class OwnerDataModel implements Serializable {
     private String id;
     private String title;
     private String description;
@@ -17,13 +17,14 @@ public class MostViewedModel implements Serializable {
     private String user_name;
     private String viewcount;
     private String thumbnail;
+    private String feed_owner;
 
-    public MostViewedModel() {
+    public OwnerDataModel() {
     }
 
-    public MostViewedModel(String id, String title, String description, String media, String
-            type, String user_id, String created, String modified, String user_name, String
-                                   viewcount, String thumbnail) {
+    public OwnerDataModel(String id, String title, String description, String media, String type,
+                          String user_id, String created, String modified, String user_name,
+                          String viewcount, String thumbnail, String feed_owner) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -35,6 +36,7 @@ public class MostViewedModel implements Serializable {
         this.user_name = user_name;
         this.viewcount = viewcount;
         this.thumbnail = thumbnail;
+        this.feed_owner = feed_owner;
     }
 
     public String getId() {
@@ -123,5 +125,13 @@ public class MostViewedModel implements Serializable {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getFeed_owner() {
+        return feed_owner;
+    }
+
+    public void setFeed_owner(String feed_owner) {
+        this.feed_owner = feed_owner;
     }
 }

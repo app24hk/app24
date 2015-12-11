@@ -69,7 +69,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         mContext = getActivity();
         mActivity = getActivity();
         initializeViews();
-        updateUI();
         MainActivity.tabs.setVisibility(View.VISIBLE);
         MainActivity.layout_user_profle.setVisibility(View.GONE);
         return mView;
@@ -78,6 +77,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onResume() {
         super.onResume();
+        updateUI();
     }
 
     /**
@@ -93,6 +93,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         list_latest_feeds.setHasFixedSize(true);
         list_latest_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
         list_latest_feeds.setAdapter(mLatestFeedsAdapter);
+        mLatestFeedsAdapter.notifyDataSetChanged();
       /*  list_latest_feeds.addOnItemTouchListener(new GlobalClass.RecyclerTouchListener(getActivity(),
                 list_latest_feeds, new GlobalClass.ClickListener() {
             @Override
@@ -188,6 +189,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
 //                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
+                params.put(APIsConstants.TAB_TYPE, APIsConstants.ONE);
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -199,6 +201,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private List<LatestFeedsModel> refreshLatestFeeds(String res) throws JSONException {
         Utils.debug(TAG, "Response  : " + res);
+        latestFeedList.clear();
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject != null) {
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {

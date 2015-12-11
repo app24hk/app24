@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.capstone.app24.R;
@@ -20,13 +19,10 @@ import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.MostViewedAdapter;
 import com.capstone.app24.animations.HidingScrollListener;
 import com.capstone.app24.bean.LatestFeedsModel;
-import com.capstone.app24.bean.MostViewedModel;
-import com.capstone.app24.sliding_tabs.SlidingTabLayout;
 import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.NetworkUtils;
-import com.capstone.app24.utils.RecyclerViewDisabler;
 import com.capstone.app24.utils.Utils;
 
 import org.json.JSONArray;
@@ -57,7 +53,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
 
     private int mPageNo = 1;
     private SwipeRefreshLayout swipeRefreshLayout;
-    List<MostViewedModel> mMostViewedFeedList = new ArrayList<>();
+    List<LatestFeedsModel> mMostViewedFeedList = new ArrayList<>();
     /* End of Volley Request Tags */
     private SweetAlertDialog mDialog;
     private String res = "";
@@ -76,11 +72,11 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     private void updateUI() {
-//        if (NetworkUtils.isOnline(getActivity()))
-//        //getMostViewedFeeds();
-//        else
-//        Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
-//                .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+        if (NetworkUtils.isOnline(getActivity()))
+            getMostViewedFeeds();
+        else
+            Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
+                    .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
 
         mMostViewedAdapter = new MostViewedAdapter(getActivity(), mMostViewedFeedList);
         most_viewed_feeds.setAdapter(mMostViewedAdapter);
@@ -140,7 +136,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                             ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                APIsConstants.API_BASE_URL + APIsConstants.API_MOST_VIEWED,
+                APIsConstants.API_BASE_URL + APIsConstants.API_RECENT_FEEDS,
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -168,6 +164,8 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
 //                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
+                params.put(APIsConstants.TAB_TYPE, APIsConstants.TWO);
+
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -177,7 +175,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
         return false;
     }
 
-    private List<MostViewedModel> refreshMostViewedFeeds(String res) {
+    private List<LatestFeedsModel> refreshMostViewedFeeds(String res) {
         Utils.debug(TAG, "Response  : " + res);
         JSONObject jsonObject = null;
         try {
@@ -192,7 +190,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                     if (jsonArray != null) {
 
                         for (int i = 0; i < jsonArray.length(); i++) {
-                            MostViewedModel mostViewedModel = new MostViewedModel();
+                            LatestFeedsModel mostViewedModel = new LatestFeedsModel();
                             JSONObject object = jsonArray.getJSONObject(i);
                             if (object != null) {
                                 try {
@@ -288,6 +286,6 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     public void onRefresh() {
         mPageNo = mPageNo + 1;
         Utils.debug(TAG, "swipeRefreshLayout mPAge Number" + mPageNo);
-        //getMostViewedFeeds();
+        getMostViewedFeeds();
     }
 }

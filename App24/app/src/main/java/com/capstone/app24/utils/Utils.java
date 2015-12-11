@@ -10,16 +10,12 @@ import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 
 import com.capstone.app24.R;
 import com.capstone.app24.bean.LatestFeedsModel;
-import com.capstone.app24.bean.MostViewedModel;
 import com.capstone.app24.interfaces.OnScrolling;
 import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -236,24 +232,5 @@ public class Utils {
         return feedsModel;
     }
 
-    public void setMostViewedPreferences(Activity activity, MostViewedModel model) {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
-                .getString(R.string.app_name), Context.MODE_PRIVATE);
-        SharedPreferences.Editor prefsEditor = sharedPref.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(model);
-        prefsEditor.putString(Constants.MOST_FEEDS_MODEL, json);
-        prefsEditor.commit();
-        Log.e("Saved Model", "MostViewedSaved ");
-    }
-
-    public MostViewedModel getMostViewedPreferences(Activity activity) {
-        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
-                .getString(R.string.app_name), Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPref.getString(Constants.MOST_FEEDS_MODEL, "");
-        MostViewedModel mostViewedModel = gson.fromJson(json, MostViewedModel.class);
-        return mostViewedModel;
-    }
 
 }

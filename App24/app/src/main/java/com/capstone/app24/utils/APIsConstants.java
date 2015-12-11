@@ -14,6 +14,7 @@ public class APIsConstants {
     public static final String API_FEED_SEEN = "/feedSeen";
     public static final String API_EDIT_FEED = "/editFeed";
     public static final String API_MOST_VIEWED = "/mostViewed";
+    public static final String API_FEED_DATA = "/getFeedData";
 
     public static final String KEY_RESULT = "result";
     public static final String KEY_USERINFO = "userInfo";
@@ -44,5 +45,9 @@ public class APIsConstants {
     public static final String KEY_MODIFIED = "modified";
     public static final String KEY_VIEWCOUNT = "viewcount";
     public static final String KEY_THUMBNAIL = "thumbnail";
+    public static final String KEY_FEED_OWNER = "feed_owner";
     public static final String KEY_FEED_ID = "feed_id";
+    public static final String TAB_TYPE = "tabType";
+    public static final String ONE = "1";
+    public static final String TWO = "2";
 }

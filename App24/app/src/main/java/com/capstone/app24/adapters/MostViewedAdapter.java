@@ -3,14 +3,8 @@ package com.capstone.app24.adapters;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -20,7 +14,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -29,11 +22,9 @@ import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.LatestFeedsModel;
-import com.capstone.app24.bean.MostViewedModel;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
-import com.paypal.android.sdk.m;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,13 +40,13 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     private Activity mActivity;
     private LayoutInflater mInflater;
     Intent intent;
-    List<MostViewedModel> mMostViewedFeedList = new ArrayList<>();
+    List<LatestFeedsModel> mMostViewedFeedList = new ArrayList<>();
 
-    public MostViewedAdapter(Activity activity, List<MostViewedModel> mMostViewedFeedList) {
+    public MostViewedAdapter(Activity activity, List<LatestFeedsModel> mostViewedFeedList) {
         mActivity = activity;
         mInflater = LayoutInflater.from(activity);
         mImageHeight = Utils.getHeight(mActivity);
-
+        mMostViewedFeedList = mostViewedFeedList;
         //(LayoutInflater) mActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -69,7 +60,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
 
     @Override
     public void onBindViewHolder(final MostViewedAdapter.ViewHolder holder, final int position) {
-        MostViewedModel mostViewedModel = new MostViewedModel();
+        LatestFeedsModel mostViewedModel = new LatestFeedsModel();
         mostViewedModel = mMostViewedFeedList.get(position);
 
         if (position == 0 && MainActivity.tabs.getVisibility() == View.VISIBLE) {
@@ -119,7 +110,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         holder.img_video_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Utils(mActivity).setMostViewedPreferences(mActivity, mMostViewedFeedList.get
+                new Utils(mActivity).setLatestFeedPreferences(mActivity, mMostViewedFeedList.get
                         (position));
                 Utils.debug(TAG, "img_video_preview Clicked : Data of Latest Feed " +
                         "Model : " + new Utils(mActivity)
@@ -132,7 +123,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             @Override
             public void onClick(View v) {
                 if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
-                    new Utils(mActivity).setMostViewedPreferences(mActivity, mMostViewedFeedList.get
+                    new Utils(mActivity).setLatestFeedPreferences(mActivity, mMostViewedFeedList.get
                             (position));
                     Utils.debug(TAG, "layout_img_video_preview Clicked : Data of Latest Feed " +
                             "Model : " + new Utils(mActivity)
@@ -194,7 +185,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new Utils(mActivity).setMostViewedPreferences(mActivity, mMostViewedFeedList.get
+                    new Utils(mActivity).setLatestFeedPreferences(mActivity, mMostViewedFeedList.get
                             (getLayoutPosition()));
                     Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
                             .getLatestFeedPreferences(mActivity));

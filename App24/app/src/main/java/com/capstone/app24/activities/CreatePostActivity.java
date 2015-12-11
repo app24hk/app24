@@ -348,7 +348,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         edit_write_post = (EditText) findViewById(R.id.edit_write_post);
         txt_save = (TextView) findViewById(R.id.txt_save);
 
-        shareButton = (ShareButton) findViewById(R.id.shareButton);
+        //shareButton = (ShareButton) findViewById(R.id.shareButton);
         callbackManager = CallbackManager.Factory.create();
         //shareButton.setOnClickListener(this);
     }

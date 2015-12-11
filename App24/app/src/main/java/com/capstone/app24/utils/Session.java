@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.capstone.app24.R;
+import com.capstone.app24.bean.OwnerDataModel;
 import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.capstone.app24.webservices_model.UserLoginModel;
 import com.google.gson.Gson;
@@ -17,6 +18,7 @@ public class Session {
     Activity mActivity;
     Context mContext;
     SharedPreferences mPrefs;
+    public static OwnerDataModel mOwnerDataModel;
 
     public Session(Activity mActivity) {
         this.mActivity = mActivity;
@@ -59,5 +61,15 @@ public class Session {
         String json = mPrefs.getString(Constants.KEY_USER_DETAILS, "");
         FeedRequestModel feedModel = gson.fromJson(json, FeedRequestModel.class);
         return feedModel;
+    }
+
+    public static void setOwnerModel(OwnerDataModel ownerDataModel) {
+        if (mOwnerDataModel == null)
+            mOwnerDataModel = new OwnerDataModel();
+        mOwnerDataModel = ownerDataModel;
+    }
+
+    public static OwnerDataModel getOwnerModel() {
+        return mOwnerDataModel;
     }
 }

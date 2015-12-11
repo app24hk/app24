@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
@@ -21,12 +22,32 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.capstone.app24.R;
 import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.bean.OwnerDataModel;
+import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AlertToastManager;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.security.acl.Owner;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 4/11/15.
@@ -43,11 +64,23 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private Intent intent;
     //private LikeView likeView;
     LatestFeedsModel latestFeedsModel;
+    /* Volley Request Tags */
+    private String res = "";
+    private String tag_string_req = "feeds_req";
+    private int mPageNo = 1;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    List<LatestFeedsModel> latestFeedList = new ArrayList<>();
+    /* End of Volley Request Tags */
+    private SweetAlertDialog mDialog;
+    private OwnerDataModel mOwnerDataModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
+
+        getFeedOwnerData();
+
         setHeader(null, true, true, false, false, true, null);
         type = getIntent().getIntExtra("type", 0);
         initializeViews();
@@ -56,6 +89,157 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         mAdView.loadAd(adRequest);
         setClickListeners();
         updateUI();
+    }
+
+    private boolean getFeedOwnerData() {
+        /*
+         Starting a progress Dialog...
+         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
+         it will show (Searching...)
+         */
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_DATA,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+
+                        res = response.toString();
+                        try {
+                            makeOwnerDataModel(res);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (mPageNo == 1)
+                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+//                        user_id(int)
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_FEED_ID, latestFeedsModel.getId());
+                params.put(APIsConstants.KEY_USER_ID, latestFeedsModel.getUser_id());
+                Utils.info("params...", params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void makeOwnerDataModel(String res) {
+        Utils.debug(TAG, "Response  : " + res);
+        latestFeedList.clear();
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    JSONObject object = jsonObject.getJSONObject(APIsConstants.KEY_FEED_DATA);
+                    if (object != null) {
+                        mOwnerDataModel = new OwnerDataModel();
+                        if (object != null) {
+                            try {
+                                mOwnerDataModel.setId(object.getString(APIsConstants.KEY_ID));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setTitle(object.getString(APIsConstants.KEY_TITLE));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setDescription(object.getString(APIsConstants.KEY_DESCRIPTION));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setMedia(object.getString(APIsConstants.KEY_MEDIA));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setType(object.getString(APIsConstants.KEY_TYPE));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setUser_id(object.getString(APIsConstants.KEY_USER_ID));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setCreated(object.getString(APIsConstants.KEY_CREATED));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setModified(object.getString(APIsConstants.KEY_MODIFIED));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setUser_name(object.getString(APIsConstants.KEY_USER_NAME));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setViewcount(object.getString(APIsConstants.KEY_VIEWCOUNT));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setFeed_owner(object.getString(APIsConstants.KEY_FEED_OWNER));
+                                if (object.getString(APIsConstants.KEY_FEED_OWNER)
+                                        .equalsIgnoreCase(Constants.YES))
+                                    setHeader(null, true, true, false, false, false, null);
+                                else
+                                    setHeader(null, true, true, false, false, false, null);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            Session.setOwnerModel(mOwnerDataModel);
+                        }
+                    }
+                } else {
+                    try {
+                        Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
+                        Utils.showSweetProgressDialog(PostDetailActivity.this, jsonObject.getString(APIsConstants
+                                .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void updateUI() {
@@ -179,6 +363,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.txt_edit:
                 edit_menu.setVisibility(View.GONE);
                 AlertToastManager.showToast("Edit", this);
+                Intent intent = new Intent(PostDetailActivity.this, EditPostActivity.class);
+                startActivity(intent);
                 break;
             case R.id.txt_delete:
                 edit_menu.setVisibility(View.GONE);

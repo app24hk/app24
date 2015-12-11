@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">App24</string>
     <!-- Facebook Data-->
-    <string name="app_id">1673090976236867</string>
+    <!--trigma facebook id-->
+    <!--<string name="app_id">1673090976236867</string>-->
+    <!--capstone facebook id -->
+    <string name="app_id">1626774610922182</string>
     <!--Banner ad unit-id-->
     <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383
@@ -21,7 +24,6 @@
     <string name="profile_count_login_user">0.8700 HKD</string>
     <string name="create_post">Title:</string>
 
-    <string name="edit_post">Edit Post</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="delete_post">Delete Post</string>
@@ -36,6 +38,7 @@
     <string name="setting">Setting</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
     <string name="post">Post</string>
+    <string name="edit_post">Edit Post</string>
 
     <!--Toasts to Users-->
     <string name="please_try_again">Please Try Again</string>
