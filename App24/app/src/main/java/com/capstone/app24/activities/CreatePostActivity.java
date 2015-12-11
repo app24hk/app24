@@ -31,12 +31,14 @@ import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
@@ -98,6 +100,8 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         setContentView(R.layout.activity_create_post);
         mSimpleFacebook = SimpleFacebook.getInstance(this);
         callbackManager = CallbackManager.Factory.create();
@@ -204,7 +208,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         .EMPTY)) {
                     if (feedModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
                         try {
-                            if (feedModel.getMedia() != null && !isFromMediaActivity)
+                            if (feedModel.getMedia() != null && isFromMediaActivity)
                                 bitmap = BitmapFactory.decodeFile(feedModel.getMedia());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -280,111 +284,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             }
         }
 
-
-//        try {
-//            edit_post_title.setText(intent.getStringExtra(Constants.POST_TITLE));
-//            edit_write_post.setText(intent.getStringExtra(Constants.POST_BODY));
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        isFromMediaActivity = intent.getBooleanExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
-//        gallery_type = intent.getStringExtra(Constants.KEY_GALLERY_TYPE);
-//
-//        Utils.debug(TAG, "isFromMediaActivity : " + isFromMediaActivity);
-//        Utils.debug(TAG, "gallery_type : " + gallery_type);
-//
-//        Intent intent1 = getIntent();
-//        Bundle extras = intent1.getExtras();
-//        Utils.debug(TAG, extras + "");
-//        if (intent1.hasExtra("capturedVideo")) {
-//            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(
-//                    intent1.getStringExtra("path"), MediaStore.Video.Thumbnails.MINI_KIND);
-//            SquareImageView imageView = new SquareImageView(this);
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-//            params.setMargins(5, 10, 5, 10);
-//            imageView.setLayoutParams(params);
-//            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//            imageView.setImageBitmap(bitmap);
-//            camera_tumb.addView(imageView);
-//            if (camera_tumb.getChildCount() <= 0)
-//                ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-//            else
-//                ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-//        }
-//
-//
-//        if (extras != null) {
-//            Bundle bundle = extras.getBundle(Constants.KEY_BUNDLE);
-//            if (bundle != null) {
-//                Bitmap imageBitmap = (Bitmap) bundle.get(Constants.KEY_DATA);
-//                SquareImageView imageView = new SquareImageView(this);
-//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-//                params.setMargins(5, 10, 5, 10);
-//                imageView.setLayoutParams(params);
-//                imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//                imageView.setImageBitmap(imageBitmap);
-//                camera_tumb.addView(imageView);
-//                if (camera_tumb.getChildCount() <= 0)
-//                    ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-//                else
-//                    ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-//            } else if (intent1 != null && intent1.hasExtra(Constants.KEY_COME_FROM)) {
-//                if (intent1.getStringExtra("media_type").equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-//
-//                    bundle = extras.getBundle(Constants.KEY_GALLERY_BUNDLE);
-//                    int id = Integer.parseInt(bundle.getString(Constants.KEY_PATH));
-//                    BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//                    bmOptions.inSampleSize = 4;
-//                    bmOptions.inPurgeable = true;
-//
-//                    SquareImageView imageView = new SquareImageView(this);
-//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-//                    params.setMargins(5, 10, 5, 10);
-//                    imageView.setLayoutParams(params);
-//                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//                    Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(
-//                            getContentResolver(), id,
-//                            MediaStore.Video.Thumbnails.MINI_KIND, bmOptions);
-//                    imageView.setImageBitmap(bitmap);
-//
-//                    ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
-//                    if (bitmap != null) {
-//                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
-//                        // imv_profileuser.setImageBitmap(bitmap);
-//                    }
-//                    byte[] ful_bytes = thumb_stream.toByteArray();
-//                    base64 = Base64.encodeBytes(ful_bytes);
-//
-//                    Utils.debug("base64 : ", "base64 image String : " + base64);
-//                    camera_tumb.addView(imageView);
-//                    if (camera_tumb.getChildCount() <= 0)
-//                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-//                    else
-//                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-//                } else {
-//                    bundle = extras.getBundle(Constants.KEY_GALLERY_BUNDLE);
-//                    Uri uri = Uri.parse(bundle.getString(Constants.KEY_PATH));
-//                    SquareImageView imageView = new SquareImageView(this);
-//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-//                    params.setMargins(5, 10, 5, 10);
-//                    imageView.setLayoutParams(params);
-//                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//                    imageView.setImageURI(uri);
-//                    camera_tumb.addView(imageView);
-////                    try {
-////                        base64 = Base64.encodeBytes(readBytes(uri));
-////                        Utils.debug("base64", "base64base64 : " + base64);
-////                    } catch (IOException e) {
-////                        e.printStackTrace();
-////                    }
-//                    if (camera_tumb.getChildCount() <= 0)
-//                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-//                    else
-//                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-//                }
-//
-//            }
-//        }
         sv.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver
                 .OnGlobalLayoutListener() {
             @Override
@@ -449,6 +348,9 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         edit_write_post = (EditText) findViewById(R.id.edit_write_post);
         txt_save = (TextView) findViewById(R.id.txt_save);
 
+        shareButton = (ShareButton) findViewById(R.id.shareButton);
+        callbackManager = CallbackManager.Factory.create();
+        //shareButton.setOnClickListener(this);
     }
 
     private void setClickListeners() {
@@ -831,38 +733,77 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     private void postStoryToWall() {
 
+//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+//                .putString("com_capstone_app:title", "0-553-57340-3")
+//                .putString("com_capstone_app:description", "0-553-57340-3")
+//                        //.putString("og:type", "post.post")//613292//
+//                .build();
+//
+//        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+//                .setActionType("post.create")
+//                .putObject("post", object)
+//                .build();
+//
+//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+//                .setPreviewPropertyName("post")
+//                .setAction(action)
+//                .build();
+//        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+//            @Override
+//            public void onSuccess(Sharer.Result result) {
+//                Utils.debug("fb", "facebook Result  : " + result);
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Utils.debug("fb", "facebook Cancel  : ");
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//                Utils.debug("fb", "facebook Error  : " + error);
+//            }
+//        });
+
+
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("com_capstone_app:title", "0-553-57340-3")
-                .putString("com_capstone_app:description", "0-553-57340-3")
-                        //.putString("og:type", "post.post")//613292//
+                .putString("og:type", "fitness.course")
+                .putString("og:title", "Sample Course")
+                .putString("og:description", "This is a sample course.")
+                .putInt("fitness:duration:value", 100)
+                .putString("fitness:duration:units", "s")
+                .putInt("fitness:distance:value", 12)
+                .putString("fitness:distance:units", "km")
+                .putInt("fitness:speed:value", 5)
+                .putString("fitness:speed:units", "m/s")
                 .build();
-
         ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                .setActionType("post.create")
-                .putObject("post", object)
+                .setActionType("fitness.runs")
+                .putObject("fitness:course", object)
                 .build();
-
         ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                .setPreviewPropertyName("post")
+                .setPreviewPropertyName("fitness:course")
                 .setAction(action)
                 .build();
-        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-                Utils.debug("fb", "facebook Result  : " + result);
-            }
-
-            @Override
-            public void onCancel() {
-                Utils.debug("fb", "facebook Cancel  : ");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Utils.debug("fb", "facebook Error  : " + error);
-            }
-        });
-
+        shareButton.setShareContent(content);
+        shareButton.callOnClick();
+//        shareButton.performClick();
+//        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+//            @Override
+//            public void onSuccess(Sharer.Result result) {
+//                Utils.debug("fb", "facebook Result  : " + result);
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Utils.debug("fb", "facebook Cancel  : ");
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//                Utils.debug("fb", "facebook Error  : " + error);
+//            }
+//        });
 
         Utils.debug(TAG, "Inside Post to Wall ");
         String userId = new Utils().getSharedPreferences(CreatePostActivity.this, Constants

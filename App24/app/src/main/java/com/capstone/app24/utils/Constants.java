@@ -50,6 +50,7 @@ public class Constants {
     public static final int SIMPLE_DIALOG = 1;
     public static final String KEY_FACEBOOK_ACCESS_TOKEN = "";
     public static final String LATEST_FEED_MODEL = "LATEST_FEED_MODEL";
+    public static final String MOST_FEEDS_MODEL = "MOST_FEEDS_MODEL";
     public static final String FETCH_GALLERY_IMAGE = "fetch_gallery_image";
     public static final String FETCH_GALLERY_VIDEO = "fetch_gallery_video";
 }

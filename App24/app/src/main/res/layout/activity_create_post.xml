@@ -83,6 +83,7 @@
                     android:overScrollMode="ifContentScrolls"
                     android:padding="10dp"
                     android:textSize="@dimen/enter_text"/>
+
                 <ImageButton
                     android:id="@+id/ibtn_select_image_from_gallery"
                     android:layout_width="?android:attr/actionBarSize"
@@ -92,6 +93,11 @@
                     android:background="@android:color/transparent"
                     android:padding="@dimen/text_row_height"
                     android:src="@drawable/camera"/>
+
+                <com.facebook.share.widget.ShareButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" android:layout_alignParentBottom="true"
+                    android:layout_toEndOf="@+id/ibtn_select_image_from_gallery"/>
 
             </RelativeLayout>
         </RelativeLayout>

@@ -98,7 +98,9 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:screenOrientation="portrait"/>
-
+        <provider android:name="com.facebook.FacebookContentProvider"
+                  android:authorities="com.facebook.app.FacebookContentProvider1673090976236867"
+                  android:exported="true"/>
         <!--  <provider android:name="com.facebook.FacebookContentProvider"
                     android:authorities="com.facebook.app.FacebookContentProvider1673090976236867"
                     android:exported="true"/>-->

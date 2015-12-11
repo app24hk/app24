@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,19 +19,49 @@ import com.capstone.app24.R;
 import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.MostViewedAdapter;
 import com.capstone.app24.animations.HidingScrollListener;
+import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.bean.MostViewedModel;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.utils.APIsConstants;
+import com.capstone.app24.utils.AppController;
+import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.NetworkUtils;
+import com.capstone.app24.utils.RecyclerViewDisabler;
 import com.capstone.app24.utils.Utils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 4/11/15.
  */
-public class MostViewedFragment extends Fragment {
+public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = MostViewedFragment.class.getSimpleName();
     private View mView;
     private Context mContext;
     private Activity mActivity;
     private MostViewedAdapter mMostViewedAdapter;
     private RecyclerView most_viewed_feeds;
+
+    private int mPageNo = 1;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    List<MostViewedModel> mMostViewedFeedList = new ArrayList<>();
+    /* End of Volley Request Tags */
+    private SweetAlertDialog mDialog;
+    private String res = "";
+    private String tag_string_req = "feeds_req";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,7 +76,13 @@ public class MostViewedFragment extends Fragment {
     }
 
     private void updateUI() {
-        mMostViewedAdapter = new MostViewedAdapter(getActivity());
+//        if (NetworkUtils.isOnline(getActivity()))
+//        //getMostViewedFeeds();
+//        else
+//        Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
+//                .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+
+        mMostViewedAdapter = new MostViewedAdapter(getActivity(), mMostViewedFeedList);
         most_viewed_feeds.setAdapter(mMostViewedAdapter);
         most_viewed_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -53,6 +90,8 @@ public class MostViewedFragment extends Fragment {
     private void initializeViews() {
         most_viewed_feeds = (RecyclerView) mView.findViewById(R.id.most_viewed_feeds);
         initRecyclerView();
+        swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
     }
 
@@ -86,5 +125,169 @@ public class MostViewedFragment extends Fragment {
                 // Utils.setScrollDirection(Constants.SCROLL_DOWN);
             }
         });
+    }
+
+    public boolean getMostViewedFeeds() {
+        /*
+         Starting a progress Dialog...
+         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
+         it will show (Searching...)
+         */
+
+        if (mPageNo == 1)
+            mDialog = Utils.showSweetProgressDialog(getActivity(),
+                    getResources
+                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_MOST_VIEWED,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+
+                        res = response.toString();
+                        try {
+                            refreshMostViewedFeeds(res);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (mPageNo == 1)
+                    Utils.closeSweetProgressDialog(getActivity(), mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+//                        user_id(int)
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
+                Utils.info("params...", params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private List<MostViewedModel> refreshMostViewedFeeds(String res) {
+        Utils.debug(TAG, "Response  : " + res);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    JSONArray jsonArray = jsonObject.getJSONArray(APIsConstants.KEY_FEED_DATA);
+                    if (jsonArray != null) {
+
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            MostViewedModel mostViewedModel = new MostViewedModel();
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            if (object != null) {
+                                try {
+                                    mostViewedModel.setId(object.getString(APIsConstants.KEY_ID));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setTitle(object.getString(APIsConstants.KEY_TITLE));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setDescription(object.getString(APIsConstants.KEY_DESCRIPTION));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setMedia(object.getString(APIsConstants.KEY_MEDIA));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setType(object.getString(APIsConstants.KEY_TYPE));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setUser_id(object.getString(APIsConstants.KEY_USER_ID));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setCreated(object.getString(APIsConstants.KEY_CREATED));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setModified(object.getString(APIsConstants.KEY_MODIFIED));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setUser_name(object.getString(APIsConstants.KEY_USER_NAME));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setViewcount(object.getString(APIsConstants.KEY_VIEWCOUNT));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                mMostViewedFeedList.add(mostViewedModel);
+                            }
+                        }
+                    }
+                    if (jsonArray.length() == 0) {
+                        try {
+                            Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
+                                            ().getResources().getString(R.string.no_more_data)),
+                                    SweetAlertDialog.ERROR_TYPE);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } else {
+                    try {
+                        Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
+                        Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
+                                .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        mMostViewedAdapter.notifyDataSetChanged();
+        swipeRefreshLayout.setRefreshing(false);
+        if (mPageNo == 1)
+            Utils.closeSweetProgressDialog(getActivity(), mDialog);
+        return mMostViewedFeedList;
+    }
+
+
+    @Override
+    public void onRefresh() {
+        mPageNo = mPageNo + 1;
+        Utils.debug(TAG, "swipeRefreshLayout mPAge Number" + mPageNo);
+        //getMostViewedFeeds();
     }
 }

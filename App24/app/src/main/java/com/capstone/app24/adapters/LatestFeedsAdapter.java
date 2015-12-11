@@ -55,6 +55,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     Intent intent;
     List<LatestFeedsModel> mLatestFeedList = new ArrayList<>();
     private String res = "";
+    private SweetAlertDialog mDialog;
 
     public LatestFeedsAdapter(Activity activity, List<LatestFeedsModel> latestFeedList) {
         mActivity = activity;
@@ -256,7 +257,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     }
 
     private boolean makeSeenPostRequest(final String user_id, final String id) {
-        final SweetAlertDialog pd = Utils.showSweetProgressDialog(mActivity,
+        mDialog = Utils.showSweetProgressDialog(mActivity,
                 mActivity.getResources
                         ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
         StringRequest strReq = new StringRequest(Request.Method.POST,
@@ -265,7 +266,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                     @Override
                     public void onResponse(String response) {
                         Utils.debug(TAG, response.toString());
-                        Utils.closeSweetProgressDialog(mActivity, pd);
+                        Utils.closeSweetProgressDialog(mActivity, mDialog);
                         res = response.toString();
                         try {
                             //  setFeedData(res);
@@ -280,7 +281,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Utils.closeSweetProgressDialog(mActivity, pd);
+                Utils.closeSweetProgressDialog(mActivity, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -301,6 +302,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
 
     private void handleResponse(String res) {
         Utils.debug(TAG, "Response :  " + res);
+//        {"result":true,"message":"One more View saved."}
     }
 }
 
