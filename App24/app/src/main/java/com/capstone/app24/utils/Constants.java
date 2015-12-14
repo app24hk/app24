@@ -54,5 +54,4 @@ public class Constants {
     public static final String FETCH_GALLERY_IMAGE = "fetch_gallery_image";
     public static final String FETCH_GALLERY_VIDEO = "fetch_gallery_video";
     public static final String YES = "yes";
-    public static final String NO = "no";
 }

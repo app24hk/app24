@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.custom.SquareImageView;
 import com.capstone.app24.utils.APIsConstants;
@@ -38,7 +37,6 @@ import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.ShareButton;
-import com.facebook.share.widget.ShareDialog;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
@@ -96,6 +94,8 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private Intent intent;
     private CallbackManager callbackManager;
     Bitmap bitmap = null;
+    private boolean editable;
+    private Intent editIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +123,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.post));
         initializeViews();
         setClickListeners();
-
     }
 
 
@@ -150,8 +149,8 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
         if (isFromMediaActivity) {
             try {
-                Bundle bundle = intent.getBundleExtra("bundle");
-                bitmap = (Bitmap) bundle.get("data");
+                Bundle bundle = intent.getBundleExtra(Constants.KEY_BUNDLE);
+                bitmap = (Bitmap) bundle.get(Constants.KEY_DATA);
 
             } catch (Exception e) {
                 e.printStackTrace();

@@ -61,7 +61,16 @@ public class BaseActivity extends Activity implements View.OnClickListener {
             } else {
                 ibtn_dots.setVisibility(View.GONE);
             }
+
+        } else {
+            if (show_dots) {
+                ibtn_dots.setVisibility(View.VISIBLE);
+                ibtn_dots.setOnClickListener(this);
+            } else {
+                ibtn_dots.setVisibility(View.GONE);
+            }
         }
+
         if (ibtn_camera == null) {
             ibtn_camera = (ImageButton) findViewById(R.id.ibtn_add_image);
             if (show_camera) {

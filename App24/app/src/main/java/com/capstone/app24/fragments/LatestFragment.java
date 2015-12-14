@@ -200,8 +200,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private List<LatestFeedsModel> refreshLatestFeeds(String res) throws JSONException {
-        Utils.debug(TAG, "Response  : " + res);
-        latestFeedList.clear();
+        //Utils.debug(TAG, "Response  : " + res);
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject != null) {
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
@@ -267,7 +266,9 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            latestFeedList.add(latestFeedsModel);
+                            if (!latestFeedList.contains(latestFeedsModel)) {
+                                latestFeedList.add(latestFeedsModel);
+                            }
                         }
                     }
                 }

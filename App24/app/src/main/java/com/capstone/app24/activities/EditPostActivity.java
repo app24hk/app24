@@ -55,6 +55,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,12 +98,12 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
     private Intent intent;
     private CallbackManager callbackManager;
     Bitmap bitmap = null;
+    OwnerDataModel ownerDataModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
-
         setContentView(R.layout.activity_create_post);
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.edit_post));
         initializeViews();
@@ -122,11 +124,120 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
      * Update UI with Data
      */
     private void UpdateUI() {
-        OwnerDataModel ownerDataModel = Session.getOwnerModel();
+
+        ownerDataModel = Session.getOwnerModel();
         if (ownerDataModel != null) {
             edit_post_title.setText(ownerDataModel.getTitle());
             edit_write_post.setText(ownerDataModel.getDescription());
+            mType = ownerDataModel.getType();
         }
+        if (ownerDataModel.getMedia() != null && !ownerDataModel.getMedia().equalsIgnoreCase("")) {
+            URL newurl = null;
+            try {
+                newurl = new URL(ownerDataModel.getMedia());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            try {
+                bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            SquareImageView imageView = new SquareImageView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+            params.setMargins(5, 10, 5, 10);
+            imageView.setLayoutParams(params);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setImageBitmap(bitmap);
+            camera_tumb.addView(imageView);
+//            bitmap
+
+            base64 = getBase64(bitmap);
+        } else {
+            camera_tumb.removeAllViews();
+        }
+
+        if (camera_tumb.getChildCount() <= 0)
+            ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+        else
+            ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+    }
+
+    private String getBase64(Bitmap bitmap) {
+        if (ownerDataModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
+//            try {
+//                if (ownerDataModel.getMedia() != null)
+//                    this.bitmap = BitmapFactory.decodeFile(ownerDataModel.getMedia());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+//            if (this.bitmap != null) {
+//                this.bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+//            }
+//            byte[] ful_bytes = thumb_stream.toByteArray();
+//            imageBytes = ful_bytes;
+//            base64 = Base64.encodeBytes(ful_bytes);
+            ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+            if (bitmap != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+            }
+            byte[] ful_bytes = thumb_stream.toByteArray();
+            imageBytes = ful_bytes;
+            base64 = Base64.encodeBytes(ful_bytes);
+
+            ownerDataModel.setBase64String(base64);
+            SquareImageView imageView = new SquareImageView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+            params.setMargins(5, 10, 5, 10);
+            imageView.setLayoutParams(params);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setImageBitmap(this.bitmap);
+            mBitmap = this.bitmap;
+
+        } else if (ownerDataModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
+
+
+            Uri vidFile = Uri.parse(ownerDataModel.getMedia());
+
+            this.bitmap = ThumbnailUtils.createVideoThumbnail(
+                    ownerDataModel.getMedia(), MediaStore.Video.Thumbnails.MINI_KIND);
+
+
+            int bytesRead;
+            FileInputStream imageStream = null;
+            try {
+
+                imageStream = new FileInputStream(ownerDataModel.getMedia());
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            }
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] b = new byte[1024];
+            try {
+                while ((bytesRead = imageStream.read(b)) != -1) {
+                    bos.write(b, 0, bytesRead);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                byte[] ba = bos.toByteArray();
+                base64 = Base64.encodeBytes(ba);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Utils.debug(TAG, "base64 : " + base64);
+            SquareImageView imageView = new SquareImageView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+            params.setMargins(5, 10, 5, 10);
+            imageView.setLayoutParams(params);
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setImageBitmap(this.bitmap);
+        }
+        return base64;
     }
 
     Bitmap getPreview(Uri uri) {
@@ -348,6 +459,7 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
                 }
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_USER_ID, userId);
+                params.put(APIsConstants.KEY_FEED_ID, ownerDataModel.getId());
                 params.put(APIsConstants.KEY_TITLE, title);
                 params.put(APIsConstants.KEY_DESCRIPTION, description);
                 if (!mType.equalsIgnoreCase(Constants.KEY_TEXT)) {

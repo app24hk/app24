@@ -78,10 +78,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_detail);
-
+        latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
+        setHeader(null, true, true, false, false, false, null);
         getFeedOwnerData();
-
-        setHeader(null, true, true, false, false, true, null);
         type = getIntent().getIntExtra("type", 0);
         initializeViews();
         AdView mAdView = (AdView) findViewById(R.id.adView);
@@ -216,11 +215,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             try {
                                 mOwnerDataModel.setFeed_owner(object.getString(APIsConstants.KEY_FEED_OWNER));
                                 if (object.getString(APIsConstants.KEY_FEED_OWNER)
-                                        .equalsIgnoreCase(Constants.YES))
+                                        .equalsIgnoreCase(Constants.YES)) {
+                                    setHeader(null, true, true, false, false, true, null);
+                                } else {
                                     setHeader(null, true, true, false, false, false, null);
-                                else
-                                    setHeader(null, true, true, false, false, false, null);
-
+                                }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -240,11 +239,12 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 e.printStackTrace();
             }
         }
+
     }
 
     private void updateUI() {
 
-        latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
+//        latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
         if (latestFeedsModel != null) {
             if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
                 layout_media_preview.setVisibility(View.GONE);
