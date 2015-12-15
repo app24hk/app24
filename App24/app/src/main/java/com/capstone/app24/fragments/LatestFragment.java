@@ -165,7 +165,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Utils.debug(TAG, response.toString());
+                       // Utils.debug(TAG, response.toString());
 
                         res = response.toString();
                         try {

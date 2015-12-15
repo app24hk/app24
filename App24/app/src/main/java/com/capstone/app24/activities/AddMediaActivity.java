@@ -24,10 +24,12 @@ import android.widget.LinearLayout;
 
 import com.capstone.app24.R;
 import com.capstone.app24.bean.GalleryModel;
+import com.capstone.app24.bean.OwnerDataModel;
 import com.capstone.app24.custom.SquareImageView;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Base64;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.sromku.simple.fb.entities.Feed;
@@ -68,6 +70,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     private ImageAdapter imageAdapter;
 
     private SweetAlertDialog mDialog;
+    private boolean isEditable;
 
     /**
      *
@@ -86,7 +89,14 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            try {
+                isEditable = intent.getBooleanExtra(Constants.KEY_IS_EDITABLE, false);
+                Utils.debug(TAG, "" + isEditable);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         initializeView();
         setClickListeners();
         if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE, true)) {
@@ -180,6 +190,8 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                 Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
                 intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                if (isEditable)
+                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
                 intent.putExtra("come_from", "gallery");
                 intent.putExtra("gallery_bundle", bundle);
                 finish();
@@ -224,7 +236,13 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             case R.id.ibtn_back:
                 finish();
                 Intent intent;
-                intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                if (isEditable) {
+                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                } else {
+                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+
+                }
                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
                 intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
                 startActivity(intent);
@@ -246,23 +264,49 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             Utils.debug(TAG, extras + "Inside OnactivityResult");
 
             if (isFromMediaActivity) {
-                FeedRequestModel feedModel = Utils.getFeed();
-                feedModel.setType(mType);
-                Utils.setFeed(feedModel);
-                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-                intent.putExtra("media_type", Constants.KEY_IMAGES);
-                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
-                intent.putExtra("bundle", extras);
+                Intent intent1;
+                if (isEditable) {
+                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                    ownerDataModel.setType(mType);
+                    Session.setOwnerModel(ownerDataModel);
+                    intent1 = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                } else {
+                    FeedRequestModel feedModel = Utils.getFeed();
+                    feedModel.setType(mType);
+                    Utils.setFeed(feedModel);
+                    intent1 = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+
+                }
+                intent1.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                intent1.putExtra("media_type", Constants.KEY_IMAGES);
+                intent1.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                intent1.putExtra("bundle", extras);
                 Bitmap image = (Bitmap) extras.get("data");
                 finish();
-                startActivity(intent);
+                startActivity(intent1);
             } else {
 
-                Intent resultIntent = new Intent();
-                resultIntent.putExtras(extras);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+
+                if (isEditable) {
+                    Intent intent1;
+                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                    ownerDataModel.setType(mType);
+                    Session.setOwnerModel(ownerDataModel);
+                    intent1 = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                    intent1.putExtra(Constants.KEY_IS_EDITABLE, true);
+                    intent1.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                    intent1.putExtra("media_type", Constants.KEY_IMAGES);
+                    intent1.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                    intent1.putExtra("bundle", extras);
+                    Bitmap image = (Bitmap) extras.get("data");
+                    startActivity(intent1);
+                    finish();
+                } else {
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtras(extras);
+                    setResult(Activity.RESULT_OK, resultIntent);
+                }
             }
         }
         if (requestCode == REQUEST_VIDEO_CAPTURED) if (resultCode == RESULT_OK) {
@@ -324,21 +368,36 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                     byte[] ba1 = bao.toByteArray();
                     //  video_base64
 
-                    FeedRequestModel feedModel = Utils.getFeed();
-                    feedModel.setMedia(videorealpath);
-                    feedModel.setMediaId("" + id);
-                    feedModel.setType(mType);
+
+                    Intent intent1;
+                    if (isEditable) {
+                        OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                        ownerDataModel.setType(mType);
+                        Session.setOwnerModel(ownerDataModel);
+                        ownerDataModel.setMediaId("" + id);
+                    } else {
+                        FeedRequestModel feedModel = Utils.getFeed();
+                        feedModel.setMedia(videorealpath);
+                        feedModel.setMediaId("" + id);
+                        feedModel.setType(mType);
+                    }
+
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     image1.compress(Bitmap.CompressFormat.PNG, 40, baos);
                     byte[] byteArray = baos.toByteArray();
                     String videoimage_base64 = Base64.encodeBytes(byteArray);
-                    Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                    intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-                    intent.putExtra("media_type", Constants.KEY_VIDEOS);
-                    intent.putExtra("capturedVideo", Constants.KEY_VIDEOS);
-                    intent.putExtra("path", videorealpath);
-                    intent.putExtra("video_base64", videoimage_base64);
+                    if (isEditable) {
+                        intent1 = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                        intent1.putExtra(Constants.KEY_IS_EDITABLE, true);
+                    } else {
+                        intent1 = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                    }
+                    intent1.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                    intent1.putExtra("media_type", Constants.KEY_VIDEOS);
+                    intent1.putExtra("capturedVideo", Constants.KEY_VIDEOS);
+                    intent1.putExtra("path", videorealpath);
+                    intent1.putExtra("video_base64", videoimage_base64);
                     finish();
                     startActivity(intent);
                 } catch (Exception e) {
@@ -449,15 +508,28 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                 holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
                                         .color.colorPrimary));
                                 imageSelectedPosition = position;
+                                if (isEditable) {
+                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    ownerDataModel.setType(mType);
+                                } else {
+                                    FeedRequestModel feedModel = Utils.getFeed();
+                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    feedModel.setType(mType);
+                                }
 
-                                FeedRequestModel feedModel = Utils.getFeed();
-                                feedModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                feedModel.setType(mType);
 
                                 Bundle bundle = new Bundle();
                                 bundle.putString("path", holder1.picturesView.getTag() + "");
-                                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                Intent intent;
+                                if (isEditable) {
+                                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                                } else {
+                                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                }
                                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
                                 intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
                                 intent.putExtra("come_from", "gallery");
@@ -481,14 +553,27 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                         .color.colorPrimary));
                                 videoSelectedPosition = position;
 
-                                FeedRequestModel feedModel = Utils.getFeed();
-                                feedModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                feedModel.setType(mType);
+                                if (isEditable) {
+                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    ownerDataModel.setType(mType);
+                                } else {
+                                    FeedRequestModel feedModel = Utils.getFeed();
+                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    feedModel.setType(mType);
+                                }
 
                                 Bundle bundle = new Bundle();
                                 bundle.putString("path", holder1.picturesView.getTag().toString());
-                                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                Intent intent;
+                                if (isEditable) {
+                                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                                } else {
+                                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                }
                                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
                                 intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
                                 intent.putExtra("come_from", "gallery");
@@ -517,7 +602,14 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     public void onBackPressed() {
         finish();
         Intent intent;
-        intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+        if (isEditable) {
+            intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+            intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+
+        } else {
+            intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+
+        }
         intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
         intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
         startActivity(intent);

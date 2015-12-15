@@ -106,16 +106,17 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_create_post);
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.edit_post));
+        AlertToastManager.showToast("EditPostActivity", this);
         initializeViews();
         setClickListeners();
-
+        UpdateUI();
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-        UpdateUI();
+
         Utils.closeSweetProgressDialog(this, mDialog);
 
     }
@@ -131,19 +132,73 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
             edit_write_post.setText(ownerDataModel.getDescription());
             mType = ownerDataModel.getType();
         }
+        /**
+         * geting Media Details
+         */
         if (ownerDataModel.getMedia() != null && !ownerDataModel.getMedia().equalsIgnoreCase("")) {
-            URL newurl = null;
-            try {
-                newurl = new URL(ownerDataModel.getMedia());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            try {
-                bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-            } catch (Exception e) {
-                e.printStackTrace();
+
+
+            //Processing Image
+            if (ownerDataModel.getMedia().contains("http://")) {
+                URL newurl = null;
+                try {
+                    newurl = new URL(ownerDataModel.getMedia());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                base64 = getBase64(bitmap);
+                ownerDataModel.setBase64String(base64);
+
+            } else {
+                try {
+                    if (ownerDataModel.getMedia() != null)
+                        bitmap = BitmapFactory.decodeFile(ownerDataModel.getMedia());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+                if (bitmap != null) {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+                }
+//                byte[] ful_bytes = thumb_stream.toByteArray();
+//                imageBytes = ful_bytes;
+//                base64 = Base64.encodeBytes(ful_bytes);
+                base64 = getBase64(bitmap);
+                ownerDataModel.setBase64String(base64);
+
             }
 
+//            try {
+//                if (ownerDataModel.getMedia() != null && isFromMediaActivity)
+//                    bitmap = BitmapFactory.decodeFile(ownerDataModel.getMedia());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+//            if (bitmap != null) {
+//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+//            }
+//            byte[] ful_bytes = thumb_stream.toByteArray();
+//            imageBytes = ful_bytes;
+//            base64 = Base64.encodeBytes(ful_bytes);
+//            ownerDataModel.setBase64String(base64);
+
+
+            //Printing Feed Data
+            OwnerDataModel ownerDataModel = Session.getOwnerModel();
+            Utils.debug("feedModel", "CreatePost feedModel : " + ownerDataModel.getTitle());
+            Utils.debug("feedModel", "CreatePost feedModel : " + ownerDataModel.getDescription());
+            Utils.debug("feedModel", "CreatePost feedModel : " + ownerDataModel.getType());
+            Utils.debug("feedModel", "CreatePost feedModel : " + ownerDataModel.getMedia());
+            Utils.debug("feedModel", "CreatePost feedModel : " + ownerDataModel.getUser_id());
+
+
+            //Setting Image Resource
             SquareImageView imageView = new SquareImageView(this);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
             params.setMargins(5, 10, 5, 10);
@@ -151,9 +206,7 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
             imageView.setScaleType(ImageView.ScaleType.FIT_XY);
             imageView.setImageBitmap(bitmap);
             camera_tumb.addView(imageView);
-//            bitmap
-
-            base64 = getBase64(bitmap);
+            //base64 = getBase64(bitmap);
         } else {
             camera_tumb.removeAllViews();
         }
@@ -166,19 +219,6 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
 
     private String getBase64(Bitmap bitmap) {
         if (ownerDataModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
-//            try {
-//                if (ownerDataModel.getMedia() != null)
-//                    this.bitmap = BitmapFactory.decodeFile(ownerDataModel.getMedia());
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//            ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
-//            if (this.bitmap != null) {
-//                this.bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
-//            }
-//            byte[] ful_bytes = thumb_stream.toByteArray();
-//            imageBytes = ful_bytes;
-//            base64 = Base64.encodeBytes(ful_bytes);
             ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
             if (bitmap != null) {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
@@ -187,14 +227,14 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
             imageBytes = ful_bytes;
             base64 = Base64.encodeBytes(ful_bytes);
 
-            ownerDataModel.setBase64String(base64);
-            SquareImageView imageView = new SquareImageView(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-            params.setMargins(5, 10, 5, 10);
-            imageView.setLayoutParams(params);
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-            imageView.setImageBitmap(this.bitmap);
-            mBitmap = this.bitmap;
+            //ownerDataModel.setBase64String(base64);
+//            SquareImageView imageView = new SquareImageView(this);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+//            params.setMargins(5, 10, 5, 10);
+//            imageView.setLayoutParams(params);
+//            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+//            imageView.setImageBitmap(this.bitmap);
+//            mBitmap = this.bitmap;
 
         } else if (ownerDataModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
 
@@ -229,13 +269,13 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Utils.debug(TAG, "base64 : " + base64);
-            SquareImageView imageView = new SquareImageView(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-            params.setMargins(5, 10, 5, 10);
-            imageView.setLayoutParams(params);
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-            imageView.setImageBitmap(this.bitmap);
+            //  Utils.debug(TAG, "base64 : " + base64);
+//            SquareImageView imageView = new SquareImageView(this);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+//            params.setMargins(5, 10, 5, 10);
+//            imageView.setLayoutParams(params);
+//            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+//            imageView.setImageBitmap(this.bitmap);
         }
         return base64;
     }
@@ -339,16 +379,20 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
                     finish();
                     intent = new Intent(EditPostActivity.this, AddMediaActivity.class);
                     intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_TEXT);
+                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
                     startActivity(intent);
                 } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
                     finish();
                     intent = new Intent(EditPostActivity.this, AddMediaActivity.class);
                     intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_IMAGES);
+                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+
                     startActivity(intent);
                 } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
                     finish();
                     intent = new Intent(EditPostActivity.this, AddMediaActivity.class);
                     intent.putExtra(Constants.KEY_GALLERY_TYPE, Constants.KEY_VIDEOS);
+                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
                     startActivity(intent);
                 }
                 break;
@@ -418,7 +462,7 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
                 getResources
                         ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                APIsConstants.API_BASE_URL + APIsConstants.API_SAVE_FEEDS,
+                APIsConstants.API_BASE_URL + APIsConstants.API_EDIT_FEED,
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -479,7 +523,7 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
 
 
     private void setFeedData(String res) throws JSONException {
-        Utils.debug(TAG, "Response : " + res);
+        //  Utils.debug(TAG, "Response : " + res);
         try {
             JSONObject jsonObject = new JSONObject(res);
             if (jsonObject != null) {
@@ -491,8 +535,6 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
                                 .SUCCESS_TYPE);
 
 //                        postStoryToWall();
-
-
                         finish();
                         Intent intent;
                         intent = new Intent(EditPostActivity.this, MainActivity.class);

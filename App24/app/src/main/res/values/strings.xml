@@ -111,6 +111,7 @@
     <string name="progress_fetching_videos">Fetching gallery videos</string>
     <string name="progress_fetching_images">Fetching gallery images</string>
     <string name="posting_feed">Posting Feed...</string>
+    <string name="updating_feed">Updating Feed...</string>
     <string name="no_more_data">No more data</string>
     <string name="check_your_internet_connection">Please check your internet connection</string>
 </resources>

@@ -764,28 +764,56 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 //            }
 //        });
 
-
+        shareButton = (ShareButton) findViewById(R.id.shareButton);
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("og:type", "fitness.course")
-                .putString("og:title", "Sample Course")
-                .putString("og:description", "This is a sample course.")
-                .putInt("fitness:duration:value", 100)
-                .putString("fitness:duration:units", "s")
-                .putInt("fitness:distance:value", 12)
-                .putString("fitness:distance:units", "km")
-                .putInt("fitness:speed:value", 5)
-                .putString("fitness:speed:units", "m/s")
+                .putString("og:type", "app_capstone.post")
+//                .putString("og:type", "fitness.course")
+//                .putString("og:title", "Sample Course")
+//                .putString("og:description", "This is a sample course.")
+                .putString("title", "Sample Title")
+                .putString("description", "Sample Description")
+//                .putInt("fitness:duration:value", 200)
+//                .putString("fitness:duration:units", "s")
+//                .putInt("fitness:distance:value", 24)
+//                .putString("fitness:distance:units", "km")
+//                .putInt("fitness:speed:value", 5)
+//                .putString("fitness:speed:units", "m/s")
                 .build();
         ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                .setActionType("fitness.runs")
-                .putObject("fitness:course", object)
+                .setActionType("app_capstone.create")
+                .putObject("app_capstone:post", object)
                 .build();
         ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                .setPreviewPropertyName("fitness:course")
+                .setPreviewPropertyName("app_capstone:post")
                 .setAction(action)
                 .build();
+
         shareButton.setShareContent(content);
-        shareButton.callOnClick();
+
+//
+//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+//                .putString("og:type", "fitness.course")
+//                .putString("og:title", "Sample Course")
+//                .putString("og:description", "This is a sample course.")
+//                .putInt("fitness:duration:value", 100)
+//                .putString("fitness:duration:units", "s")
+//                .putInt("fitness:distance:value", 12)
+//                .putString("fitness:distance:units", "km")
+//                .putInt("fitness:speed:value", 5)
+//                .putString("fitness:speed:units", "m/s")
+//                .build();
+//        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+//                .setActionType("fitness.runs")
+//                .putObject("fitness:course", object)
+//                .build();
+//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+//                .setPreviewPropertyName("fitness:course")
+//                .setAction(action)
+//                .build();
+//        shareButton.setShareContent(content);
+//        shareButton.callOnClick();
+
+
 //        shareButton.performClick();
 //        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
 //            @Override

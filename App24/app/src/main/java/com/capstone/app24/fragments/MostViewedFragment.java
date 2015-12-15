@@ -176,7 +176,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     private List<LatestFeedsModel> refreshMostViewedFeeds(String res) {
-        Utils.debug(TAG, "Response  : " + res);
+//        Utils.debug(TAG, "Response  : " + res);
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(res);
