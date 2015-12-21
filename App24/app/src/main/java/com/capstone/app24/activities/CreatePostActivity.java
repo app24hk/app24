@@ -224,7 +224,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
                         params.setMargins(5, 10, 5, 10);
                         imageView.setLayoutParams(params);
-                        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         imageView.setImageBitmap(bitmap);
                         mBitmap = bitmap;
                         camera_tumb.addView(imageView);
@@ -271,7 +271,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
                         params.setMargins(5, 10, 5, 10);
                         imageView.setLayoutParams(params);
-                        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                         imageView.setImageBitmap(bitmap);
                         camera_tumb.addView(imageView);
                         if (camera_tumb.getChildCount() <= 0)
@@ -429,7 +429,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
             params.setMargins(5, 10, 5, 10);
             imageView.setLayoutParams(params);
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setImageBitmap(imageBitmap);
             camera_tumb.addView(imageView);
             if (camera_tumb.getChildCount() <= 0)
@@ -475,6 +475,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         final SweetAlertDialog pd = Utils.showSweetProgressDialog(CreatePostActivity.this,
                 getResources
                         ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
+
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_SAVE_FEEDS,
                 new volley.Response.Listener<String>() {
@@ -696,19 +697,24 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
                     try {
                         Utils.debug(TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-                        Utils.showSweetProgressDialog(CreatePostActivity.this, jsonObject
+                        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, jsonObject
                                 .getString(APIsConstants.KEY_MESSAGE), SweetAlertDialog
                                 .SUCCESS_TYPE);
 
-                        postStoryToWall();
+                        // postStoryToWall();
+                        mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                            @Override
+                            public void onClick(SweetAlertDialog sweetAlertDialog) {
 
+                                finish();
+                                Intent intent;
+                                intent = new Intent(CreatePostActivity.this, MainActivity.class);
+                                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
+                                Utils.setFeed(null);
+                                startActivity(intent);
+                            }
+                        });
 
-                        finish();
-                        Intent intent;
-                        intent = new Intent(CreatePostActivity.this, MainActivity.class);
-                        intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
-                        Utils.setFeed(null);
-                        startActivity(intent);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

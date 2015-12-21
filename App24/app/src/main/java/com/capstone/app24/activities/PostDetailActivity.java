@@ -27,17 +27,17 @@ import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.InterfaceListener;
+import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.acl.Owner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -229,8 +229,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 } else {
                     try {
                         Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-                        Utils.showSweetProgressDialog(PostDetailActivity.this, jsonObject.getString(APIsConstants
-                                .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+//                        Utils.showSweetProgressDialog(PostDetailActivity.this, jsonObject.getString(APIsConstants
+//                                .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -267,7 +267,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 Glide.with(this).load(latestFeedsModel.getMedia()).centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                         .into(img_preview);
-
             }
             if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
 
@@ -291,13 +290,15 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 Glide.with(this).load(latestFeedsModel.getThumbnail()).centerCrop()
                         .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                         .into(img_preview);
-
             }
             txt_post_title.setText(latestFeedsModel.getTitle());
             txt_description.setText(latestFeedsModel.getDescription());
             txt_seen.setText(latestFeedsModel.getViewcount());
             txt_creator.setText(latestFeedsModel.getUser_name());
-            txt_created_time.setText(latestFeedsModel.getModified());
+            txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated
+                    ())));
+
+
         }
     }
 
@@ -369,6 +370,12 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.txt_delete:
                 edit_menu.setVisibility(View.GONE);
                 AlertToastManager.showToast("Delete", this);
+                if (NetworkUtils.isOnline(this)) {
+                    deleteFeed();
+                } else {
+                    Utils.showSweetProgressDialog(this, getResources().getString(R.string
+                            .check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+                }
                 break;
             case R.id.img_preview:
                 showImageDialog(latestFeedsModel.getMedia());
@@ -386,7 +393,88 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    private boolean deleteFeed() {
+
+        /*
+         Starting a progress Dialog...
+         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
+         it will show (Searching...)
+         */
+        final SweetAlertDialog pd = Utils.showSweetProgressDialog(PostDetailActivity.this,
+                getResources
+                        ().getString(R.string.deleting_feed), SweetAlertDialog.PROGRESS_TYPE);
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_DELETE_FEED,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+
+                        res = response.toString();
+                        try {
+                            handleDeleteResponse(res);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (mPageNo == 1)
+                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+//                        user_id(int)
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_FEED_ID, latestFeedsModel.getId());
+                params.put(APIsConstants.KEY_USER_ID, latestFeedsModel.getUser_id());
+                Utils.info("params...", params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleDeleteResponse(String res) {
+        Utils.debug(TAG, "Result of delete API: " + res);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    // jsonObject.getBoolean(APIsConstants.KEY_RESULT);
+                    mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, jsonObject
+                            .getString
+                                    (APIsConstants.KEY_MESSAGE), SweetAlertDialog.SUCCESS_TYPE);
+                    mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            finish();
+                        }
+                    });
+                    InterfaceListener.OnDelete(latestFeedsModel.getId(), true);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
     //............FullView imageView..............
+
     public void showImageDialog(String media) {
         Display display = this.getWindowManager().getDefaultDisplay();
         int width = display.getWidth();
@@ -400,7 +488,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         final TouchImageView custom_image = (TouchImageView) (dialog.findViewById(R.id.custom_image));
         custom_image.setLayoutParams(params);
         custom_image.setImageResource(R.drawable.pic_two);
-
         Glide.with(this).load(media).centerCrop()
                 .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                 .into(custom_image);

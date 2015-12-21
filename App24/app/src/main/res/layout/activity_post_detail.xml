@@ -189,7 +189,9 @@
                             android:layout_height="match_parent"
                             android:layout_alignParentLeft="true"
                             android:layout_alignParentTop="true"
+                            android:gravity="fill_horizontal|right"
                             android:isScrollContainer="false"
+                            android:maxEms="18"
                             android:text="@string/lorem_ipsum"
                             android:textColor="@color/black"
                             android:textSize="@dimen/feed_body_text"/>

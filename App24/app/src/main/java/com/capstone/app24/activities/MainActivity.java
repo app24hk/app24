@@ -9,12 +9,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AnticipateInterpolator;
@@ -23,27 +22,21 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.animations.AnimatorUtils;
+import com.capstone.app24.bean.UserFeedModel;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
+import com.capstone.app24.interfaces.OnListUpdateListener;
 import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
-import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.Utils;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.login.widget.LoginButton;
-import com.facebook.share.ShareApi;
-import com.facebook.share.Sharer;
-import com.facebook.share.model.ShareOpenGraphAction;
-import com.facebook.share.model.ShareOpenGraphContent;
-import com.facebook.share.model.ShareOpenGraphObject;
-import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -51,19 +44,12 @@ import com.ogaclejapan.arclayout.ArcLayout;
 import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
-import com.sromku.simple.fb.entities.Feed;
-import com.sromku.simple.fb.entities.Story;
-import com.sromku.simple.fb.listeners.OnCreateStoryObject;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.ConsoleHandler;
+import java.util.TimeZone;
 
 /**
  * Created by amritpal on 3/11/15.
@@ -99,6 +85,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private Bitmap mIcon_val;
     private SimpleFacebook mSimpleFacebook;
     OnPublishListener onPublishListener;
+    private ArrayList<UserFeedModel> userFeedList = new ArrayList<>();
+    private TextView txt_profile_header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +139,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        System.out.println(TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + " minutes ago");
 //        System.out.println(TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + " hours ago");
 //        System.out.println(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + " days ago");
-
+        //AppController.getInstance().fetchGalleryImages();
+        //AppController.getInstance().fetchGalleryVideos();
     }
 
     private void beginPlayingGame() {
@@ -213,6 +202,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         ibtn_search = (ImageButton) findViewById(R.id.ibtn_search);
         ibtn_setting = (ImageButton) findViewById(R.id.ibtn_setting);
+        txt_profile_header = (TextView) findViewById(R.id.txt_profile_header);
+        txt_profile_header.setSelected(true);  // Set focus to the textview
+        txt_profile_header.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+
 
     }
 
@@ -297,7 +290,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         {
             intent = new Intent(this, ProfileActivity.class);
-            //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         } else if (v.getId() == R.id.ibtn_setting)
 
@@ -375,6 +367,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         } else {
             showMenu();
         }
+        TimeZone tz = TimeZone.getDefault();
+        Utils.debug("timezone", "TimeZone   " + tz.getDisplayName(false, TimeZone.SHORT) + " " +
+                "Timezon id :: "
+                + tz
+                .getID());
 
         if (v.isSelected()) {
             btn_app_24.setImageResource(R.drawable.app_button);
@@ -493,7 +490,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
 
     private void setUserProfileFragment() {
-        userProfileDetailsFragment = UserProfileDetailsFragment.newInstance("UserProfileFragment", 1);
+        Bundle bundle = new Bundle();
+        bundle.putString(Constants.KEY_USER_NAME, txt_profile_header.getText().toString().trim());
+        userProfileDetailsFragment = UserProfileDetailsFragment.newInstance();
+        userProfileDetailsFragment.setArguments(bundle);
         manager = getSupportFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
         ft.replace(R.id.main_frame, userProfileDetailsFragment);
@@ -569,4 +569,5 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public View getAppMenu() {
         return menuLayout;
     }
+
 }

@@ -21,6 +21,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.capstone.app24.R;
 import com.capstone.app24.bean.GalleryModel;
@@ -32,7 +33,6 @@ import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
-import com.sromku.simple.fb.entities.Feed;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -56,6 +56,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     private boolean isFromMediaActivity;
     public static int videoSelectedPosition = -1;
     public static int imageSelectedPosition = -1;
+    public static int textSelectedPosition = -1;
     private Intent intent;
     private String mType;
 
@@ -117,17 +118,32 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                 .progress_fetching_videos), SweetAlertDialog.PROGRESS_TYPE);
             }
         }
+        if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true)) {
+            if (mType.equalsIgnoreCase
+                    (Constants.KEY_TEXT)) {
+                mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
+                        .getString(R
+                                .string
+                                .progress_fetching_images_and_videos), SweetAlertDialog.PROGRESS_TYPE);
+            }
+        }
         if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
             if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE, true)) {
                 new fetchGalleryData().execute();
             } else {
-                fetchGalleryImages();
+                fetchGallery();
             }
         } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
             if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_VIDEO, true)) {
                 new fetchGalleryData().execute();
             } else {
-                fetchGalleryImages();
+                fetchGallery();
+            }
+        } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+            if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true)) {
+                new fetchGalleryData().execute();
+            } else {
+                fetchGallery();
             }
         }
         updateUI();
@@ -146,6 +162,8 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                 AppController.getInstance().fetchGalleryVideos();
             } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
                 AppController.getInstance().fetchGalleryImages();
+            } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                AppController.getInstance().AddImagesAndVideos(null);
             }
             return null;
         }
@@ -159,12 +177,15 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
                 new Utils(AddMediaActivity.this).setPreferences(AddMediaActivity.this, Constants
                         .FETCH_GALLERY_IMAGE, false);
+            } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                new Utils(AddMediaActivity.this).setPreferences(AddMediaActivity.this, Constants
+                        .FETCH_GALLERY_IMAGE_AND_VIDEOS, false);
             }
-            fetchGalleryImages();
+            fetchGallery();
         }
     }
 
-    private void fetchGalleryImages() {
+    private void fetchGallery() {
 
         if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
             imageAdapter = new ImageAdapter(this, AppController.getGalleryVideoModelArrayList(), false);
@@ -173,6 +194,10 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
 
         } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
             imageAdapter = new ImageAdapter(this, AppController.getGalleryImageModelArrayList(), true);
+            gridView.setAdapter(imageAdapter);
+            Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
+        } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+            imageAdapter = new ImageAdapter(this, AppController.getGalleryImagesAndVideoModelArrayList(), true);
             gridView.setAdapter(imageAdapter);
             Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
         }
@@ -372,14 +397,16 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                     Intent intent1;
                     if (isEditable) {
                         OwnerDataModel ownerDataModel = Session.getOwnerModel();
-                        ownerDataModel.setType(mType);
-                        Session.setOwnerModel(ownerDataModel);
+                        ownerDataModel.setType(Constants.KEY_VIDEOS);
                         ownerDataModel.setMediaId("" + id);
+                        ownerDataModel.setMedia(videorealpath);
+                        Session.setOwnerModel(ownerDataModel);
+
                     } else {
                         FeedRequestModel feedModel = Utils.getFeed();
                         feedModel.setMedia(videorealpath);
                         feedModel.setMediaId("" + id);
-                        feedModel.setType(mType);
+                        feedModel.setType(Constants.KEY_VIDEOS);
                     }
 
 
@@ -399,7 +426,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                     intent1.putExtra("path", videorealpath);
                     intent1.putExtra("video_base64", videoimage_base64);
                     finish();
-                    startActivity(intent);
+                    startActivity(intent1);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -419,7 +446,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     private class ImageAdapter extends BaseAdapter {
         private Context context;
         LayoutInflater mInflater;
-        ArrayList<LinearLayout> linearLayoutArrayList;
+        ArrayList<RelativeLayout> linearLayoutArrayList;
         ArrayList<GalleryModel> mGalleryModelsList;
         Cursor mCursor;
         boolean isImage;
@@ -427,7 +454,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         public ImageAdapter(Context localContext, ArrayList arrayList, boolean isImage) {
             context = localContext;
             mGalleryModelsList = arrayList;
-            linearLayoutArrayList = new ArrayList<LinearLayout>();
+            linearLayoutArrayList = new ArrayList<RelativeLayout>();
             mInflater = (LayoutInflater) localContext.getSystemService(Activity
                     .LAYOUT_INFLATER_SERVICE);
             this.isImage = isImage;
@@ -451,8 +478,9 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.grid_item_view, null);
                 holder = new ViewHolder();
-                holder.linearLayout = (LinearLayout) convertView.findViewById(R.id.layout_selection);
+                holder.linearLayout = (RelativeLayout) convertView.findViewById(R.id.layout_selection);
                 holder.picturesView = (SquareImageView) convertView.findViewById(R.id.pictures_view);
+                holder.iconView = (ImageView) convertView.findViewById(R.id.iconView);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
@@ -465,6 +493,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                             (position).getImage());
                     holder.picturesView.setTag(mGalleryModelsList.get
                             (position).getId());
+                    holder.iconView.setVisibility(View.GONE);
                     //bitmapsIdImages.get(position)
                 } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
                     Utils.debug("position", "position : " + position);
@@ -474,10 +503,23 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                    Utils.debug("position", "position : " + position);
+                    holder.picturesView.setImageBitmap(mGalleryModelsList.get(position).getImage());
+                    if (mGalleryModelsList.get(position).isVideo())
+                        holder.iconView.setVisibility(View.VISIBLE);
+                    else {
+                        holder.iconView.setVisibility(View.GONE);
+                    }
+                    try {
+                        holder.picturesView.setTag(mGalleryModelsList.get(position).getId());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
 
-                holder.picturesView.setScaleType(ImageView.ScaleType.FIT_XY);
+                holder.picturesView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 final View finalConvertView = convertView;
                 linearLayoutArrayList.add(holder.linearLayout);
                 if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
@@ -490,6 +532,11 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                         holder.linearLayout.setBackgroundColor(context.getResources().getColor(R
                                 .color.colorPrimary));
                     }
+                } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                    if (textSelectedPosition == position) {
+                        holder.linearLayout.setBackgroundColor(context.getResources().getColor(R
+                                .color.colorPrimary));
+                    }
                 }
 
 
@@ -499,7 +546,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                         if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
                             ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
                             if (imageSelectedPosition == position) {
-                                for (LinearLayout linearLayout : linearLayoutArrayList) {
+                                for (RelativeLayout linearLayout : linearLayoutArrayList) {
                                     linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
                                 }
                                 imageSelectedPosition = -1;
@@ -544,7 +591,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                             .string
                                             .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
                             if (videoSelectedPosition == position) {
-                                for (LinearLayout linearLayout : linearLayoutArrayList) {
+                                for (RelativeLayout linearLayout : linearLayoutArrayList) {
                                     linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
                                 }
                                 videoSelectedPosition = -1;
@@ -552,6 +599,51 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                 holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
                                         .color.colorPrimary));
                                 videoSelectedPosition = position;
+
+                                if (isEditable) {
+                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    ownerDataModel.setType(mType);
+                                } else {
+                                    FeedRequestModel feedModel = Utils.getFeed();
+                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    feedModel.setType(mType);
+                                }
+
+                                Bundle bundle = new Bundle();
+                                bundle.putString("path", holder1.picturesView.getTag().toString());
+                                Intent intent;
+                                if (isEditable) {
+                                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                                } else {
+                                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                }
+                                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                                intent.putExtra("come_from", "gallery");
+                                intent.putExtra("gallery_bundle", bundle);
+                                finish();
+                                startActivity(intent);
+                            }
+                            Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
+                        } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                            ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
+                            mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
+                                    .getString(R
+                                            .string
+                                            .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+                            if (textSelectedPosition == position) {
+                                for (RelativeLayout linearLayout : linearLayoutArrayList) {
+                                    linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+                                }
+                                textSelectedPosition = -1;
+                            } else {
+                                holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
+                                        .color.colorPrimary));
+                                textSelectedPosition = position;
 
                                 if (isEditable) {
                                     OwnerDataModel ownerDataModel = Session.getOwnerModel();
@@ -593,7 +685,8 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
 
         class ViewHolder {
             SquareImageView picturesView;
-            LinearLayout linearLayout;
+            ImageView iconView;
+            RelativeLayout linearLayout;
         }
 
     }

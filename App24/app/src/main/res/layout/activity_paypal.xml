@@ -4,21 +4,8 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <!--<Button
-        android:id="@+id/payPal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#1565C0"
-        android:text="Payment"
-        android:textColor="#fff"
-        android:textSize="16sp"/>-->
     <include layout="@layout/base_main_toolbar"></include>
 
-    <!-- -->
-    <!--<WebView-->
-    <!--android:id="@+id/webview"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"/>-->
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:orientation="vertical">

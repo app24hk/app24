@@ -19,9 +19,11 @@ import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.LatestFeedsAdapter;
 import com.capstone.app24.animations.HidingScrollListener;
 import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.interfaces.OnDeleteListener;
 import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.RecyclerViewDisabler;
 import com.capstone.app24.utils.Utils;
@@ -44,7 +46,7 @@ import volley.toolbox.StringRequest;
 /**
  * Created by amritpal on 3/11/15.
  */
-public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener {
 
     private static final String TAG = LatestFragment.class.getSimpleName();
     View mView;
@@ -71,13 +73,13 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         initializeViews();
         MainActivity.tabs.setVisibility(View.VISIBLE);
         MainActivity.layout_user_profle.setVisibility(View.GONE);
+        updateUI();
         return mView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateUI();
     }
 
     /**
@@ -94,20 +96,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         list_latest_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
         list_latest_feeds.setAdapter(mLatestFeedsAdapter);
         mLatestFeedsAdapter.notifyDataSetChanged();
-      /*  list_latest_feeds.addOnItemTouchListener(new GlobalClass.RecyclerTouchListener(getActivity(),
-                list_latest_feeds, new GlobalClass.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-
-                Intent intent = new Intent(getActivity(), PostDetailActivity.class);
-                getActivity().startActivity(intent);
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));*/
 
     }
 
@@ -146,6 +134,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         disabler = new RecyclerViewDisabler();
         swipeRefreshLayout.setOnRefreshListener(this);
         initRecyclerView();
+        InterfaceListener.setOnDeleteListener(this);
     }
 
     public boolean getLatestFeeds() {
@@ -159,13 +148,14 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             mDialog = Utils.showSweetProgressDialog(getActivity(),
                     getResources
                             ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+        mDialog.setCancelable(true);
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_RECENT_FEEDS,
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                       // Utils.debug(TAG, response.toString());
+                        // Utils.debug(TAG, response.toString());
 
                         res = response.toString();
                         try {
@@ -299,5 +289,17 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         mPageNo = mPageNo + 1;
         Utils.debug(TAG, "swipeRefreshLayout mPAge Number" + mPageNo);
         getLatestFeeds();
+    }
+
+    @Override
+    public void onDelete(String id, boolean isDelete) {
+        if (latestFeedList.size() > 0) {
+            for (int i = 0; i < latestFeedList.size(); i++) {
+                if (latestFeedList.get(i).getId().equalsIgnoreCase(id)) {
+                    latestFeedList.remove(i);
+                    mLatestFeedsAdapter.notifyDataSetChanged();
+                }
+            }
+        }
     }
 }

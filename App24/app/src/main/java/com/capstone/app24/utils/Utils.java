@@ -13,9 +13,15 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.capstone.app24.R;
 import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.bean.UserFeedModel;
+import com.capstone.app24.interfaces.OnListUpdateListener;
 import com.capstone.app24.interfaces.OnScrolling;
 import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -30,6 +36,7 @@ public class Utils {
     private Context _context;
     public static RecyclerView mRecyclerView;
     private static FeedRequestModel mFeedModel;
+
 
     // constructor
     public Utils(Context context) {
@@ -232,5 +239,85 @@ public class Utils {
         return feedsModel;
     }
 
+    public void setUserFeedPreferences(Activity activity, UserFeedModel model) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = sharedPref.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(model);
+        prefsEditor.putString(Constants.LATEST_FEED_MODEL, json);
+        prefsEditor.commit();
+        Log.e("Saved Model", "LatestModelSaved ");
+    }
+
+    public UserFeedModel getUserFeedPreferences(Activity activity) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPref.getString(Constants.LATEST_FEED_MODEL, "");
+        UserFeedModel feedsModel = gson.fromJson(json, UserFeedModel.class);
+        return feedsModel;
+    }
+
+/*
+ * Copyright 2012 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+    private static final int SECOND_MILLIS = 1000;
+    private static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
+    private static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
+    private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
+
+
+    public static String getTimeAgo(long time) {
+        if (time < 1000000000000L) {
+            // if timestamp given in seconds, convert to millis
+            time *= 1000;
+        }
+
+        long now = System.currentTimeMillis();
+        if (time > now || time <= 0) {
+            return null;
+        }
+
+        // TODO: localize
+        final long diff = now - time;
+        if (diff < MINUTE_MILLIS) {
+            return " just now";
+        } else if (diff < 2 * MINUTE_MILLIS) {
+            return " a minute ago";
+        } else if (diff < 50 * MINUTE_MILLIS) {
+            return diff / MINUTE_MILLIS + " minutes ago";
+        } else if (diff < 90 * MINUTE_MILLIS) {
+            return " an hour ago";
+        } else if (diff < 24 * HOUR_MILLIS) {
+            return diff / HOUR_MILLIS + " hours ago";
+        } else if (diff < 48 * HOUR_MILLIS) {
+            return " yesterday";
+        } else {
+            return diff / DAY_MILLIS + " days ago";
+        }
+    }
+
+    // validating email id
+    public static boolean isValidEmail(String email) {
+        String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 
 }

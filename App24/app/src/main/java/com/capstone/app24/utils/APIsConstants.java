@@ -10,11 +10,17 @@ public class APIsConstants {
     public static final String API_FACEBOOK_LOGIN = "/facebooklogin";
     public static final String API_SAVE_FEEDS = "/saveFeeds";
     public static final String API_RECENT_FEEDS = "/recentFeed";
+    public static final String API_GET_ALL_USER_FEED = "/getAllFeed";
+    public static final String API_USER_FEEDS = "/getUserProfile";
     public static final String API_LOGOUT = "/logout";
     public static final String API_FEED_SEEN = "/feedSeen";
     public static final String API_EDIT_FEED = "/editFeed";
     public static final String API_MOST_VIEWED = "/mostViewed";
     public static final String API_FEED_DATA = "/getFeedData";
+    public static final String API_DELETE_FEED = "/deleteFeed";
+    public static final String API_ADD_EDIT_PAYPAL_INFO = "/addEditPaypalInfo";
+    public static final String API_GET_PAYPAL_INFO = "/getPaypalInfo";
+
 
     public static final String KEY_RESULT = "result";
     public static final String KEY_USERINFO = "userInfo";
@@ -50,4 +56,5 @@ public class APIsConstants {
     public static final String TAB_TYPE = "tabType";
     public static final String ONE = "1";
     public static final String TWO = "2";
+    public static final String KEY_PAYPAL_EMAIL = "paypal_email";
 }

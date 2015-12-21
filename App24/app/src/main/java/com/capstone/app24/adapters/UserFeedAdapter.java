@@ -10,6 +10,8 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.capstone.app24.R;
 import com.capstone.app24.activities.PostDetailActivity;
+import com.capstone.app24.activities.ProfileActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.UserFeedModel;
 import com.capstone.app24.utils.Constants;
@@ -32,19 +35,24 @@ import java.util.List;
 /**
  * Created by amritpal on 4/11/15.
  */
-public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.ViewHolder> {
+public class UserFeedAdapter extends RecyclerView.Adapter<UserFeedAdapter.ViewHolder> implements Filterable {
 
-    private static final String TAG = UserProfitAdapter.class.getSimpleName();
+    private static final String TAG = UserFeedAdapter.class.getSimpleName();
     private final int mImageHeight;
-    private List<UserFeedModel> mUserFeedList = new ArrayList<>();
     private Activity mActivity;
     private LayoutInflater mInflater;
     Intent intent;
 
-    public UserProfitAdapter(Activity activity, List<UserFeedModel> userFeedList) {
+    List<UserFeedModel> friendslist;
+    List<UserFeedModel> friendslist_FilterList;
+    private ValueFilter valueFilter;
+    public int count = 9;
+
+    public UserFeedAdapter(Activity activity, List<UserFeedModel> userFeedList) {
         mActivity = activity;
         mInflater = LayoutInflater.from(activity);
-        mUserFeedList = userFeedList;
+        friendslist = userFeedList;
+        friendslist_FilterList = userFeedList;
         mImageHeight = Utils.getHeight(mActivity);
     }
 
@@ -57,19 +65,12 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(final UserProfitAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final UserFeedAdapter.ViewHolder holder, final int position) {
         UserFeedModel userFeedModel = new UserFeedModel();
-        userFeedModel = mUserFeedList.get(position);
+        userFeedModel = friendslist.get(position);
 
-        if (position == 0) {
-            holder.xtra_layout.setVisibility(View.VISIBLE);
-            holder.view_profit_and_feeds.setVisibility(View.VISIBLE);
-
-        } else {
-            holder.xtra_layout.setVisibility(View.GONE);
-            holder.view_profit_and_feeds.setVisibility(View.GONE);
-
-        }
+        holder.xtra_layout.setVisibility(View.GONE);
+        holder.view_profit_and_feeds.setVisibility(View.GONE);
 
         if (userFeedModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
             holder.img_preview.setVisibility(View.GONE);
@@ -103,20 +104,18 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
         holder.txt_seen.setText(userFeedModel.getViewcount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(userFeedModel.getCreated
                 ())));
+
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showImageDialog(mUserFeedList.get(position).getMedia());
+                showImageDialog(friendslist.get(position).getMedia());
             }
         });
         holder.img_video_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Utils(mActivity).setUserFeedPreferences(mActivity, mUserFeedList.get
+                new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
                         (position));
-                Utils.debug(TAG, "img_video_preview Clicked : Data of Latest Feed " +
-                        "Model : " + new Utils(mActivity)
-                        .getLatestFeedPreferences(mActivity));
                 intent = new Intent(mActivity, VideoActivity.class);
                 mActivity.startActivity(intent);
             }
@@ -125,53 +124,23 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
             @Override
             public void onClick(View v) {
                 if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
-                    new Utils(mActivity).setUserFeedPreferences(mActivity, mUserFeedList.get
+                    new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
                             (position));
-                    Utils.debug(TAG, "layout_img_video_preview Clicked : Data of Latest Feed " +
-                            "Model : " + new Utils(mActivity)
-                            .getLatestFeedPreferences(mActivity));
                     intent = new Intent(mActivity, VideoActivity.class);
                     mActivity.startActivity(intent);
                 } else if (holder.img_video_preview
                         .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
-                    showImageDialog(mUserFeedList.get(position).getMedia());
+                    showImageDialog(friendslist.get(position).getMedia());
                 }
             }
         });
-
-//        if (position == 0) {
-//            holder.view_profit_and_feeds.setVisibility(View.VISIBLE);
-//            holder.img_preview.setVisibility(View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.VISIBLE);
-//            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
-//            Uri videoURI = Uri.parse("android.resource://" + mActivity.getPackageName() + "/"
-//                    + R.raw.itcuties);
-//            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-//            retriever.setDataSource(mActivity, videoURI);
-//            Bitmap bitmap = retriever
-//                    .getFrameAtTime(10, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
-//            Drawable drawable = new BitmapDrawable(mActivity.getResources(), bitmap);
-//            holder.img_preview.setImageDrawable(drawable);
-//        } else if (position == 1) {
-//            holder.view_profit_and_feeds.setVisibility(View.GONE);
-//            holder.img_preview.setVisibility
-//                    (View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//            holder.img_preview.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
-//        } else {
-//            holder.view_profit_and_feeds.setVisibility(View.GONE);
-//            holder.img_preview.setVisibility(View.GONE);
-//            holder.layout_img_video_preview.setVisibility(View.GONE);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//
-//        }
 
     }
 
 
     @Override
     public int getItemCount() {
-        return mUserFeedList.size();
+        return friendslist.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -203,11 +172,9 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new Utils(mActivity).setUserFeedPreferences(mActivity, mUserFeedList.get
+                    new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
                             (getLayoutPosition()));
-                    Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
-                            .getLatestFeedPreferences(mActivity));
-//                    makeSeenPostRequest(mUserFeedList.get(getLayoutPosition()).getUser_id(), mUserFeedList.get(getLayoutPosition()).getId());
+//                    makeSeenPostRequest(friendslist.get(getLayoutPosition()).getUser_id(), friendslist.get(getLayoutPosition()).getId());
                     intent = new Intent(mActivity, PostDetailActivity.class);
                     //intent.putExtra("type", getLayoutPosition());
                     mActivity.startActivity(intent);
@@ -217,7 +184,67 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
         }
 
 
-    } //............FullView imageView..............
+    }
+
+    ///
+    @Override
+    public Filter getFilter() {
+        if (valueFilter == null) {
+            valueFilter = new ValueFilter();
+        }
+        return valueFilter;
+    }
+
+
+    private class ValueFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+            // List<AllConversationBean> friendslist;
+            // List<AllConversationBean> friendslist_FilterList;
+            if (constraint != null && constraint.length() > 0) {
+                ArrayList<UserFeedModel> filterList = new ArrayList<UserFeedModel>();
+                for (int i = 0; i < friendslist_FilterList.size(); i++) {
+                    switch (ProfileActivity.mSearchType) {
+                        case USER:
+                            if ((friendslist_FilterList.get(i).getUser_name().toUpperCase()).contains
+                                    (constraint.toString().toUpperCase())) {
+                                UserFeedModel names = (UserFeedModel) friendslist_FilterList
+                                        .get(i);
+                                filterList.add(names);
+                            }
+                            break;
+                        case POST:
+                            if ((friendslist_FilterList.get(i).getTitle().toUpperCase()).contains
+                                    (constraint.toString().toUpperCase())) {
+                                UserFeedModel names = (UserFeedModel) friendslist_FilterList
+                                        .get(i);
+                                filterList.add(names);
+                            }
+                            break;
+                    }
+                }
+                results.count = filterList.size();
+                results.values = filterList;
+            } else {
+                results.count = friendslist_FilterList.size();
+                results.values = friendslist_FilterList;
+            }
+            return results;
+
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint,
+                                      Filter.FilterResults results) {
+            friendslist = (ArrayList<UserFeedModel>) results.values;
+            notifyDataSetChanged();
+        }
+
+    }
+
+    //............FullView imageView..............
 
     public void showImageDialog(String media) {
         Display display = mActivity.getWindowManager().getDefaultDisplay();

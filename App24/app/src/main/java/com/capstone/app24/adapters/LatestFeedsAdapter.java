@@ -78,16 +78,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
 
         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
         latestFeedsModel = mLatestFeedList.get(position);
-//        Utils.debug(TAG, latestFeedsModel.getUser_name());
-//        Utils.debug(TAG, latestFeedsModel.getTitle());
-//        Utils.debug(TAG, latestFeedsModel.getDescription());
-//        Utils.debug(TAG, latestFeedsModel.getId());
-//        Utils.debug(TAG, latestFeedsModel.getMedia());
-//        Utils.debug(TAG, latestFeedsModel.getModified());
-//        Utils.debug(TAG, latestFeedsModel.getThumbnail());
-//        Utils.debug(TAG, latestFeedsModel.getUser_id());
-//        Utils.debug(TAG, latestFeedsModel.getViewcount());
-//        Utils.debug(TAG, latestFeedsModel.getType());
 
         if (position == 0 && MainActivity.tabs.getVisibility() == View.VISIBLE) {
             holder.xtra_layout.setVisibility(View.VISIBLE);
@@ -126,7 +116,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         holder.txt_feed_body.setText(latestFeedsModel.getDescription());
         holder.txt_creator.setText(latestFeedsModel.getUser_name());
         holder.txt_seen.setText(latestFeedsModel.getViewcount());
-        holder.txt_created_time.setText(latestFeedsModel.getModified());
+        holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated())));
 //        itemView.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -187,10 +177,10 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         private final FrameLayout progress_dialog;
         private LinearLayout layout_feed_body = null;
         //        private VideoView video = null;
-        TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
+        private final TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
-        ImageView img_preview, img_video_preview;
-        RelativeLayout layout_img_video_preview, xtra_layout;
+        private final ImageView img_preview, img_video_preview;
+        private final RelativeLayout layout_img_video_preview, xtra_layout;
 
         public ViewHolder(final View itemView, Activity act) {
             super(itemView);
@@ -259,7 +249,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     private boolean makeSeenPostRequest(final String user_id, final String id) {
         mDialog = Utils.showSweetProgressDialog(mActivity,
                 mActivity.getResources
-                        ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
+                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
                 new volley.Response.Listener<String>() {
@@ -274,7 +264,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                             handleResponse(res);
                             //  postToWall();
                         } catch (Exception e) {
-                            //TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     }
@@ -294,14 +283,13 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                 Utils.info("params...", params.toString());
                 return params;
             }
-            // Adding request to request queue
         };
         AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
         return false;
     }
 
     private void handleResponse(String res) {
-        Utils.debug(TAG, "Response :  " + res);
+//        Utils.debug(TAG, "Response :  " + res);
 //        {"result":true,"message":"One more View saved."}
     }
 }

@@ -50,9 +50,15 @@ public class Constants {
     public static final int SIMPLE_DIALOG = 1;
     public static final String KEY_FACEBOOK_ACCESS_TOKEN = "";
     public static final String LATEST_FEED_MODEL = "LATEST_FEED_MODEL";
+    public static final String USER_FEED_MODEL = "USER_FEED_MODEL";
     public static final String MOST_FEEDS_MODEL = "MOST_FEEDS_MODEL";
+    public static final String FETCH_GALLERY_IMAGE_AND_VIDEOS = "fetch_gallery_image_and_videos";
     public static final String FETCH_GALLERY_IMAGE = "fetch_gallery_image";
     public static final String FETCH_GALLERY_VIDEO = "fetch_gallery_video";
     public static final String YES = "yes";
     public static final String KEY_IS_EDITABLE = "is_editable";
+    public static final String PAYPAL_EMAIL = "paypal_email";
+    public static final String SEARCH_LIST = "search_list";
+    public static final String KEY_USER_NAME = "user_name";
+    public static final String SEARCH_ELEMENT = "search_element";
 }

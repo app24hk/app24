@@ -108,10 +108,13 @@
         共的功斯常
     </string>
     <string name="progress_loading">Loading</string>
+    <string name="progress_fetching_images_and_videos">Fetching gallery images &amp; videos</string>
     <string name="progress_fetching_videos">Fetching gallery videos</string>
     <string name="progress_fetching_images">Fetching gallery images</string>
     <string name="posting_feed">Posting Feed...</string>
     <string name="updating_feed">Updating Feed...</string>
     <string name="no_more_data">No more data</string>
     <string name="check_your_internet_connection">Please check your internet connection</string>
+    <string name="deleting_feed">Deleting Feed</string>
+    <string name="please_enter_valid_email">Please enter valid details</string>
 </resources>

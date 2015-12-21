@@ -15,7 +15,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
-
 import com.capstone.app24.bean.GalleryModel;
 
 import java.security.MessageDigest;
@@ -37,7 +36,6 @@ public class AppController extends Application {
 
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
-
     private static AppController mInstance;
 
 //    private static ArrayList<Bitmap> bitmapsListImages = new ArrayList<>();
@@ -49,6 +47,7 @@ public class AppController extends Application {
 
     private static ArrayList<GalleryModel> galleryImageModelArrayList = new ArrayList<>();
     private static ArrayList<GalleryModel> galleryVideoModelArrayList = new ArrayList<>();
+    private static ArrayList<GalleryModel> galleryImagesAndVideoModelArrayList = new ArrayList<>();
     //private static ArrayList<Integer> bitmapsIdVideos = new ArrayList<>();
     private static Cursor cursor;
     /**
@@ -124,6 +123,90 @@ public class AppController extends Application {
         }
     }
 
+    public void AddImagesAndVideos(ArrayList<GalleryModel> galleryArrayList) {
+
+//        galleryImagesAndVideoModelArrayList.addAll(galleryArrayList);
+//        galleryImagesAndVideoModelArrayList.addAll(galleryArrayList);
+        String[] columns = {MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DATA,
+                MediaStore.Files.FileColumns.DATE_ADDED,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.TITLE,
+        };
+        String selection =
+                MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                        + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE + " OR " + MediaStore
+                        .Files.FileColumns.MEDIA_TYPE + "="
+                        + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+        final String orderBy = MediaStore.Files.FileColumns.DATE_ADDED;
+        Uri queryUri = MediaStore.Files.getContentUri("external");
+
+        cursor = this.getContentResolver().query(queryUri,
+                columns,
+                selection,
+                null, // Selection args (none).
+                orderBy + " DESC" // Sort order.
+        );
+
+        int image_column_index = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID);
+        this.count = cursor.getCount();
+        this.thumbnails = new Bitmap[this.count];
+        this.arrPath = new String[this.count];
+        this.typeMedia = new int[this.count];
+        this.thumbnailsselection = new boolean[this.count];
+
+
+        for (int i = 0; i < this.count; i++) {
+            cursor.moveToPosition(i);
+            int id = cursor.getInt(image_column_index);
+            int dataColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inSampleSize = 4;
+            bmOptions.inPurgeable = true;
+            int type1 = cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE);
+            int t = cursor.getInt(type1);
+            if (t == 1) {
+                thumbnails[i] = MediaStore.Images.Thumbnails.getThumbnail(
+                        getContentResolver(), id,
+                        MediaStore.Images.Thumbnails.MINI_KIND, bmOptions);
+                GalleryModel galleryModel = new GalleryModel(id, cursor.getString
+                        (dataColumnIndex), MediaStore.Images.Thumbnails
+                        .getThumbnail(
+                                getContentResolver(), id,
+                                MediaStore.Images.Thumbnails.MINI_KIND, bmOptions), false);
+
+                if (!galleryImagesAndVideoModelArrayList.contains(galleryModel)) {
+                    galleryImagesAndVideoModelArrayList.add(galleryModel);
+                }
+//                if (!galleryImageModelArrayList.contains(galleryModel)) {
+//                    galleryImageModelArrayList.add(galleryModel);
+//                }
+
+            } else if (t == 3) {
+                thumbnails[i] = MediaStore.Video.Thumbnails.getThumbnail(
+                        getContentResolver(), id,
+                        MediaStore.Video.Thumbnails.MINI_KIND, bmOptions);
+                GalleryModel galleryModel = new GalleryModel(id, cursor.getString
+                        (dataColumnIndex), MediaStore.Video.Thumbnails.getThumbnail(
+                        getContentResolver(), id,
+                        MediaStore.Video.Thumbnails.MINI_KIND, bmOptions), true);
+
+                if (!galleryImagesAndVideoModelArrayList.contains(galleryModel)) {
+                    galleryImagesAndVideoModelArrayList.add(galleryModel);
+                }
+//                if (!galleryVideoModelArrayList.contains(galleryModel)) {
+//                    galleryVideoModelArrayList.add(galleryModel);
+//                }
+            }
+        }
+//        if (!galleryImagesAndVideoModelArrayList.contains(galleryImageModelArrayList))
+//            galleryImagesAndVideoModelArrayList.addAll(0, galleryImageModelArrayList);
+//        if (!galleryImagesAndVideoModelArrayList.contains(galleryVideoModelArrayList))
+//            galleryImagesAndVideoModelArrayList.addAll(1, galleryVideoModelArrayList);
+
+    }
+
     public void fetchGalleryImages() {
 
 
@@ -176,7 +259,7 @@ public class AppController extends Application {
                         (dataColumnIndex), MediaStore.Images.Thumbnails
                         .getThumbnail(
                                 getContentResolver(), id,
-                                MediaStore.Images.Thumbnails.MINI_KIND, bmOptions));
+                                MediaStore.Images.Thumbnails.MINI_KIND, bmOptions), false);
 
                 if (!galleryImageModelArrayList.contains(galleryModel)) {
                     galleryImageModelArrayList.add(galleryModel);
@@ -184,6 +267,7 @@ public class AppController extends Application {
 
             }
         }
+        //AddImagesAndVideos(galleryImageModelArrayList);
     }
 
     public void fetchGalleryVideos() {
@@ -261,13 +345,14 @@ public class AppController extends Application {
                 GalleryModel galleryModel = new GalleryModel(id, cursor.getString
                         (dataColumnIndex), MediaStore.Video.Thumbnails.getThumbnail(
                         getContentResolver(), id,
-                        MediaStore.Video.Thumbnails.MINI_KIND, bmOptions));
+                        MediaStore.Video.Thumbnails.MINI_KIND, bmOptions), true);
 
                 if (!galleryVideoModelArrayList.contains(galleryModel)) {
                     galleryVideoModelArrayList.add(galleryModel);
                 }
             }
         }
+        //AddImagesAndVideos(galleryVideoModelArrayList);
     }
 //    public static ArrayList<Bitmap> getBitmapsListImages() {
 //        return bitmapsListImages;
@@ -324,6 +409,15 @@ public class AppController extends Application {
 //    public static void setGalleryModelArrayList(ArrayList<GalleryModel> galleryModelArrayList) {
 //        AppController.galleryModelArrayList = galleryModelArrayList;
 //    }
+
+
+    public static ArrayList<GalleryModel> getGalleryImagesAndVideoModelArrayList() {
+        return galleryImagesAndVideoModelArrayList;
+    }
+
+    public static void setGalleryImagesAndVideoModelArrayList(ArrayList<GalleryModel> galleryImagesAndVideoModelArrayList) {
+        AppController.galleryImagesAndVideoModelArrayList = galleryImagesAndVideoModelArrayList;
+    }
 
     public static ArrayList<GalleryModel> getGalleryImageModelArrayList() {
         return galleryImageModelArrayList;

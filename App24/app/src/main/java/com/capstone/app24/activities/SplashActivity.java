@@ -79,11 +79,12 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
+        Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_VIDEO, true);
+        new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true);
         callbackManager = CallbackManager.Factory.create();
 
         setContentView(R.layout.activity_splash);
@@ -175,6 +176,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         fb_btn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(final LoginResult loginResult) {
+                accessToken = loginResult.getAccessToken();
+                Utils.debug(TAG, "Access Token : " + accessToken);
                 GraphRequest request = GraphRequest.newMeRequest(
                         loginResult.getAccessToken(),
                         new GraphRequest.GraphJSONObjectCallback() {
@@ -226,7 +229,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 //                                            MyAsyncTask task = new MyAsyncTask();
 //                                            task.setListener(SplashActivity.this);
 //                                            task.execute();
-                                makeUserLoginRequest();
+                                //makeUserLoginRequest();
                                 if (NetworkUtils.isOnline(SplashActivity.this)) {
                                     makeUserLoginRequest();
                                 } else {
@@ -302,7 +305,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                             userModel = new UserLoginModel(facebookid, email,
                                                     first_name, last_name, gender, Constants
                                                     .ANDROID,
-                                                    accessToken + "", Constants.FACEBOOK);
+                                                    /*accessToken + ""*/"abcdefgh", Constants
+                                                    .FACEBOOK);
 //                                            MyAsyncTask task = new MyAsyncTask();
 //                                            task.setListener(SplashActivity.this);
 //                                            task.execute();
@@ -436,7 +440,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                         try {
                             setUserData(res);
                         } catch (JSONException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     }
@@ -459,7 +462,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 params.put("user_gender", userModel.getUser_gender());
                 params.put("user_deviceType", userModel.getUser_deviceType());
                 params.put("user_deviceToken", userModel.getUser_deviceToken());
-                params.put("user_loginType", userModel.getUser_deviceType());
+                params.put("user_loginType", Constants.FACEBOOK);
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -563,6 +566,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
                 Utils.showSweetProgressDialog(SplashActivity.this, jsonObject.getString(APIsConstants
                         .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -570,81 +575,5 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
         Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
     }
-
-    private void checkHomeFeedResponse(String res) throws JSONException {
-        Utils.debug(TAG, "Response : " + res);
-//        {
-//            "user_info": {
-//                    "result": "true",
-//                    "response": "Thank You for Registering! A confirmation email with activation link in sent to the email address.",
-//                    "user_id": 32
-//        }
-//        }
-
-//        JSONObject jo = null, jo1 = null;
-//        JSONArray ja;
-//
-//        String result = "false";
-//        String response = "";
-//        Log.d("res register", res.toString());
-//
-//
-//        jo1 = new JSONObject(res);
-//
-//        jo = jo1.getJSONObject("user_info");
-//
-//        if (jo.has("result")) {
-//            result = jo.getString("result");
-//        }
-//
-//        if (jo.has("response")) {
-//            response = jo.getString("response");
-//        }
-//
-//
-//        if (result.equals("true")) {
-//
-//
-//            if (jo.has("data")) {
-//                ja = jo.getJSONArray("data");
-//
-//                list_homefeeds.clear();
-//
-//                for (int i = 0; i < ja.length(); i++) {
-//                    JSONObject join = ja.getJSONObject(i);
-//                    HomeFeedModel homeFeedModel = new HomeFeedModel();
-//
-//                    if (join.has("coupon_id")) {
-//                        homeFeedModel.setCoupon_id(join.getString("coupon_id"));
-//                    }
-//                    if (join.has("title")) {
-//                        homeFeedModel.setTitle(join.getString("title"));
-//                    }
-//                    if (join.has("description")) {
-//                        homeFeedModel.setDescription(join.getString("description"));
-//                    }
-//                    if (join.has("favorite")) {
-//                        homeFeedModel.setFavorite(join.getString("favorite"));
-//                    }
-//                    if (join.has("location")) {
-//                        homeFeedModel.setLocation(join.getString("location"));
-//                    }
-//                    if (join.has("image")) {
-//                        homeFeedModel.setImage(join.getString("image"));
-//                    }
-//                    if (join.has("icons")) {
-//                        JSONArray jaicon = join.getJSONArray("icons");
-//                        homeFeedModel.setIcon(jaicon.getString(0).toString().trim());
-//                    }
-//                    list_homefeeds.add(homeFeedModel);
-//                }
-//                adapter.notifyDataSetChanged();
-//            }
-//
-//        } else if (result.equals("false")) {
-//            CommonControl.showSweetErrorDialog(context, "Error", response);
-//        }
-    }
-
 
 }

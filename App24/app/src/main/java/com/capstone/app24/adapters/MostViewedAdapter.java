@@ -99,7 +99,8 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         holder.txt_feed_body.setText(mostViewedModel.getDescription());
         holder.txt_creator.setText(mostViewedModel.getUser_name());
         holder.txt_seen.setText(mostViewedModel.getViewcount());
-        holder.txt_created_time.setText(mostViewedModel.getModified());
+        holder.txt_created_time.setText(Utils.getTimeAgo(Long
+                .parseLong(mostViewedModel.getCreated())));
 
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override

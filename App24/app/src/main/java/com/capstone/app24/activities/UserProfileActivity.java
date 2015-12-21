@@ -31,29 +31,6 @@ public class UserProfileActivity extends Activity {
     private void initializeViews() {
         ibtn_search = (ImageButton) findViewById(R.id.edit_search);
         ibtn_search.setVisibility(View.GONE);
-     /*   edit_search = (EditText) findViewById(R.id.edit_search);
-        edit_search = (EditText) findViewById(R.id.edit_search);
-        edit_search.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    AlertToastManager.showToast("Has Focus", UserProfileActivity.this);
-                } else {
-                    AlertToastManager.showToast("Has No Focus", UserProfileActivity.this);
-                }
-            }
-        });*/
-/*        edit_search.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    //  performSearch();
-                    AlertToastManager.showToast("Edit", UserProfileActivity.this);
-                    return true;
-                }
-                return false;
-            }
-        });*/
     }
 
 }
