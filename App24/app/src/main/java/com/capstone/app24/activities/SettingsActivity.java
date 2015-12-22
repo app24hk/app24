@@ -111,14 +111,6 @@ public class SettingsActivity extends BaseActivity {
                 AlertToastManager.showToast("Logout ", this);
                 logout();
                 LoginManager.getInstance().logOut();
-                // finishAffinity();
-                /*if (!new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN)) {
-                    Utils.debug(TAG, "Inside If Condition");
-                    fb_btn.performClick();
-                    finish();
-                } else {
-                    AlertToastManager.showToast("You are not currently logged in", context);
-                }*/
 
                 break;
 
@@ -178,15 +170,12 @@ public class SettingsActivity extends BaseActivity {
                     .this).setPreferences
                     (SettingsActivity.this, Constants
                             .KEY_IS_LOGGED_IN, false);
-
-            //LoginManager.getInstance().logOut();
-//            AccessToken accessToken = AccessToken.getCurrentAccessToken();
-//            if (accessToken != null) {
-//                LoginManager.getInstance().logOut();
-//            }
-//            Utils.showSweetProgressDialog(this, jsonObject.getString(APIsConstants.KEY_MESSAGE),
-//                    SweetAlertDialog.SUCCESS_TYPE);
+            new Utils(this).clearSharedPreferences(this);
+            finish();
             Intent intent = new Intent(SettingsActivity.this, SplashActivity.class);
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            intent.addCategory(Intent.CATEGORY_HOME);
             startActivity(intent);
         } else {
             try {

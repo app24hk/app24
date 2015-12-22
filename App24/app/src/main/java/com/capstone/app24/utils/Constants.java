@@ -61,4 +61,5 @@ public class Constants {
     public static final String SEARCH_LIST = "search_list";
     public static final String KEY_USER_NAME = "user_name";
     public static final String SEARCH_ELEMENT = "search_element";
+    public static final String IS_VIDEO = "is_video";
 }

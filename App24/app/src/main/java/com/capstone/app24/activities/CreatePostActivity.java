@@ -96,6 +96,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     Bitmap bitmap = null;
     private boolean editable;
     private Intent editIntent;
+    private boolean isVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,8 +138,13 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             if (intent.getStringExtra(Constants.KEY_GALLERY_TYPE) != null) {
                 mType = intent.getStringExtra(Constants.KEY_GALLERY_TYPE);
                 Utils.debug(TAG, Constants.KEY_GALLERY_TYPE + " : " + mType);
-            } else {
-                Utils.debug(TAG, "Intent : " + intent);
+            }
+            if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+
+                if (intent.hasExtra(Constants.IS_VIDEO)) {
+                    isVideo = intent.getBooleanExtra(Constants.IS_VIDEO, false);
+                    Utils.debug(TAG, Constants.IS_VIDEO + " : " + isVideo);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,10 +183,11 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         }
 
 
-        if (AddMediaActivity.imageSelectedPosition == -1 && AddMediaActivity.videoSelectedPosition == -1) {
+        if (AddMediaActivity.imageSelectedPosition == -1 && AddMediaActivity
+                .videoSelectedPosition == -1 && AddMediaActivity.textSelectedPosition == -1) {
             camera_tumb.removeAllViews();
         }
-        FeedRequestModel feedModel = Utils.getFeed();
+        final FeedRequestModel feedModel = Utils.getFeed();
         Utils.debug("feedModel", "CreatePost feedModel : " + feedModel.getTitle());
         Utils.debug("feedModel", "CreatePost feedModel : " + feedModel.getDescription());
         Utils.debug("feedModel", "CreatePost feedModel : " + feedModel.getType());
@@ -212,26 +219,27 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
-                        if (bitmap != null) {
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
-                        }
-                        byte[] ful_bytes = thumb_stream.toByteArray();
-                        imageBytes = ful_bytes;
-                        base64 = Base64.encodeBytes(ful_bytes);
-                        feedModel.setBase64String(base64);
-                        SquareImageView imageView = new SquareImageView(this);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-                        params.setMargins(5, 10, 5, 10);
-                        imageView.setLayoutParams(params);
-                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageView.setImageBitmap(bitmap);
-                        mBitmap = bitmap;
-                        camera_tumb.addView(imageView);
-                        if (camera_tumb.getChildCount() <= 0)
-                            ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-                        else
-                            ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                                ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+                                if (bitmap != null) {
+                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+                                }
+                                byte[] ful_bytes = thumb_stream.toByteArray();
+                                imageBytes = ful_bytes;
+                                base64 = Base64.encodeBytes(ful_bytes);
+                                feedModel.setBase64String(base64);
+                                SquareImageView imageView = new SquareImageView
+                                        (CreatePostActivity.this);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                                params.setMargins(5, 10, 5, 10);
+                                imageView.setLayoutParams(params);
+                                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                imageView.setImageBitmap(bitmap);
+                                mBitmap = bitmap;
+                                camera_tumb.addView(imageView);
+                                if (camera_tumb.getChildCount() <= 0)
+                                    ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                                else
+                                    ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
 
                     } else if (feedModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
 
@@ -278,6 +286,82 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                             ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
                         else
                             ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                    } else if (feedModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
+                        if (isVideo) {
+                            Uri vidFile = Uri.parse(feedModel.getMedia());
+//
+                            bitmap = ThumbnailUtils.createVideoThumbnail(
+                                    feedModel.getMedia(), MediaStore.Video.Thumbnails.MINI_KIND);
+
+
+                            int bytesRead;
+                            FileInputStream imageStream = null;
+                            try {
+
+                                imageStream = new FileInputStream(feedModel.getMedia());
+                            } catch (FileNotFoundException e1) {
+                                e1.printStackTrace();
+                            }
+
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            byte[] b = new byte[1024];
+                            try {
+                                while ((bytesRead = imageStream.read(b)) != -1) {
+                                    bos.write(b, 0, bytesRead);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                byte[] ba = bos.toByteArray();
+                                base64 = Base64.encodeBytes(ba);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            Utils.debug(TAG, "base64 : " + base64);
+                            SquareImageView imageView = new SquareImageView(this);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                            params.setMargins(5, 10, 5, 10);
+                            imageView.setLayoutParams(params);
+                            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                            imageView.setImageBitmap(bitmap);
+                            camera_tumb.addView(imageView);
+                            if (camera_tumb.getChildCount() <= 0)
+                                ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                            else
+                                ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                        } else {
+                            try {
+                                if (feedModel.getMedia() != null && isFromMediaActivity)
+                                    bitmap = BitmapFactory.decodeFile(feedModel.getMedia());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                                    ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+                                    if (bitmap != null) {
+                                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+                                    }
+                                    byte[] ful_bytes = thumb_stream.toByteArray();
+                                    imageBytes = ful_bytes;
+                                    base64 = Base64.encodeBytes(ful_bytes);
+                                    feedModel.setBase64String(base64);
+                                    SquareImageView imageView = new SquareImageView
+                                            (CreatePostActivity.this);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                                    params.setMargins(5, 10, 5, 10);
+                                    imageView.setLayoutParams(params);
+                                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                    imageView.setImageBitmap(bitmap);
+                                    mBitmap = bitmap;
+                                    camera_tumb.addView(imageView);
+                                    if (camera_tumb.getChildCount() <= 0)
+                                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                                    else
+                                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+
+                        }
+
+
                     }
                 }
             }
@@ -520,11 +604,12 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 params.put(APIsConstants.KEY_USER_ID, userId);
                 params.put(APIsConstants.KEY_TITLE, title);
                 params.put(APIsConstants.KEY_DESCRIPTION, description);
-                if (!mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                if (!mType.equalsIgnoreCase(Constants.KEY_TEXT)||camera_tumb.getChildCount()>0) {
                     params.put(APIsConstants.KEY_MEDIA, base64);
                 } else {
                     params.put(APIsConstants.KEY_MEDIA, "");
                 }
+
                 params.put(APIsConstants.KEY_TYPE, mType);
                 Utils.info("params...", params.toString());
                 return params;
@@ -770,7 +855,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 //            }
 //        });
 
-        shareButton = (ShareButton) findViewById(R.id.shareButton);
+//        shareButton = (ShareButton) findViewById(R.id.shareButton);
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
                 .putString("og:type", "app_capstone.post")
 //                .putString("og:type", "fitness.course")
@@ -794,7 +879,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 .setAction(action)
                 .build();
 
-        shareButton.setShareContent(content);
+//        shareButton.setShareContent(content);
 
 //
 //        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()

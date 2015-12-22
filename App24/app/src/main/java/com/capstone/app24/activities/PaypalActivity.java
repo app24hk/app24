@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +62,7 @@ public class PaypalActivity extends BaseActivity {
     private String res = "";
     private String tag_string_req = "feeds_req";
     private int mPageNo = 1;
+    private ProgressBar progress_dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +76,6 @@ public class PaypalActivity extends BaseActivity {
     }
 
     private void updateUI() {
-//        String email = new Utils(this).getSharedPreferences(this, Constants.PAYPAL_EMAIL, "");
-//        if (email != null && !email.equalsIgnoreCase(Constants.EMPTY))
-//            editText.setText(email);
         if (NetworkUtils.isOnline(this)) {
             getPaypalDetails();
         } else {
@@ -85,20 +86,36 @@ public class PaypalActivity extends BaseActivity {
 
     private void setClickListeners() {
         txt_save.setOnClickListener(this);
+        editText.setImeActionLabel("Done", EditorInfo.IME_ACTION_DONE);
+        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    setPaypalDetails();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         super.onClick(v);
-        if (Utils.isValidEmail(editText.getText().toString().trim())) {
-            if (NetworkUtils.isOnline(this)) {
-                setPaypalDetails();
-            } else {
-                Utils.showSweetProgressDialog(this, this.getResources().getString(R
-                        .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
-            }
-        } else {
-            editText.setError(getResources().getString(R.string.please_enter_valid_email));
+        switch (v.getId()) {
+            case R.id.txt_save:
+                if (Utils.isValidEmail(editText.getText().toString().trim())) {
+                    if (NetworkUtils.isOnline(this)) {
+                        setPaypalDetails();
+                    } else {
+                        Utils.showSweetProgressDialog(this, this.getResources().getString(R
+                                .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+                    }
+                } else {
+                    editText.setError(getResources().getString(R.string.please_enter_valid_email));
+                }
+                break;
         }
 
 
@@ -109,6 +126,7 @@ public class PaypalActivity extends BaseActivity {
     private void initializeViews() {
         editText = (EditText) findViewById(R.id.editText);
         txt_save = (TextView) findViewById(R.id.txt_save);
+        progress_dialog = (ProgressBar) findViewById(R.id.progress_dialog);
     }
 
     public void onBuyPressed() {
@@ -161,16 +179,7 @@ public class PaypalActivity extends BaseActivity {
     }
 
     public boolean getPaypalDetails() {
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
-
-        mDialog = Utils.showSweetProgressDialog(this,
-                getResources
-                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-        mDialog.setCancelable(true);
+        progress_dialog.setVisibility(View.VISIBLE);
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_GET_PAYPAL_INFO,
@@ -181,7 +190,7 @@ public class PaypalActivity extends BaseActivity {
 
                         res = response.toString();
                         try {
-                            updateEmail(res);
+                            updateEmailBlock(res);
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -193,6 +202,7 @@ public class PaypalActivity extends BaseActivity {
                 if (mPageNo == 1)
                     Utils.closeSweetProgressDialog(PaypalActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
+                progress_dialog.setVisibility(View.GONE);
                 res = error.toString();
             }
         }) {
@@ -211,14 +221,9 @@ public class PaypalActivity extends BaseActivity {
     }
 
     public boolean setPaypalDetails() {
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
-
-        mDialog.setCancelable(true);
-
+        mDialog = Utils.showSweetProgressDialog(PaypalActivity.this,
+                getResources
+                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_ADD_EDIT_PAYPAL_INFO,
                 new volley.Response.Listener<String>() {
@@ -228,7 +233,7 @@ public class PaypalActivity extends BaseActivity {
 
                         res = response.toString();
                         try {
-                            updateEmail(res);
+                            refreshLatestFeeds(res);
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -237,8 +242,7 @@ public class PaypalActivity extends BaseActivity {
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (mPageNo == 1)
-                    Utils.closeSweetProgressDialog(PaypalActivity.this, mDialog);
+                Utils.closeSweetProgressDialog(PaypalActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -258,7 +262,7 @@ public class PaypalActivity extends BaseActivity {
         return false;
     }
 
-    private void updateEmail(String res) {
+    private void updateEmailBlock(String res) {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(res);
@@ -268,9 +272,12 @@ public class PaypalActivity extends BaseActivity {
         if (jsonObject != null) {
             try {
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-                    JSONObject jsonObject1 = jsonObject.getJSONObject("paypalInfo");
-                    if (!jsonObject1.getString("paypal_email").equalsIgnoreCase(""))
-                        editText.setText(jsonObject1.getString("paypal_email"));
+                    JSONObject jsonObject1 = jsonObject.getJSONObject(APIsConstants.PAYPAL_INFO);
+                    if (!jsonObject1.getString(APIsConstants.PAYPAL_EMAIL).equalsIgnoreCase
+                            (Constants.EMPTY))
+                        editText.setText(jsonObject1.getString(APIsConstants.PAYPAL_EMAIL));
+                    progress_dialog.setVisibility(View.GONE);
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -280,6 +287,7 @@ public class PaypalActivity extends BaseActivity {
 
     private void refreshLatestFeeds(String res) {
         JSONObject jsonObject = null;
+        Utils.closeSweetProgressDialog(PaypalActivity.this, mDialog);
         try {
             jsonObject = new JSONObject(res);
         } catch (JSONException e) {
@@ -288,14 +296,14 @@ public class PaypalActivity extends BaseActivity {
         if (jsonObject != null) {
             try {
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-
-
-                    Utils.showSweetProgressDialog(this, jsonObject.getString("message"),
+                    mDialog = Utils.showSweetProgressDialog(this, jsonObject.getString(APIsConstants
+                                    .KEY_MESSAGE),
                             SweetAlertDialog
                                     .SUCCESS_TYPE);
                     mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            Utils.closeSweetProgressDialog(PaypalActivity.this, mDialog);
                             finish();
                         }
                     });

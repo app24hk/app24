@@ -25,25 +25,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1">
-
-            <EditText
-                android:id="@+id/editText"
+            <FrameLayout
+                android:id="@+id/frame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:background="@drawable/rect_corners_edit_text"
-                android:drawableLeft="@drawable/mail"
-                android:drawablePadding="10dp"
-                android:ems="10"
-                android:hint="@string/email_hint_chinese"
-                android:inputType="textEmailAddress"
-                android:padding="10dp"/>
+                android:layout_gravity="center_vertical">
+                <EditText
+                    android:id="@+id/editText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/rect_corners_edit_text"
+                    android:drawableLeft="@drawable/mail"
+                    android:drawablePadding="10dp"
+                    android:ems="10"
+                    android:hint="@string/email_hint_chinese"
+                    android:inputType="textEmailAddress"
+                    android:padding="10dp"/>
+                <ProgressBar
+                    android:id="@+id/progress_dialog"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginLeft="-30dp"
+                    android:layout_toRightOf="@+id/editText"
+                    android:visibility="visible"/>
+            </FrameLayout>
+
+
             <TextView
                 android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/editText"
+                android:layout_below="@+id/frame"
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:padding="10dp"

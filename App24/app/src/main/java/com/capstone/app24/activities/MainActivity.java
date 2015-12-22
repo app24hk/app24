@@ -33,6 +33,7 @@ import com.capstone.app24.fragments.UserProfileDetailsFragment;
 import com.capstone.app24.interfaces.OnListUpdateListener;
 import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
+import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.Utils;
@@ -86,7 +87,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private SimpleFacebook mSimpleFacebook;
     OnPublishListener onPublishListener;
     private ArrayList<UserFeedModel> userFeedList = new ArrayList<>();
-    private TextView txt_profile_header;
+    private static TextView txt_profile_header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -490,6 +491,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
 
     private void setUserProfileFragment() {
+
+
         Bundle bundle = new Bundle();
         bundle.putString(Constants.KEY_USER_NAME, txt_profile_header.getText().toString().trim());
         userProfileDetailsFragment = UserProfileDetailsFragment.newInstance();
@@ -560,6 +563,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onPause() {
         super.onPause();
 
+    }
+
+    public static void setUsername(String username) {
+        txt_profile_header.setText(username);
     }
 
     public static RelativeLayout getBottomLayout() {

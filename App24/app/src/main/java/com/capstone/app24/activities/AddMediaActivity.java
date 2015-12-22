@@ -550,6 +550,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
                                 }
                                 imageSelectedPosition = -1;
+                                mType = Constants.KEY_TEXT;
                             } else {
 
                                 holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
@@ -560,11 +561,14 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
                                     ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
                                     ownerDataModel.setType(mType);
+                                    Session.setOwnerModel(ownerDataModel);
                                 } else {
                                     FeedRequestModel feedModel = Utils.getFeed();
                                     feedModel.setMedia(mGalleryModelsList.get(position).getPath());
                                     feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
                                     feedModel.setType(mType);
+                                    Utils.setFeed(feedModel);
+
                                 }
 
 
@@ -595,6 +599,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
                                 }
                                 videoSelectedPosition = -1;
+                                mType = Constants.KEY_TEXT;
                             } else {
                                 holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
                                         .color.colorPrimary));
@@ -605,11 +610,14 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
                                     ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
                                     ownerDataModel.setType(mType);
+                                    Session.setOwnerModel(ownerDataModel);
                                 } else {
                                     FeedRequestModel feedModel = Utils.getFeed();
                                     feedModel.setMedia(mGalleryModelsList.get(position).getPath());
                                     feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
                                     feedModel.setType(mType);
+                                    Utils.setFeed(feedModel);
+
                                 }
 
                                 Bundle bundle = new Bundle();
@@ -640,22 +648,12 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
                                 }
                                 textSelectedPosition = -1;
+                                mType = Constants.KEY_TEXT;
                             } else {
                                 holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
                                         .color.colorPrimary));
                                 textSelectedPosition = position;
 
-                                if (isEditable) {
-                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
-                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    ownerDataModel.setType(mType);
-                                } else {
-                                    FeedRequestModel feedModel = Utils.getFeed();
-                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    feedModel.setType(mType);
-                                }
 
                                 Bundle bundle = new Bundle();
                                 bundle.putString("path", holder1.picturesView.getTag().toString());
@@ -667,9 +665,30 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
                                 }
                                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                                if (mGalleryModelsList.get(position).isVideo()) {
+                                    mType = Constants.KEY_VIDEOS;
+                                } else {
+                                    mType = Constants.KEY_IMAGES;
+                                }
+                                if (isEditable) {
+                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    ownerDataModel.setType(mType);
+                                    Session.setOwnerModel(ownerDataModel);
+
+                                } else {
+                                    FeedRequestModel feedModel = Utils.getFeed();
+                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                    feedModel.setType(mType);
+                                    Utils.setFeed(feedModel);
+
+                                }
                                 intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
                                 intent.putExtra("come_from", "gallery");
                                 intent.putExtra("gallery_bundle", bundle);
+                                intent.putExtra(Constants.IS_VIDEO, mGalleryModelsList.get(position).isVideo());
                                 finish();
                                 startActivity(intent);
                             }

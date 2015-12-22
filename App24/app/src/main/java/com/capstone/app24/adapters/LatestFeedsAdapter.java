@@ -117,16 +117,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         holder.txt_creator.setText(latestFeedsModel.getUser_name());
         holder.txt_seen.setText(latestFeedsModel.getViewcount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated())));
-//        itemView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                new Utils(mActivity).setLatestFeedPreferences(mActivity, mLatestFeedList.get
-//                        (itemView.get));
-//                intent = new Intent(mActivity, PostDetailActivity.class);
-//                intent.putExtra("type", getLayoutPosition());
-//                mActivity.startActivity(intent);
-//            }
-//        });
 
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -262,7 +252,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                             //  setFeedData(res);
                             Utils.debug("fb", "Now going to post on Facebook");
                             handleResponse(res);
-                            //  postToWall();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -289,7 +278,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
     }
 
     private void handleResponse(String res) {
-//        Utils.debug(TAG, "Response :  " + res);
+        Utils.debug(TAG, "Response :  " + res);
 //        {"result":true,"message":"One more View saved."}
     }
 }

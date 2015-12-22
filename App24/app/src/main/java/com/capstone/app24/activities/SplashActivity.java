@@ -79,7 +79,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
+        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
@@ -360,64 +360,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
         }
     }
-
-//    @Override
-//    public void onPreExecuteConcluded() {
-//        mDialog = Utils.showSweetProgressDialog(SplashActivity.this, "Loading...");
-////        mRestAdapter = new RestAdapter.Builder()
-////                .setEndpoint(APIsConstants.API_BASE_URL)
-////                .build();
-//    }
-
-
-//    @Override
-//    public Object doInBackground(String... params) {
-//        //   IApiMethods methods = mRestAdapter.create(IApiMethods.class);
-////        methods.getUserLoginModel(userModel.getUser_social_id(), userModel.getUser_email(),
-////                userModel.getUser_fname(), userModel.getUser_lname(), userModel.getUser_gender
-////                        (), userModel.getUser_deviceType(), userModel.getUser_deviceToken(),
-////                userModel.getUser_loginType(), new
-////                        Callback<UserLoginResponseModel>() {
-////                            @Override
-////                            public void success(UserLoginResponseModel userLoginResponseModel, Response response) {
-////
-////                                mUserBeanResponse = new UserLoginResponseModel();
-////                                mUserBeanResponse = userLoginResponseModel;
-////                                if (mUserBeanResponse.isResult()) {
-////                                    UserLoginResponseModel.UserInfo userInfo = mUserBeanResponse
-////                                            .getUserInfo();
-////                                    Utils.debug(Constants.API_TAG, "UserInfo : { " + userInfo
-////                                            .getUser_id() + ", " + userInfo.getUser_email() + ", " +
-////                                            "" + userInfo.getUser_fname() + ", " + userInfo
-////                                            .getUser_lname() + ", " + userInfo.getUser_gender() +
-////                                            ", " + userInfo.getUser_loginType() + ", " + userInfo
-////                                            .getUser_social_id() + " }");
-////                                    mUserInfo = mUserBeanResponse
-////                                            .getUserInfo();
-////                                    setUserData();
-////                                } else {
-////
-////                                    Utils.debug(Constants.API_TAG, mUserBeanResponse.getMessage());
-////                                    btn_login_with_facebook.setOnClickListener(SplashActivity.this);
-////                                }
-////                            }
-////
-////                            @Override
-////                            public void failure(RetrofitError error) {
-////                                error.printStackTrace();
-////                            }
-////                        }
-////        );
-//        return null;
-//    }
-
-
-//    @Override
-//    public void onPostExecuteConcluded(Object result) {
-//
-//    }
-
-
     //...............Volley String Request..............
 
     public boolean makeUserLoginRequest() {
@@ -549,11 +491,11 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                 .KEY_IS_LOGGED_IN, true);
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_USER_DETAILS,
                         mUserBeanResponse.getUser_id());
+                new Utils().setPreferences(SplashActivity.this, Constants.KEY_USER_NAME,
+                        mUserBeanResponse.getUser_fname() + " " + mUserBeanResponse.getUser_lname());
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_FACEBOOK_ACCESS_TOKEN,
                         accessToken + "");
 
-                Utils.debug("acc", new Utils().getSharedPreferences(SplashActivity.this, Constants
-                        .KEY_FACEBOOK_ACCESS_TOKEN, Constants.EMPTY));
                 Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
                 finish();
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);

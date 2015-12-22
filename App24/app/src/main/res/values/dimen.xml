@@ -10,7 +10,9 @@
     <dimen name="item_circle_size_path">36dp</dimen>
 
     <!-- Feeds Dimens-->
-    <dimen name="feed_heading_text">22dp</dimen>
-    <dimen name="feed_body_text">15dp</dimen>
+    <dimen name="feed_heading_text">25dp</dimen>
+    <dimen name="feed_body_text">20dp</dimen>
     <dimen name="enter_text">15dp</dimen>
+    <dimen name="grey_heading_text">15sp</dimen>
+
 </resources>

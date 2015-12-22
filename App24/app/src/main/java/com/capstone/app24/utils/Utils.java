@@ -167,17 +167,6 @@ public class Utils {
         Utils.debug(TAG, "FeedRequestModel Saved Successfully");
     }
 
-
-    public static RecyclerView getRecyclerView() {
-
-        return mRecyclerView;
-    }
-
-    public static RecyclerView setRecyclerView(RecyclerView recyclerView) {
-        mRecyclerView = recyclerView;
-        return mRecyclerView;
-    }
-
     public void setPreferences(Activity activity, String key, boolean value) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
                 .getString(R.string.app_name), Context.MODE_PRIVATE);
@@ -258,6 +247,15 @@ public class Utils {
         UserFeedModel feedsModel = gson.fromJson(json, UserFeedModel.class);
         return feedsModel;
     }
+
+    public void clearSharedPreferences(Activity activity) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
+    }
+
 
 /*
  * Copyright 2012 Google Inc.

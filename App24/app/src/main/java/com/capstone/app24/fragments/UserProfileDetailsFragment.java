@@ -77,7 +77,9 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
     }
 
     private void updateUI() {
-
+        MainActivity.setUsername(new Utils(getActivity())
+                .getSharedPreferences(getActivity(), Constants
+                        .KEY_USER_NAME, ""));
         if (NetworkUtils.isOnline(getActivity()))
             getUserFeeds();
         else
@@ -128,9 +130,8 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 //                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
-                params.put(APIsConstants.KEY_USER_ID, new Utils(getActivity()).getSharedPreferences
-                        (getActivity(),
-                                Constants.KEY_USER_DETAILS, ""));
+                params.put(APIsConstants.KEY_USER_ID, new Utils(getActivity())
+                        .getSharedPreferences(getActivity(), Constants.KEY_USER_DETAILS, ""));
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -198,10 +199,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
     public static UserProfileDetailsFragment newInstance() {
         UserProfileDetailsFragment f = new UserProfileDetailsFragment();
         Bundle args = new Bundle();
-        args.getString(Constants.KEY_USER_NAME);
-//        args.putString("a", foo);
-//        args.putInt("b", bar);
-//        f.setArguments(args);
+//        username = args.getString(Constants.KEY_USER_NAME);
         return f;
     }
 

@@ -136,42 +136,122 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
          * geting Media Details
          */
         if (ownerDataModel.getMedia() != null && !ownerDataModel.getMedia().equalsIgnoreCase("")) {
+            if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
+                //Processing Image
+                if (ownerDataModel.getMedia().contains("http://")) {
+                    URL newurl = null;
+                    try {
+                        newurl = new URL(ownerDataModel.getMedia());
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    base64 = getBase64(bitmap);
+                    ownerDataModel.setBase64String(base64);
 
-
-            //Processing Image
-            if (ownerDataModel.getMedia().contains("http://")) {
-                URL newurl = null;
-                try {
-                    newurl = new URL(ownerDataModel.getMedia());
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                base64 = getBase64(bitmap);
-                ownerDataModel.setBase64String(base64);
-
-            } else {
-                try {
-                    if (ownerDataModel.getMedia() != null)
-                        bitmap = BitmapFactory.decodeFile(ownerDataModel.getMedia());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
-                if (bitmap != null) {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
-                }
+                } else {
+                    try {
+                        if (ownerDataModel.getMedia() != null)
+                            bitmap = BitmapFactory.decodeFile(ownerDataModel.getMedia());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
+                    if (bitmap != null) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, thumb_stream);
+                    }
 //                byte[] ful_bytes = thumb_stream.toByteArray();
 //                imageBytes = ful_bytes;
 //                base64 = Base64.encodeBytes(ful_bytes);
-                base64 = getBase64(bitmap);
-                ownerDataModel.setBase64String(base64);
+                    base64 = getBase64(bitmap);
+                    ownerDataModel.setBase64String(base64);
+
+                }
+            } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
+                if (ownerDataModel.getMedia().contains("http://")) {
+                    URL newurl = null;
+                    try {
+                        newurl = new URL(ownerDataModel.getThumbnail());
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+//                    base64 = getBase64(bitmap);
+//                    ownerDataModel.setBase64String(base64);
+
+
+                    //Uri uri=Uri.parse(ownerDataModel.getMedia());
+
+                    int bytesRead;
+                    FileInputStream imageStream = null;
+                    try {
+
+                        imageStream = new FileInputStream(ownerDataModel.getMedia());
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    byte[] b = new byte[1024];
+                    try {
+                        while ((bytesRead = imageStream.read(b)) != -1) {
+                            bos.write(b, 0, bytesRead);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        byte[] ba = bos.toByteArray();
+                        base64 = Base64.encodeBytes(ba);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                } else {
+                    // Uri vidFile = Uri.parse(ownerDataModel.getMedia());
+//
+                    bitmap = ThumbnailUtils.createVideoThumbnail(
+                            ownerDataModel.getMedia(), MediaStore.Video.Thumbnails.MINI_KIND);
+
+
+                    int bytesRead;
+                    FileInputStream imageStream = null;
+                    try {
+
+                        imageStream = new FileInputStream(ownerDataModel.getMedia());
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    byte[] b = new byte[1024];
+                    try {
+                        while ((bytesRead = imageStream.read(b)) != -1) {
+                            bos.write(b, 0, bytesRead);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        byte[] ba = bos.toByteArray();
+                        base64 = Base64.encodeBytes(ba);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
 
             }
+
 
 //            try {
 //                if (ownerDataModel.getMedia() != null && isFromMediaActivity)

@@ -57,4 +57,7 @@ public class APIsConstants {
     public static final String ONE = "1";
     public static final String TWO = "2";
     public static final String KEY_PAYPAL_EMAIL = "paypal_email";
+    public static final String PAYPAL_INFO = "paypalInfo";
+    public static final String PAYPAL_EMAIL = "paypal_email";
+
 }

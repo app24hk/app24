@@ -83,6 +83,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:gravity="center_vertical|left"
+                android:lineSpacingMultiplier="1.2"
                 android:maxLines="5"
                 android:text="@string/chinese_lorem_ipsum"
                 android:textSize="@dimen/feed_body_text"/>
