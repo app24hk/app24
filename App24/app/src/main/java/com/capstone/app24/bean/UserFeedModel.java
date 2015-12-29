@@ -20,13 +20,15 @@ public class UserFeedModel implements Parcelable {
     private String user_name;
     private String viewcount;
     private String thumbnail;
+    private String fb_feed_id;
+    private String profit_amount;
 
     public UserFeedModel() {
     }
 
     public UserFeedModel(String id, String title, String description, String media, String
             type, String user_id, String created, String modified, String user_name, String
-                                 viewcount, String thumbnail) {
+                                 viewcount, String thumbnail, String profit_amount, String fb_feed_id) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -129,6 +131,22 @@ public class UserFeedModel implements Parcelable {
         this.thumbnail = thumbnail;
     }
 
+    public String getFb_feed_id() {
+        return fb_feed_id;
+    }
+
+    public void setFb_feed_id(String fb_feed_id) {
+        this.fb_feed_id = fb_feed_id;
+    }
+
+    public String getProfit_amount() {
+        return profit_amount;
+    }
+
+    public void setProfit_amount(String profit_amount) {
+        this.profit_amount = profit_amount;
+    }
+
     public static final Parcelable.Creator<UserFeedModel> CREATOR = new Creator<UserFeedModel>() {
         @Override
         public UserFeedModel createFromParcel(Parcel source) {
@@ -159,6 +177,8 @@ public class UserFeedModel implements Parcelable {
         dest.writeString(user_name);
         dest.writeString(viewcount);
         dest.writeString(thumbnail);
+        dest.writeString(fb_feed_id);
+        dest.writeString(profit_amount);
     }
 
     public UserFeedModel(Parcel source) {
@@ -173,6 +193,8 @@ public class UserFeedModel implements Parcelable {
         this.user_name = source.readString();
         this.viewcount = source.readString();
         this.thumbnail = source.readString();
+        this.fb_feed_id = source.readString();
+        this.profit_amount = source.readString();
     }
 
 }

@@ -2,9 +2,9 @@
     <string name="app_name">App24</string>
     <!-- Facebook Data-->
     <!--trigma facebook id-->
-    <string name="app_id">1673090976236867</string>
+    <!--<string name="app_id">1673090976236867</string>-->
     <!--capstone facebook id -->
-    <!--<string name="app_id">1626774610922182</string>-->
+    <string name="app_id">1626774610922182</string>
     <!--Banner ad unit-id-->
     <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383

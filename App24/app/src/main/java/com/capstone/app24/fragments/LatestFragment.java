@@ -73,14 +73,16 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         initializeViews();
         MainActivity.tabs.setVisibility(View.VISIBLE);
         MainActivity.layout_user_profle.setVisibility(View.GONE);
-        updateUI();
+        // updateUI();
         return mView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        updateUI();
     }
+
 
     /**
      * This method is used to Update the UI with Feeds
@@ -134,7 +136,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         disabler = new RecyclerViewDisabler();
         swipeRefreshLayout.setOnRefreshListener(this);
         initRecyclerView();
-        InterfaceListener.setOnDeleteListener(this);
+        InterfaceListener.setOnDeleteListener(LatestFragment.this);
     }
 
     public boolean getLatestFeeds() {
@@ -180,6 +182,10 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
                 params.put(APIsConstants.TAB_TYPE, APIsConstants.ONE);
+                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(getActivity(),
+                        Constants.KEY_USER_DETAILS, ""));
+                Utils.debug("params", new Utils(getActivity())
+                        .getSharedPreferences(getActivity(), Constants.KEY_USER_DETAILS, ""));
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -190,7 +196,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private List<LatestFeedsModel> refreshLatestFeeds(String res) throws JSONException {
-        //Utils.debug(TAG, "Response  : " + res);
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject != null) {
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
@@ -253,6 +258,18 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             }
                             try {
                                 latestFeedsModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                latestFeedsModel.setProfit_amount(object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                latestFeedsModel.setFb_feed_id(object.getString(APIsConstants
+                                        .KEY_FB_FEED_ID));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

@@ -110,7 +110,13 @@ public class BaseActivity extends Activity implements View.OnClickListener {
                 txt_header.setVisibility(View.GONE);
             }
         } else {
-            txt_header.setVisibility(View.GONE);
+            if (header != null) {
+                txt_header.setVisibility(View.VISIBLE);
+                txt_header.setText(header);
+            } else {
+                txt_header.setVisibility(View.GONE);
+            }
+            //txt_header.setVisibility(View.GONE);
         }
 
     }

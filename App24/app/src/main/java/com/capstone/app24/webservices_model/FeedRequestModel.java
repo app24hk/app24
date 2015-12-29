@@ -13,12 +13,13 @@ public class FeedRequestModel {
     String message;
     String base64String;
     String mediaId;
+    String thumbnail;
 
     public FeedRequestModel() {
     }
 
     public FeedRequestModel(String user_id, String title, String description, String media, String type,
-                            boolean result, String message) {
+                            boolean result, String message, String thumbnail) {
         this.user_id = user_id;
         this.title = title;
         this.description = description;
@@ -26,10 +27,11 @@ public class FeedRequestModel {
         this.type = type;
         this.result = result;
         this.message = message;
+        this.thumbnail = thumbnail;
     }
 
     public FeedRequestModel(String user_id, String title, String description, String media, String type,
-                            String base64String, String mediaId, boolean result, String message) {
+                            String base64String, String mediaId, boolean result, String message, String thumbnail) {
         this.user_id = user_id;
         this.title = title;
         this.description = description;
@@ -39,6 +41,7 @@ public class FeedRequestModel {
         this.result = result;
         this.message = message;
         this.mediaId = mediaId;
+        this.thumbnail = thumbnail;
     }
 
     public String getUser_id() {
@@ -111,5 +114,13 @@ public class FeedRequestModel {
 
     public void setMediaId(String mediaId) {
         this.mediaId = mediaId;
+    }
+
+    public String getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
 }

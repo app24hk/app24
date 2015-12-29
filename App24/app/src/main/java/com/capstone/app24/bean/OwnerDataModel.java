@@ -20,6 +20,8 @@ public class OwnerDataModel implements Serializable {
     private String feed_owner;
     private String base64String;
     String mediaId;
+    private String profit_amount;
+    private String fb_feed_id;
 
     public OwnerDataModel() {
     }
@@ -27,7 +29,7 @@ public class OwnerDataModel implements Serializable {
     public OwnerDataModel(String id, String title, String description, String media, String type,
                           String user_id, String created, String modified, String user_name,
                           String viewcount, String thumbnail, String feed_owner, String
-                                  base64String, String mediaId) {
+                                  base64String, String mediaId, String profit_amount, String fb_feed_id) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -42,6 +44,10 @@ public class OwnerDataModel implements Serializable {
         this.feed_owner = feed_owner;
         this.base64String = base64String;
         this.mediaId = mediaId;
+        this.profit_amount = profit_amount;
+        this.fb_feed_id = fb_feed_id;
+
+
     }
 
     public String getBase64String() {
@@ -154,5 +160,21 @@ public class OwnerDataModel implements Serializable {
 
     public void setMediaId(String mediaId) {
         this.mediaId = mediaId;
+    }
+
+    public String getProfit_amount() {
+        return profit_amount;
+    }
+
+    public void setProfit_amount(String profit_amount) {
+        this.profit_amount = profit_amount;
+    }
+
+    public String getFb_feed_id() {
+        return fb_feed_id;
+    }
+
+    public void setFb_feed_id(String fb_feed_id) {
+        this.fb_feed_id = fb_feed_id;
     }
 }

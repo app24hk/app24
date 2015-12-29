@@ -49,6 +49,7 @@ public class Constants {
 
     public static final int SIMPLE_DIALOG = 1;
     public static final String KEY_FACEBOOK_ACCESS_TOKEN = "";
+    public static final String KEY_FACEBOOK_ID = "facebook_id";
     public static final String LATEST_FEED_MODEL = "LATEST_FEED_MODEL";
     public static final String USER_FEED_MODEL = "USER_FEED_MODEL";
     public static final String MOST_FEEDS_MODEL = "MOST_FEEDS_MODEL";
@@ -62,4 +63,8 @@ public class Constants {
     public static final String KEY_USER_NAME = "user_name";
     public static final String SEARCH_ELEMENT = "search_element";
     public static final String IS_VIDEO = "is_video";
+
+    //Facebook Likes
+    public static final String GRAPH_OBJECT = "graphObject";
+
 }

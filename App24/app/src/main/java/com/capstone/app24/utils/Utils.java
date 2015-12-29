@@ -175,6 +175,14 @@ public class Utils {
         editor.commit();
     }
 
+    public void setPreferences(Context activity, String key, boolean value) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
     public boolean getSharedPreferences(Activity activity, String key, boolean defaultValue) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
                 .getString(R.string.app_name), Context.MODE_PRIVATE);
@@ -183,6 +191,14 @@ public class Utils {
     }
 
     public void setPreferences(Activity activity, String key, String value) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
+                .getString(R.string.app_name), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    public void setPreferences(Context activity, String key, String value) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getResources()
                 .getString(R.string.app_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();

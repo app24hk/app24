@@ -22,12 +22,22 @@ import com.capstone.app24.R;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.UserFeedModel;
+import com.capstone.app24.utils.APIsConstants;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 4/11/15.
@@ -40,6 +50,8 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
     private Activity mActivity;
     private LayoutInflater mInflater;
     Intent intent;
+    private String res = "";
+    private SweetAlertDialog mDialog;
 
     public UserProfitAdapter(Activity activity, List<UserFeedModel> userFeedList) {
         mActivity = activity;
@@ -103,6 +115,7 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
         holder.txt_seen.setText(userFeedModel.getViewcount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(userFeedModel.getCreated
                 ())));
+        holder.txt_profile_count_login_user.setText(userFeedModel.getProfit_amount());
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -138,34 +151,6 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
                 }
             }
         });
-
-//        if (position == 0) {
-//            holder.view_profit_and_feeds.setVisibility(View.VISIBLE);
-//            holder.img_preview.setVisibility(View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.VISIBLE);
-//            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
-//            Uri videoURI = Uri.parse("android.resource://" + mActivity.getPackageName() + "/"
-//                    + R.raw.itcuties);
-//            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-//            retriever.setDataSource(mActivity, videoURI);
-//            Bitmap bitmap = retriever
-//                    .getFrameAtTime(10, MediaMetadataRetriever.OPTION_PREVIOUS_SYNC);
-//            Drawable drawable = new BitmapDrawable(mActivity.getResources(), bitmap);
-//            holder.img_preview.setImageDrawable(drawable);
-//        } else if (position == 1) {
-//            holder.view_profit_and_feeds.setVisibility(View.GONE);
-//            holder.img_preview.setVisibility
-//                    (View.VISIBLE);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//            holder.img_preview.setImageDrawable(mActivity.getResources().getDrawable(R.drawable.pic_two));
-//        } else {
-//            holder.view_profit_and_feeds.setVisibility(View.GONE);
-//            holder.img_preview.setVisibility(View.GONE);
-//            holder.layout_img_video_preview.setVisibility(View.GONE);
-//            holder.img_video_preview.setVisibility(View.GONE);
-//
-//        }
-
     }
 
 
@@ -207,9 +192,9 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
                             (getLayoutPosition()));
                     Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
                             .getLatestFeedPreferences(mActivity));
-//                    makeSeenPostRequest(mUserFeedList.get(getLayoutPosition()).getUser_id(), mUserFeedList.get(getLayoutPosition()).getId());
+                    makeSeenPostRequest(mUserFeedList.get(getLayoutPosition()).getUser_id(), mUserFeedList.get(getLayoutPosition()).getId());
+                    mActivity.finish();
                     intent = new Intent(mActivity, PostDetailActivity.class);
-                    //intent.putExtra("type", getLayoutPosition());
                     mActivity.startActivity(intent);
                 }
             });
@@ -245,6 +230,52 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
             }
         });
         dialog.show();
+    }
+
+    private boolean makeSeenPostRequest(final String user_id, final String id) {
+        mDialog = Utils.showSweetProgressDialog(mActivity,
+                mActivity.getResources
+                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+                        try {
+                            Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        } catch (Exception e) {
+                        }
+                        res = response.toString();
+                        try {
+                            handleResponse(res);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Utils.closeSweetProgressDialog(mActivity, mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, user_id);
+                params.put(APIsConstants.KEY_FEED_ID, id);
+                Utils.info("params...", params.toString());
+                return params;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleResponse(String res) {
+        Utils.debug(TAG, "Response :  " + res);
     }
 }
 

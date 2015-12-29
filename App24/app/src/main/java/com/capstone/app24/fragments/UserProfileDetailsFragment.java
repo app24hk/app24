@@ -270,6 +270,18 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
+                            try {
+                                userFeedModel.setProfit_amount(object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                userFeedModel.setFb_feed_id(object.getString(APIsConstants
+                                        .KEY_FB_FEED_ID));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             if (!userFeedList.contains(userFeedModel)) {
                                 userFeedList.add(userFeedModel);
                             }

@@ -19,9 +19,11 @@ import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.adapters.MostViewedAdapter;
 import com.capstone.app24.animations.HidingScrollListener;
 import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.interfaces.OnDeleteListener;
 import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
 
@@ -43,12 +45,12 @@ import volley.toolbox.StringRequest;
 /**
  * Created by amritpal on 4/11/15.
  */
-public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener {
     private static final String TAG = MostViewedFragment.class.getSimpleName();
     private View mView;
     private Context mContext;
     private Activity mActivity;
-    private MostViewedAdapter mMostViewedAdapter;
+    public MostViewedAdapter mMostViewedAdapter;
     private RecyclerView most_viewed_feeds;
 
     private int mPageNo = 1;
@@ -60,12 +62,17 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     private String tag_string_req = "feeds_req";
 
     @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_most_viewed, container, false);
         mContext = getActivity();
         mActivity = getActivity();
         initializeViews();
-        updateUI();
         MainActivity.tabs.setVisibility(View.VISIBLE);
         MainActivity.layout_user_profle.setVisibility(View.GONE);
         return mView;
@@ -88,6 +95,8 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
         initRecyclerView();
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
+        InterfaceListener.setOnDeleteListener(MostViewedFragment.this);
+
 
     }
 
@@ -165,7 +174,8 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
                 params.put(APIsConstants.TAB_TYPE, APIsConstants.TWO);
-
+                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(getActivity(),
+                        Constants.KEY_USER_DETAILS, ""));
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -176,7 +186,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     }
 
     private List<LatestFeedsModel> refreshMostViewedFeeds(String res) {
-//        Utils.debug(TAG, "Response  : " + res);
+        Utils.debug("nnnnn", "Response  : " + res);
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(res);
@@ -248,7 +258,21 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
-                                mMostViewedFeedList.add(mostViewedModel);
+                                try {
+                                    mostViewedModel.setProfit_amount(object.getString(APIsConstants
+                                            .KEY_PROFIT_AMOUNT));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    mostViewedModel.setFb_feed_id(object.getString(APIsConstants
+                                            .KEY_FB_FEED_ID));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                if (!mMostViewedFeedList.contains(mostViewedModel)) {
+                                    mMostViewedFeedList.add(mostViewedModel);
+                                }
                             }
                         }
                     }
@@ -285,7 +309,18 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     @Override
     public void onRefresh() {
         mPageNo = mPageNo + 1;
-        Utils.debug(TAG, "swipeRefreshLayout mPAge Number" + mPageNo);
         getMostViewedFeeds();
+    }
+
+    @Override
+    public void onDelete(String id, boolean isDelete) {
+        if (mMostViewedFeedList.size() > 0) {
+            for (int i = 0; i < mMostViewedFeedList.size(); i++) {
+                if (mMostViewedFeedList.get(i).getId().equalsIgnoreCase(id)) {
+                    mMostViewedFeedList.remove(i);
+                    mMostViewedAdapter.notifyDataSetChanged();
+                }
+            }
+        }
     }
 }

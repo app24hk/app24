@@ -100,18 +100,6 @@ public class VideoActivity extends Activity implements MediaPlayer.OnPreparedLis
         }
     }
 
-//    @Override
-//    public void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putBundle("newBundy", newBundy);
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        savedInstanceState.getBundle("newBundy");
-//    }
-
     public void doLayout() {
         // pan_tilt_zoom_rl
         RelativeLayout.LayoutParams playerParams = (RelativeLayout.LayoutParams) video
@@ -131,8 +119,6 @@ public class VideoActivity extends Activity implements MediaPlayer.OnPreparedLis
         } else {
             playerParams.width = LinearLayout.LayoutParams.MATCH_PARENT;
             playerParams.height = actualHeight;
-//            playerParams.height = (int) getResources().getDimension(
-//                    R.dimen.live_view_height);
         }
 
     }

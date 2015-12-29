@@ -210,7 +210,10 @@ public class PaypalActivity extends BaseActivity {
             protected Map<String, String> getParams() {
 //                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
-                params.put(APIsConstants.KEY_USER_ID, mPageNo + "");
+                params.put(APIsConstants.KEY_USER_ID, new Utils(PaypalActivity.this)
+                        .getSharedPreferences
+                                (PaypalActivity.this, Constants.KEY_USER_DETAILS, ""));
+
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -251,7 +254,9 @@ public class PaypalActivity extends BaseActivity {
             protected Map<String, String> getParams() {
 //                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
-                params.put(APIsConstants.KEY_USER_ID, mPageNo + "");
+                params.put(APIsConstants.KEY_USER_ID, new Utils(PaypalActivity.this)
+                        .getSharedPreferences
+                                (PaypalActivity.this, Constants.KEY_USER_DETAILS, ""));
                 params.put(APIsConstants.KEY_PAYPAL_EMAIL, editText.getText().toString().trim());
                 Utils.info("params...", params.toString());
                 return params;

@@ -58,8 +58,6 @@ import java.util.TimeZone;
 public class MainActivity extends FragmentActivity implements View.OnClickListener, View
         .OnTouchListener {
     private static final String TAG = MainActivity.class.getSimpleName();
-
-
     private ImageButton btn_app_24;
     private Toast toast = null;
     View menuLayout;
@@ -127,21 +125,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         // registerReceiver(AlarmReceiver.getInstance(),)
         setAlarm();
 
-//        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-//        Date past = new Date();
-//        try {
-//            past = format.parse("01/10/2010");
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Date now = new Date();
-//        System.out.println(TimeUnit.MILLISECONDS.toMillis(now.getTime() - past.getTime()) + " milliseconds ago");
-//        System.out.println(TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + " minutes ago");
-//        System.out.println(TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + " hours ago");
-//        System.out.println(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + " days ago");
-        //AppController.getInstance().fetchGalleryImages();
-        //AppController.getInstance().fetchGalleryVideos();
     }
 
     private void beginPlayingGame() {
@@ -576,5 +559,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public View getAppMenu() {
         return menuLayout;
     }
+
 
 }

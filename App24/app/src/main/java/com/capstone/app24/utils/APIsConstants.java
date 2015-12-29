@@ -20,7 +20,7 @@ public class APIsConstants {
     public static final String API_DELETE_FEED = "/deleteFeed";
     public static final String API_ADD_EDIT_PAYPAL_INFO = "/addEditPaypalInfo";
     public static final String API_GET_PAYPAL_INFO = "/getPaypalInfo";
-
+    public static final String API_UPDATE_FB_FEED_ID = "/updateFbFeedId";
 
     public static final String KEY_RESULT = "result";
     public static final String KEY_USERINFO = "userInfo";
@@ -59,5 +59,9 @@ public class APIsConstants {
     public static final String KEY_PAYPAL_EMAIL = "paypal_email";
     public static final String PAYPAL_INFO = "paypalInfo";
     public static final String PAYPAL_EMAIL = "paypal_email";
+
+    //feed Details
+    public static final String KEY_PROFIT_AMOUNT = "profitAmount";
+    public static final String KEY_FB_FEED_ID = "fb_feed_id";
 
 }

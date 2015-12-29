@@ -7,7 +7,9 @@ import android.graphics.RectF;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
@@ -32,9 +34,20 @@ import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
+import com.facebook.AccessToken;
+import com.facebook.FacebookActivity;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.share.model.ShareOpenGraphAction;
+import com.facebook.share.model.ShareOpenGraphContent;
+import com.facebook.share.model.ShareOpenGraphObject;
+import com.facebook.share.widget.LikeView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,10 +86,19 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     /* End of Volley Request Tags */
     private SweetAlertDialog mDialog;
     private OwnerDataModel mOwnerDataModel;
+    //    ShareButton shareButton;
+    private boolean isOwner;
+    private String profitAmount;
+    private int likeCount = 0;
+    private TextView txt_like_count;
+    private LikeView likeView;
+    private TextView txt_comment;
+    private int commentCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_post_detail);
         latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
         setHeader(null, true, true, false, false, false, null);
@@ -91,11 +113,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private boolean getFeedOwnerData() {
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_FEED_DATA,
@@ -208,7 +225,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                 e.printStackTrace();
                             }
                             try {
-                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_PROFIT_AMOUNT));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -216,10 +233,24 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                 mOwnerDataModel.setFeed_owner(object.getString(APIsConstants.KEY_FEED_OWNER));
                                 if (object.getString(APIsConstants.KEY_FEED_OWNER)
                                         .equalsIgnoreCase(Constants.YES)) {
-                                    setHeader(null, true, true, false, false, true, null);
+                                    isOwner = true;
+                                    setHeader(profitAmount, true, true, false, false, isOwner, null);
                                 } else {
-                                    setHeader(null, true, true, false, false, false, null);
+                                    isOwner = true;
+                                    setHeader(profitAmount, true, true, false, false, isOwner, null);
                                 }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setProfit_amount(object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setFb_feed_id(object.getString(APIsConstants
+                                        .KEY_FB_FEED_ID));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -297,8 +328,76 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             txt_creator.setText(latestFeedsModel.getUser_name());
             txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated
                     ())));
+            profitAmount = latestFeedsModel.getProfit_amount();
+            setHeader(profitAmount, true, true, false, false, isOwner, null);
+            getLikes(latestFeedsModel.getFb_feed_id());
+            getComments(latestFeedsModel.getFb_feed_id());
+            likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.DEFAULT);
+        }
 
+    }
 
+    private void getComments(String postId) {
+    /* make the API call */
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + postId + "/comments",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+
+                        Utils.debug(Constants.FACEBOOK, response.toString());
+
+                        JSONObject graphResponse = response.getJSONObject();
+                        Utils.debug(TAG, "graphResponse : " + graphResponse);
+                        try {
+                            JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
+                            Utils.debug(TAG, "jsonArray : " + jsonArray);
+                            commentCount = jsonArray.length();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        txt_comment.setText(commentCount + "");
+                    }
+                }
+        ).executeAsync();
+    }
+
+    /**
+     * this method is used to get the like counts
+     *
+     * @param postId
+     */
+    private void getLikes(String postId) {
+        //Post id  : : : : : 130220790685225
+        if (postId != null) {
+            new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/"/*130220790685225*/ + postId + "/likes",
+                    null,
+                    HttpMethod.GET,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                            Utils.debug(Constants.FACEBOOK, response.toString());
+
+                            JSONObject graphResponse = response.getJSONObject();
+                            Utils.debug(TAG, "graphResponse : " + graphResponse);
+                            try {
+                                JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
+                                Utils.debug(TAG, "jsonArray : " + jsonArray);
+                                likeCount = jsonArray.length();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            txt_like_count.setText(likeCount + "");
+                        }
+                    }
+            ).executeAsync();
+        } else {
+            txt_like_count.setText(likeCount + "");
         }
     }
 
@@ -312,12 +411,38 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         img_video_preview = (ImageView) findViewById(R.id.img_video_preview);
         layout_media_preview = (RelativeLayout) findViewById(R.id.layout_media_preview);
         layout_img_video_preview = (RelativeLayout) findViewById(R.id.layout_img_video_preview);
-
+        txt_comment = (TextView) findViewById(R.id.txt_comment);
         txt_post_title = (TextView) findViewById(R.id.txt_post_title);
         txt_description = (TextView) findViewById(R.id.txt_description);
         txt_seen = (TextView) findViewById(R.id.txt_seen);
-        txt_creator = (TextView) findViewById(R.id.txt_creator);
+        txt_like_count = (TextView) findViewById(R.id.like_count);
         txt_created_time = (TextView) findViewById(R.id.txt_created_time);
+        txt_creator = (TextView) findViewById(R.id.txt_creator);
+        txt_creator.setSelected(true);  // Set focus to the textview
+        txt_creator.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "dsjfhgu")//613292//
+                .putString("og:title", latestFeedsModel.getTitle())
+                .putString("og:description", latestFeedsModel.getDescription())
+                .build();
+//        SharePhoto photo = new SharePhoto.Builder()
+//                .setBitmap(bitmap)
+//                .build();
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("capstone_app:create")
+                .putObject("capstone_app:post", object)
+                .build();
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("capstone_app:post")
+                .setAction(action)
+                .build();
+
+//        shareButton = (ShareButton) findViewById(R.id.shareButton);
+//        shareButton.setShareContent(content);
+        //shareButton.performClick();
+        likeView = (LikeView) findViewById(R.id.like_view);
+        likeView.setLikeViewStyle(LikeView.Style.STANDARD);
+        likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE);
         //Facebook like button
         // likeView = (LikeView) findViewById(R.id.like_view);
         // Set the object for which you want to get likes from your users (Photo, Link or even your FB Fan page)
@@ -359,12 +484,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 }
                 break;
             case R.id.ibtn_back:
+                intent = new Intent(PostDetailActivity.this, MainActivity.class);
+                startActivity(intent);
                 finish();
                 break;
             case R.id.txt_edit:
                 edit_menu.setVisibility(View.GONE);
                 AlertToastManager.showToast("Edit", this);
-                Intent intent = new Intent(PostDetailActivity.this, EditPostActivity.class);
+                intent = new Intent(PostDetailActivity.this, EditPostActivity.class);
                 startActivity(intent);
                 break;
             case R.id.txt_delete:
@@ -454,14 +581,16 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         if (jsonObject != null) {
             try {
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-                    // jsonObject.getBoolean(APIsConstants.KEY_RESULT);
                     mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, jsonObject
                             .getString
                                     (APIsConstants.KEY_MESSAGE), SweetAlertDialog.SUCCESS_TYPE);
                     mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                         @Override
                         public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
+                            startActivity(intent);
                             finish();
+
                         }
                     });
                     InterfaceListener.OnDelete(latestFeedsModel.getId(), true);
@@ -503,4 +632,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         dialog.show();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(PostDetailActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

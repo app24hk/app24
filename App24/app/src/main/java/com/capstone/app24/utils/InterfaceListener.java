@@ -1,10 +1,12 @@
 package com.capstone.app24.utils;
 
+import com.capstone.app24.bean.GalleryModel;
 import com.capstone.app24.bean.OwnerDataModel;
 import com.capstone.app24.bean.UserFeedModel;
 import com.capstone.app24.interfaces.OnDeleteListener;
 import com.capstone.app24.interfaces.OnListUpdateListener;
 import com.capstone.app24.interfaces.OnLoadMoreListener;
+import com.capstone.app24.interfaces.OnNewMediaListener;
 
 import java.util.ArrayList;
 
@@ -16,6 +18,19 @@ public class InterfaceListener {
     public static OnDeleteListener mOnDeleteListener;
     public static OwnerDataModel mOwnerDataModel;
     public static OnLoadMoreListener mOnLoadMoreListener;
+    public static OnNewMediaListener mOnNewMediaListener;
+
+    public static void onMediaUpdate(GalleryModel model) {
+        mOnNewMediaListener.onMediaUpdate(model);
+    }
+
+    public static void setOnNewMediaListener(OnNewMediaListener listener) {
+        try {
+            InterfaceListener.mOnNewMediaListener = listener;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void setOnListUpdateListener(OnListUpdateListener listener) {
         mOnListUpdateListener = listener;

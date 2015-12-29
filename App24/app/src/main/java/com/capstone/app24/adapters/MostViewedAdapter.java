@@ -22,12 +22,22 @@ import com.capstone.app24.activities.MainActivity;
 import com.capstone.app24.activities.PostDetailActivity;
 import com.capstone.app24.activities.VideoActivity;
 import com.capstone.app24.bean.LatestFeedsModel;
+import com.capstone.app24.utils.APIsConstants;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 4/11/15.
@@ -41,6 +51,8 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     private LayoutInflater mInflater;
     Intent intent;
     List<LatestFeedsModel> mMostViewedFeedList = new ArrayList<>();
+    private String res = "";
+    private SweetAlertDialog mDialog;
 
     public MostViewedAdapter(Activity activity, List<LatestFeedsModel> mostViewedFeedList) {
         mActivity = activity;
@@ -101,6 +113,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         holder.txt_seen.setText(mostViewedModel.getViewcount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long
                 .parseLong(mostViewedModel.getCreated())));
+        holder.txt_profile_count_login_user.setText(mostViewedModel.getProfit_amount());
 
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,9 +203,10 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
                             (getLayoutPosition()));
                     Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
                             .getLatestFeedPreferences(mActivity));
-//                    makeSeenPostRequest(mLatestFeedList.get(getLayoutPosition()).getUser_id(), mLatestFeedList.get(getLayoutPosition()).getId());
+                    makeSeenPostRequest(mMostViewedFeedList.get(getLayoutPosition()).getUser_id()
+                            , mMostViewedFeedList.get(getLayoutPosition()).getId());
+                    mActivity.finish();
                     intent = new Intent(mActivity, PostDetailActivity.class);
-                    //intent.putExtra("type", getLayoutPosition());
                     mActivity.startActivity(intent);
                 }
             });
@@ -212,6 +226,52 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             /*Intent intent = new Intent(mActivity, PostDetailActivity.class);
             mActivity.startActivity(intent);*/
         }
+    }
+
+    private boolean makeSeenPostRequest(final String user_id, final String id) {
+        mDialog = Utils.showSweetProgressDialog(mActivity,
+                mActivity.getResources
+                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+                        Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        res = response.toString();
+                        try {
+                            //  setFeedData(res);
+                            Utils.debug("fb", "Now going to post on Facebook");
+                            handleResponse(res);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Utils.closeSweetProgressDialog(mActivity, mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, user_id);
+                params.put(APIsConstants.KEY_FEED_ID, id);
+                Utils.info("params...", params.toString());
+                return params;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleResponse(String res) {
+        Utils.debug(TAG, "Response :  " + res);
+//        {"result":true,"message":"One more View saved."}
     }
 
     //............FullView imageView..............

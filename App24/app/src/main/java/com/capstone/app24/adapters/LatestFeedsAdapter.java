@@ -117,7 +117,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         holder.txt_creator.setText(latestFeedsModel.getUser_name());
         holder.txt_seen.setText(latestFeedsModel.getViewcount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated())));
-
+        holder.txt_profile_count_login_user.setText(latestFeedsModel.getProfit_amount());
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,9 +142,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                 if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
                     new Utils(mActivity).setLatestFeedPreferences(mActivity, mLatestFeedList.get
                             (position));
-                    Utils.debug(TAG, "layout_img_video_preview Clicked : Data of Latest Feed " +
-                            "Model : " + new Utils(mActivity)
-                            .getLatestFeedPreferences(mActivity));
                     intent = new Intent(mActivity, VideoActivity.class);
                     mActivity.startActivity(intent);
                 } else if (holder.img_video_preview
@@ -196,8 +193,8 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                     Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
                             .getLatestFeedPreferences(mActivity));
                     makeSeenPostRequest(mLatestFeedList.get(getLayoutPosition()).getUser_id(), mLatestFeedList.get(getLayoutPosition()).getId());
+                    mActivity.finish();
                     intent = new Intent(mActivity, PostDetailActivity.class);
-                    //intent.putExtra("type", getLayoutPosition());
                     mActivity.startActivity(intent);
                 }
             });
@@ -246,11 +243,12 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                     @Override
                     public void onResponse(String response) {
                         Utils.debug(TAG, response.toString());
-                        Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        try {
+                            Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        } catch (Exception e) {
+                        }
                         res = response.toString();
                         try {
-                            //  setFeedData(res);
-                            Utils.debug("fb", "Now going to post on Facebook");
                             handleResponse(res);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -279,7 +277,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
 
     private void handleResponse(String res) {
         Utils.debug(TAG, "Response :  " + res);
-//        {"result":true,"message":"One more View saved."}
     }
 }
 

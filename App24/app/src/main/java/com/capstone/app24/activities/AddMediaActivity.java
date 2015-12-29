@@ -27,9 +27,12 @@ import com.capstone.app24.R;
 import com.capstone.app24.bean.GalleryModel;
 import com.capstone.app24.bean.OwnerDataModel;
 import com.capstone.app24.custom.SquareImageView;
+import com.capstone.app24.interfaces.OnNewMediaListener;
+import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Base64;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
@@ -59,7 +62,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     public static int textSelectedPosition = -1;
     private Intent intent;
     private String mType;
-
+    GalleryTask galleryTask;
     /**
      *
      */
@@ -72,6 +75,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
 
     private SweetAlertDialog mDialog;
     private boolean isEditable;
+    private ArrayList<GalleryModel> mGalleryList;
 
     /**
      *
@@ -82,7 +86,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         setContentView(R.layout.activity_add_media);
         setHeader("Add Media", true, false, true, true, false, null);
         intent = getIntent();
-        Utils.debug(TAG, "Intent Data  : " + intent);
         if (intent != null) {
             try {
                 mType = intent.getStringExtra(Constants.KEY_GALLERY_TYPE);
@@ -100,104 +103,167 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
 
         initializeView();
         setClickListeners();
-        if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE, true)) {
-            if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-                mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
-                        .getString(R
-                                .string
-                                .progress_fetching_images), SweetAlertDialog.PROGRESS_TYPE);
-            }
-
-        }
-        if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_VIDEO, true)) {
-            if (mType.equalsIgnoreCase
-                    (Constants.KEY_VIDEOS)) {
-                mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
-                        .getString(R
-                                .string
-                                .progress_fetching_videos), SweetAlertDialog.PROGRESS_TYPE);
-            }
-        }
-        if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true)) {
-            if (mType.equalsIgnoreCase
-                    (Constants.KEY_TEXT)) {
-                mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
-                        .getString(R
-                                .string
-                                .progress_fetching_images_and_videos), SweetAlertDialog.PROGRESS_TYPE);
-            }
-        }
         if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-            if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE, true)) {
-                new fetchGalleryData().execute();
-            } else {
-                fetchGallery();
-            }
+            fetchGallery();
+            galleryTask = new GalleryTask();
+            galleryTask.execute();
         } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-            if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_VIDEO, true)) {
-                new fetchGalleryData().execute();
-            } else {
-                fetchGallery();
-            }
+            fetchGallery();
+            galleryTask = new GalleryTask();
+            galleryTask.execute();
         } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
-            if (new Utils(this).getSharedPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true)) {
-                new fetchGalleryData().execute();
-            } else {
-                fetchGallery();
-            }
+            fetchGallery();
+            galleryTask = new GalleryTask();
+            galleryTask.execute();
         }
         updateUI();
     }
 
-    class fetchGalleryData extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
 
-        }
+    class GalleryTask extends AsyncTask<Void, Integer, Void> {
+        String selection;
 
         @Override
         protected Void doInBackground(Void... params) {
-            if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-                AppController.getInstance().fetchGalleryVideos();
-            } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-                AppController.getInstance().fetchGalleryImages();
+            String[] columns = {MediaStore.Files.FileColumns._ID,
+                    MediaStore.Files.FileColumns.DATA,
+                    MediaStore.Files.FileColumns.DATE_ADDED,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Files.FileColumns.MIME_TYPE,
+                    MediaStore.Files.FileColumns.TITLE,
+            };
+
+            if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
+                selection =
+                        MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+            } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
+                selection =
+                        MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                                + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+
             } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
-                AppController.getInstance().AddImagesAndVideos(null);
+                selection =
+                        MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE + " OR " + MediaStore
+                                .Files.FileColumns.MEDIA_TYPE + "="
+                                + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+            }
+
+
+            final String orderBy = MediaStore.Files.FileColumns.DATE_ADDED;
+            Uri queryUri = MediaStore.Files.getContentUri("external");
+
+            cursor = AddMediaActivity.this.getContentResolver().query(queryUri,
+                    columns,
+                    selection,
+                    null, // Selection args (none).
+                    orderBy + " DESC" // Sort order.
+            );
+
+            int image_column_index = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID);
+            count = cursor.getCount();
+            thumbnails = new Bitmap[count];
+            arrPath = new String[count];
+            typeMedia = new int[count];
+            thumbnailsselection = new boolean[count];
+
+            mGalleryList.clear();
+            boolean isVideo = false;
+
+
+            for (int j = 0; j < count; j++) {
+                mGalleryList.add(new GalleryModel());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+
+
+            for (int i = 0; i < count; i++) {
+                cursor.moveToPosition(i);
+                int id = cursor.getInt(image_column_index);
+                int dataColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+                BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                bmOptions.inSampleSize = 4;
+                bmOptions.inPurgeable = true;
+                int type1 = cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE);
+                int t = cursor.getInt(type1);
+                if (t == 1) {
+                    isVideo = false;
+                    thumbnails[i] = MediaStore.Images.Thumbnails.getThumbnail(
+                            getContentResolver(), id,
+                            MediaStore.Images.Thumbnails.MINI_KIND, bmOptions);
+                    GalleryModel galleryModel = new GalleryModel(id, cursor.getString
+                            (dataColumnIndex), MediaStore.Images.Thumbnails
+                            .getThumbnail(
+                                    getContentResolver(), id,
+                                    MediaStore.Images.Thumbnails.MINI_KIND, bmOptions), isVideo);
+                    mGalleryList.get(i).setId(id);
+                    mGalleryList.get(i).setImage(MediaStore.Images.Thumbnails.getThumbnail(
+                            getContentResolver(), id,
+                            MediaStore.Images.Thumbnails.MINI_KIND, bmOptions));
+                    mGalleryList.get(i).setPath(cursor.getString
+                            (dataColumnIndex));
+                    mGalleryList.get(i).setIsVideo(isVideo);
+                } else if (t == 3) {
+                    isVideo = true;
+                    thumbnails[i] = MediaStore.Video.Thumbnails.getThumbnail(
+                            getContentResolver(), id,
+                            MediaStore.Video.Thumbnails.MINI_KIND, bmOptions);
+                    GalleryModel galleryModel = new GalleryModel(id, cursor.getString
+                            (dataColumnIndex), MediaStore.Video.Thumbnails.getThumbnail(
+                            getContentResolver(), id,
+                            MediaStore.Video.Thumbnails.MINI_KIND, bmOptions), isVideo);
+                    mGalleryList.get(i).setId(id);
+                    mGalleryList.get(i).setImage(MediaStore.Video.Thumbnails.getThumbnail(
+                            getContentResolver(), id,
+                            MediaStore.Video.Thumbnails.MINI_KIND, bmOptions));
+                    mGalleryList.get(i).setPath(cursor.getString
+                            (dataColumnIndex));
+                    mGalleryList.get(i).setIsVideo(isVideo);
+                }
+
+
+                publishProgress(1);
+                Utils.debug(TAG, "galleryImagesAndVideoModelArrayList.size() : " +
+                        "" + mGalleryList.size());
             }
             return null;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-                new Utils(AddMediaActivity.this).setPreferences(AddMediaActivity.this, Constants
-                        .FETCH_GALLERY_VIDEO, false);
-            } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-                new Utils(AddMediaActivity.this).setPreferences(AddMediaActivity.this, Constants
-                        .FETCH_GALLERY_IMAGE, false);
-            } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
-                new Utils(AddMediaActivity.this).setPreferences(AddMediaActivity.this, Constants
-                        .FETCH_GALLERY_IMAGE_AND_VIDEOS, false);
-            }
-            fetchGallery();
+        protected void onProgressUpdate(Integer... values) {
+            //  super.onProgressUpdate(values);
+            Utils.debug(TAG, "Inside OnProgressUpdate");
+
+            imageAdapter.notifyDataSetChanged();
+
         }
     }
 
+
     private void fetchGallery() {
 
+        mGalleryList = new ArrayList<GalleryModel>();
+
+
         if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-            imageAdapter = new ImageAdapter(this, AppController.getGalleryVideoModelArrayList(), false);
+            imageAdapter = new ImageAdapter(this, mGalleryList, false);
             gridView.setAdapter(imageAdapter);
             Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
 
         } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-            imageAdapter = new ImageAdapter(this, AppController.getGalleryImageModelArrayList(), true);
+            // mGalleryList = AppController.getGalleryImageModelArrayList();
+            imageAdapter = new ImageAdapter(this, mGalleryList, true);
             gridView.setAdapter(imageAdapter);
             Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
         } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
-            imageAdapter = new ImageAdapter(this, AppController.getGalleryImagesAndVideoModelArrayList(), true);
+            //  mGalleryList = AppController.getGalleryImagesAndVideoModelArrayList();
+            imageAdapter = new ImageAdapter(this, mGalleryList, true);
             gridView.setAdapter(imageAdapter);
             Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
         }
@@ -220,21 +286,21 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                 intent.putExtra("come_from", "gallery");
                 intent.putExtra("gallery_bundle", bundle);
                 finish();
+
                 startActivity(intent);
             }
         });
 
     }
 
-    private void setClickListeners() {
 
+    private void setClickListeners() {
     }
 
     private void initializeView() {
         gridView = (GridView) findViewById(R.id.grid_view);
         Intent intent = getIntent();
         isFromMediaActivity = intent.getBooleanExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
-        Utils.debug(TAG, "" + isFromMediaActivity);
 
     }
 
@@ -242,31 +308,25 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_add_image:
-                Utils.debug(TAG, "Camera Clicked");
                 dispatchTakePictureIntent();
                 break;
             case R.id.ibtn_add_video:
-                Utils.debug(TAG, "Video Clicked");
-
                 intent = new Intent(
                         android.provider.MediaStore.ACTION_VIDEO_CAPTURE);
-                System.out.println("high quality");
                 intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
                 intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 12);
                 startActivityForResult(intent, REQUEST_VIDEO_CAPTURED);
-                //intent = new Intent("android.media.action.VIDEO_CAMERA");
-
-
                 break;
             case R.id.ibtn_back:
                 finish();
                 Intent intent;
+                galleryTask.cancel(true);
+                cursor.close();
                 if (isEditable) {
                     intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
                     intent.putExtra(Constants.KEY_IS_EDITABLE, true);
                 } else {
                     intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-
                 }
                 intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
                 intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
@@ -443,6 +503,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         return cursor.getString(index);
     }
 
+
     private class ImageAdapter extends BaseAdapter {
         private Context context;
         LayoutInflater mInflater;
@@ -461,7 +522,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         }
 
         public int getCount() {
-            return mGalleryModelsList.size();
+            return /*mGalleryModelsList.size();*/count;
         }
 
         public Object getItem(int position) {
@@ -485,10 +546,10 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-
+//            holder.linearLayout
             if (position < mGalleryModelsList.size()) {
+
                 if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-                    Utils.debug("position", "position : " + position);
                     holder.picturesView.setImageBitmap(mGalleryModelsList.get
                             (position).getImage());
                     holder.picturesView.setTag(mGalleryModelsList.get
@@ -496,7 +557,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                     holder.iconView.setVisibility(View.GONE);
                     //bitmapsIdImages.get(position)
                 } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-                    Utils.debug("position", "position : " + position);
                     holder.picturesView.setImageBitmap(mGalleryModelsList.get(position).getImage());
                     try {
                         holder.picturesView.setTag(mGalleryModelsList.get(position).getId());
@@ -504,7 +564,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                         e.printStackTrace();
                     }
                 } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
-                    Utils.debug("position", "position : " + position);
                     holder.picturesView.setImageBitmap(mGalleryModelsList.get(position).getImage());
                     if (mGalleryModelsList.get(position).isVideo())
                         holder.iconView.setVisibility(View.VISIBLE);
@@ -543,157 +602,163 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-                            ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
-                            if (imageSelectedPosition == position) {
-                                for (RelativeLayout linearLayout : linearLayoutArrayList) {
-                                    linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
-                                }
-                                imageSelectedPosition = -1;
-                                mType = Constants.KEY_TEXT;
-                            } else {
+                        Utils.debug(TAG, "mGalleryModelsList.get(position).getImage() : " + mGalleryModelsList.get(position).getImage());
+                        if (mGalleryModelsList.get(position).getImage() != null) {
 
-                                holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
-                                        .color.colorPrimary));
-                                imageSelectedPosition = position;
-                                if (isEditable) {
-                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
-                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    ownerDataModel.setType(mType);
-                                    Session.setOwnerModel(ownerDataModel);
+                            if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
+                                ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
+                                if (imageSelectedPosition == position) {
+                                    for (RelativeLayout linearLayout : linearLayoutArrayList) {
+                                        linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+                                    }
+                                    imageSelectedPosition = -1;
+                                    mType = Constants.KEY_IMAGES;
                                 } else {
-                                    FeedRequestModel feedModel = Utils.getFeed();
-                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    feedModel.setType(mType);
-                                    Utils.setFeed(feedModel);
 
+                                    holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
+                                            .color.colorPrimary));
+                                    imageSelectedPosition = position;
+                                    if (isEditable) {
+                                        OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                        ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                        ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                        ownerDataModel.setType(mType);
+                                        Session.setOwnerModel(ownerDataModel);
+                                    } else {
+                                        FeedRequestModel feedModel = Utils.getFeed();
+                                        feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                        feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                        feedModel.setType(mType);
+                                        Utils.setFeed(feedModel);
+
+                                    }
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("path", holder1.picturesView.getTag() + "");
+                                    Intent intent;
+                                    if (isEditable) {
+                                        intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                                        intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                                    } else {
+                                        intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                    }
+                                    intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                                    intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                                    intent.putExtra("come_from", "gallery");
+                                    intent.putExtra("gallery_bundle", bundle);
+                                    finish();
+                                    startActivity(intent);
                                 }
-
-
-                                Bundle bundle = new Bundle();
-                                bundle.putString("path", holder1.picturesView.getTag() + "");
-                                Intent intent;
-                                if (isEditable) {
-                                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
-                                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
-                                } else {
-                                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                                }
-                                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-                                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
-                                intent.putExtra("come_from", "gallery");
-                                intent.putExtra("gallery_bundle", bundle);
-                                finish();
-                                startActivity(intent);
-                            }
-                        } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
-                            ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
-                            mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
-                                    .getString(R
-                                            .string
-                                            .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-                            if (videoSelectedPosition == position) {
-                                for (RelativeLayout linearLayout : linearLayoutArrayList) {
-                                    linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
-                                }
-                                videoSelectedPosition = -1;
-                                mType = Constants.KEY_TEXT;
-                            } else {
-                                holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
-                                        .color.colorPrimary));
-                                videoSelectedPosition = position;
-
-                                if (isEditable) {
-                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
-                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    ownerDataModel.setType(mType);
-                                    Session.setOwnerModel(ownerDataModel);
-                                } else {
-                                    FeedRequestModel feedModel = Utils.getFeed();
-                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    feedModel.setType(mType);
-                                    Utils.setFeed(feedModel);
-
-                                }
-
-                                Bundle bundle = new Bundle();
-                                bundle.putString("path", holder1.picturesView.getTag().toString());
-                                Intent intent;
-                                if (isEditable) {
-                                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
-                                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
-                                } else {
-                                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                                }
-                                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-                                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
-                                intent.putExtra("come_from", "gallery");
-                                intent.putExtra("gallery_bundle", bundle);
-                                finish();
-                                startActivity(intent);
-                            }
-                            Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
-                        } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
-                            ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
-                            mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
-                                    .getString(R
-                                            .string
-                                            .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-                            if (textSelectedPosition == position) {
-                                for (RelativeLayout linearLayout : linearLayoutArrayList) {
-                                    linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
-                                }
-                                textSelectedPosition = -1;
-                                mType = Constants.KEY_TEXT;
-                            } else {
-                                holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
-                                        .color.colorPrimary));
-                                textSelectedPosition = position;
-
-
-                                Bundle bundle = new Bundle();
-                                bundle.putString("path", holder1.picturesView.getTag().toString());
-                                Intent intent;
-                                if (isEditable) {
-                                    intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
-                                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
-                                } else {
-                                    intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                                }
-                                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-                                if (mGalleryModelsList.get(position).isVideo()) {
+                            } else if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {
+                                ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
+                                mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
+                                        .getString(R
+                                                .string
+                                                .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+                                if (videoSelectedPosition == position) {
+                                    for (RelativeLayout linearLayout : linearLayoutArrayList) {
+                                        linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+                                    }
+                                    videoSelectedPosition = -1;
                                     mType = Constants.KEY_VIDEOS;
                                 } else {
-                                    mType = Constants.KEY_IMAGES;
-                                }
-                                if (isEditable) {
-                                    OwnerDataModel ownerDataModel = Session.getOwnerModel();
-                                    ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    ownerDataModel.setType(mType);
-                                    Session.setOwnerModel(ownerDataModel);
+                                    holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
+                                            .color.colorPrimary));
+                                    videoSelectedPosition = position;
 
+                                    if (isEditable) {
+                                        OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                        ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                        ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                        ownerDataModel.setType(mType);
+                                        Session.setOwnerModel(ownerDataModel);
+                                    } else {
+                                        FeedRequestModel feedModel = Utils.getFeed();
+                                        feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                        feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                        feedModel.setType(mType);
+                                        Utils.setFeed(feedModel);
+
+                                    }
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("path", holder1.picturesView.getTag().toString());
+                                    Intent intent;
+                                    if (isEditable) {
+                                        intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                                        intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                                    } else {
+                                        intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                    }
+                                    intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                                    intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                                    intent.putExtra("come_from", "gallery");
+                                    intent.putExtra("gallery_bundle", bundle);
+                                    finish();
+                                    startActivity(intent);
+                                }
+                                Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
+                            } else if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
+                                ViewHolder holder1 = (ViewHolder) finalConvertView.getTag();
+                                mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this, getResources()
+                                        .getString(R
+                                                .string
+                                                .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+                                if (textSelectedPosition == position) {
+                                    for (RelativeLayout linearLayout : linearLayoutArrayList) {
+                                        linearLayout.setBackgroundColor(context.getResources().getColor(R.color.white));
+                                    }
+                                    textSelectedPosition = -1;
+                                    mType = Constants.KEY_TEXT;
                                 } else {
-                                    FeedRequestModel feedModel = Utils.getFeed();
-                                    feedModel.setMedia(mGalleryModelsList.get(position).getPath());
-                                    feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
-                                    feedModel.setType(mType);
-                                    Utils.setFeed(feedModel);
+                                    holder1.linearLayout.setBackgroundColor(context.getResources().getColor(R
+                                            .color.colorPrimary));
+                                    textSelectedPosition = position;
 
+
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString("path", holder1.picturesView.getTag().toString());
+                                    Intent intent;
+                                    if (isEditable) {
+                                        intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
+                                        intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+                                    } else {
+                                        intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+                                    }
+                                    intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+                                    if (mGalleryModelsList.get(position).isVideo()) {
+                                        mType = Constants.KEY_VIDEOS;
+                                    } else {
+                                        mType = Constants.KEY_IMAGES;
+                                    }
+                                    if (isEditable) {
+                                        OwnerDataModel ownerDataModel = Session.getOwnerModel();
+                                        ownerDataModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                        ownerDataModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                        ownerDataModel.setType(mType);
+                                        Session.setOwnerModel(ownerDataModel);
+
+                                    } else {
+                                        FeedRequestModel feedModel = Utils.getFeed();
+                                        feedModel.setMedia(mGalleryModelsList.get(position).getPath());
+                                        feedModel.setMediaId("" + mGalleryModelsList.get(position).getId());
+                                        feedModel.setType(mType);
+                                        Utils.setFeed(feedModel);
+
+                                    }
+                                    intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+                                    intent.putExtra("come_from", "gallery");
+                                    intent.putExtra("gallery_bundle", bundle);
+                                    intent.putExtra(Constants.IS_VIDEO, mGalleryModelsList.get(position).isVideo());
+                                    finish();
+                                    startActivity(intent);
                                 }
-                                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
-                                intent.putExtra("come_from", "gallery");
-                                intent.putExtra("gallery_bundle", bundle);
-                                intent.putExtra(Constants.IS_VIDEO, mGalleryModelsList.get(position).isVideo());
-                                finish();
-                                startActivity(intent);
+                                Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
                             }
-                            Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
+
+                        } else {
+                            AlertToastManager.showToast("Loading images", AddMediaActivity.this);
                         }
+
                     }
                 });
             }
@@ -714,6 +779,7 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     public void onBackPressed() {
         finish();
         Intent intent;
+        closeCursor();
         if (isEditable) {
             intent = new Intent(AddMediaActivity.this, EditPostActivity.class);
             intent.putExtra(Constants.KEY_IS_EDITABLE, true);
@@ -725,5 +791,20 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
         intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, false);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        closeCursor();
+    }
+
+    private void closeCursor() {
+        if (cursor != null) {
+            cursor.close();
+        }
+        if (galleryTask != null) {
+            galleryTask.cancel(true);
+        }
     }
 }

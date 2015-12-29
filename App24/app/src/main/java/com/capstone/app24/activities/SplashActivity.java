@@ -495,6 +495,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                         mUserBeanResponse.getUser_fname() + " " + mUserBeanResponse.getUser_lname());
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_FACEBOOK_ACCESS_TOKEN,
                         accessToken + "");
+                new Utils().setPreferences(SplashActivity.this, Constants.KEY_FACEBOOK_ID,
+                        mUserBeanResponse.getUser_social_id());
 
                 Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
                 finish();

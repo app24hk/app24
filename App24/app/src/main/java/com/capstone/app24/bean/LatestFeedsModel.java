@@ -17,13 +17,16 @@ public class LatestFeedsModel implements Serializable {
     private String user_name;
     private String viewcount;
     private String thumbnail;
+    private String fb_feed_id;
+    private String profit_amount;
+
 
     public LatestFeedsModel() {
     }
 
     public LatestFeedsModel(String id, String title, String description, String media, String
             type, String user_id, String created, String modified, String user_name, String
-                                    viewcount, String thumbnail) {
+                                    viewcount, String thumbnail, String profit_amount, String fb_feed_id) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -35,6 +38,8 @@ public class LatestFeedsModel implements Serializable {
         this.user_name = user_name;
         this.viewcount = viewcount;
         this.thumbnail = thumbnail;
+        this.profit_amount = profit_amount;
+        this.fb_feed_id = fb_feed_id;
     }
 
     public String getId() {
@@ -123,5 +128,21 @@ public class LatestFeedsModel implements Serializable {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getProfit_amount() {
+        return profit_amount;
+    }
+
+    public void setProfit_amount(String profit_amount) {
+        this.profit_amount = profit_amount;
+    }
+
+    public String getFb_feed_id() {
+        return fb_feed_id;
+    }
+
+    public void setFb_feed_id(String fb_feed_id) {
+        this.fb_feed_id = fb_feed_id;
     }
 }
