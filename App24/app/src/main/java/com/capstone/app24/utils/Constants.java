@@ -67,4 +67,5 @@ public class Constants {
     //Facebook Likes
     public static final String GRAPH_OBJECT = "graphObject";
 
+    public static final String POST = "post";
 }

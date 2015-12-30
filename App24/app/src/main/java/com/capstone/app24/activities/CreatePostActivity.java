@@ -1,12 +1,12 @@
 package com.capstone.app24.activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.custom.SquareImageView;
 import com.capstone.app24.utils.APIsConstants;
@@ -26,36 +25,25 @@ import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Base64;
 import com.capstone.app24.utils.Constants;
-import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookActivity;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
-import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.model.SharePhoto;
-import com.facebook.share.widget.MessageDialog;
 import com.facebook.share.widget.ShareButton;
-import com.sromku.simple.fb.Permission;
 import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.entities.Feed;
 import com.sromku.simple.fb.entities.Photo;
 import com.sromku.simple.fb.entities.Video;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -66,7 +54,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CancellationException;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit.RestAdapter;
@@ -281,7 +268,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             try {
                 Bundle bundle = intent.getBundleExtra(Constants.KEY_BUNDLE);
                 bitmap = (Bitmap) bundle.get(Constants.KEY_DATA);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -351,19 +337,24 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         imageBytes = ful_bytes;
                         base64 = Base64.encodeBytes(ful_bytes);
                         feedModel.setBase64String(base64);
-                        SquareImageView imageView = new SquareImageView
-                                (CreatePostActivity.this);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-                        params.setMargins(5, 10, 5, 10);
-                        imageView.setLayoutParams(params);
-                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageView.setImageBitmap(bitmap);
-                        mBitmap = bitmap;
-                        camera_tumb.addView(imageView);
-                        if (camera_tumb.getChildCount() <= 0)
-                            ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-                        else
-                            ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                SquareImageView imageView = new SquareImageView
+                                        (CreatePostActivity.this);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                                params.setMargins(5, 10, 5, 10);
+                                imageView.setLayoutParams(params);
+                                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                imageView.setImageBitmap(bitmap);
+                                mBitmap = bitmap;
+                                camera_tumb.addView(imageView);
+                                if (camera_tumb.getChildCount() <= 0)
+                                    ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                                else
+                                    ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                            }
+                        }, 1000);
 
                     } else if (feedModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
 //                        mDialog = Utils.showSweetProgressDialog(this, "", SweetAlertDialog.PROGRESS_TYPE);
@@ -398,18 +389,24 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                             e.printStackTrace();
                         }
                         Utils.debug(TAG, "base64 : " + base64);
-                        SquareImageView imageView = new SquareImageView(this);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-                        params.setMargins(5, 10, 5, 10);
-                        imageView.setLayoutParams(params);
-                        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        imageView.setImageBitmap(bitmap);
-                        camera_tumb.addView(imageView);
-                        if (camera_tumb.getChildCount() <= 0)
-                            ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-                        else
-                            ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
-                        // Utils.closeSweetProgressDialog(this, mDialog);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                SquareImageView imageView = new SquareImageView
+                                        (CreatePostActivity.this);
+                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                                params.setMargins(5, 10, 5, 10);
+                                imageView.setLayoutParams(params);
+                                imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                imageView.setImageBitmap(bitmap);
+                                camera_tumb.addView(imageView);
+                                if (camera_tumb.getChildCount() <= 0)
+                                    ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                                else
+                                    ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                                // Utils.closeSweetProgressDialog(this, mDialog);
+                            }
+                        }, 1000);
 
                     } else if (feedModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
                         if (isVideo) {
@@ -444,17 +441,22 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                                 e.printStackTrace();
                             }
                             Utils.debug(TAG, "base64 : " + base64);
-                            SquareImageView imageView = new SquareImageView(this);
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-                            params.setMargins(5, 10, 5, 10);
-                            imageView.setLayoutParams(params);
-                            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                            imageView.setImageBitmap(bitmap);
-                            camera_tumb.addView(imageView);
-                            if (camera_tumb.getChildCount() <= 0)
-                                ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-                            else
-                                ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    SquareImageView imageView = new SquareImageView(CreatePostActivity.this);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                                    params.setMargins(5, 10, 5, 10);
+                                    imageView.setLayoutParams(params);
+                                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                    imageView.setImageBitmap(bitmap);
+                                    camera_tumb.addView(imageView);
+                                    if (camera_tumb.getChildCount() <= 0)
+                                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                                    else
+                                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                                }
+                            }, 1000);
                         } else {
                             try {
                                 if (feedModel.getMedia() != null && isFromMediaActivity)
@@ -470,19 +472,24 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                             imageBytes = ful_bytes;
                             base64 = Base64.encodeBytes(ful_bytes);
                             feedModel.setBase64String(base64);
-                            SquareImageView imageView = new SquareImageView
-                                    (CreatePostActivity.this);
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
-                            params.setMargins(5, 10, 5, 10);
-                            imageView.setLayoutParams(params);
-                            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                            imageView.setImageBitmap(bitmap);
-                            mBitmap = bitmap;
-                            camera_tumb.addView(imageView);
-                            if (camera_tumb.getChildCount() <= 0)
-                                ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
-                            else
-                                ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    SquareImageView imageView = new SquareImageView
+                                            (CreatePostActivity.this);
+                                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, 100, 1.0f);
+                                    params.setMargins(5, 10, 5, 10);
+                                    imageView.setLayoutParams(params);
+                                    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                    imageView.setImageBitmap(bitmap);
+                                    mBitmap = bitmap;
+                                    camera_tumb.addView(imageView);
+                                    if (camera_tumb.getChildCount() <= 0)
+                                        ibtn_select_image_from_gallery.setImageResource(R.drawable.camera);
+                                    else
+                                        ibtn_select_image_from_gallery.setImageResource(R.drawable.color_camera);
+                                }
+                            }, 1000);
 
                         }
 
@@ -831,38 +838,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     private void postStoryToWall() {
 
-//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-//                .putString("com_capstone_app:title", "0-553-57340-3")
-//                .putString("com_capstone_app:description", "0-553-57340-3")
-//                        //.putString("og:type", "post.post")//613292//
-//                .build();
-//
-//        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-//                .setActionType("post.create")
-//                .putObject("post", object)
-//                .build();
-//
-//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-//                .setPreviewPropertyName("post")
-//                .setAction(action)
-//                .build();
-//        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
-//            @Override
-//            public void onSuccess(Sharer.Result result) {
-//                Utils.debug("fb", "facebook Result  : " + result);
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                Utils.debug("fb", "facebook Cancel  : ");
-//            }
-//
-//            @Override
-//            public void onError(FacebookException error) {
-//                Utils.debug("fb", "facebook Error  : " + error);
-//            }
-//        });
-
 //        shareButton = (ShareButton) findViewById(R.id.shareButton);
         ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
                 .putString("og:type", "app_capstone.post")
@@ -887,49 +862,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 .setAction(action)
                 .build();
 
-//        shareButton.setShareContent(content);
-
-//
-//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-//                .putString("og:type", "fitness.course")
-//                .putString("og:title", "Sample Course")
-//                .putString("og:description", "This is a sample course.")
-//                .putInt("fitness:duration:value", 100)
-//                .putString("fitness:duration:units", "s")
-//                .putInt("fitness:distance:value", 12)
-//                .putString("fitness:distance:units", "km")
-//                .putInt("fitness:speed:value", 5)
-//                .putString("fitness:speed:units", "m/s")
-//                .build();
-//        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-//                .setActionType("fitness.runs")
-//                .putObject("fitness:course", object)
-//                .build();
-//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-//                .setPreviewPropertyName("fitness:course")
-//                .setAction(action)
-//                .build();
-//        shareButton.setShareContent(content);
-//        shareButton.callOnClick();
-
-
-//        shareButton.performClick();
-//        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
-//            @Override
-//            public void onSuccess(Sharer.Result result) {
-//                Utils.debug("fb", "facebook Result  : " + result);
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                Utils.debug("fb", "facebook Cancel  : ");
-//            }
-//
-//            @Override
-//            public void onError(FacebookException error) {
-//                Utils.debug("fb", "facebook Error  : " + error);
-//            }
-//        });
 
         Utils.debug(TAG, "Inside Post to Wall ");
         String userId = new Utils().getSharedPreferences(CreatePostActivity.this, Constants
@@ -961,28 +893,5 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     .build();
             //  mSimpleFacebook.publish(feed, onPublishListener);
         }
-
-
-        /*Feed feed = new Feed.Builder()
-//                .setMessage(title)
-                .setName(title)
-//                .setCaption(description)
-                .setDescription(description)
-                .setPicture("http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1449576680_.jpg")
-//                .setLink("https://www.facebook.com/games/?app_id=1673090976236867&fb_object_id=178413342510329&fb_action_ids=1705467516354449&fb_action_types=books.reads&pnref=story")
-                        //.addAction("Clone", "https://github.com/sromku/android-simple-facebook")
-                        //.addProperty("Full documentation", "http://sromku.github" +
-                        //".io/android-simple-facebook", "http://sromku.github.io/android-simple-facebook")
-                        // .addProperty("Stars", "14")
-
-                .build();*/
-
     }
-
-//    private String getvideoFilePathFromUri(Uri uri) {
-//        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-//        cursor.moveToFirst();
-//        int index = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
-//        return cursor.getString(index);
-//    }
 }

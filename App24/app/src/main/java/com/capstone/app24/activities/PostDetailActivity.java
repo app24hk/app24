@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.Display;
@@ -35,15 +34,20 @@ import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 import com.facebook.AccessToken;
-import com.facebook.FacebookActivity;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.LikeView;
+import com.facebook.share.widget.ShareButton;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
@@ -94,12 +98,16 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private LikeView likeView;
     private TextView txt_comment;
     private int commentCount;
+    private ShareButton shareButton;
+    private CallbackManager callbackManager;
+    private String mFeedId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_post_detail);
+        callbackManager = CallbackManager.Factory.create();
         latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
         setHeader(null, true, true, false, false, false, null);
         getFeedOwnerData();
@@ -437,12 +445,18 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 .setAction(action)
                 .build();
 
-//        shareButton = (ShareButton) findViewById(R.id.shareButton);
-//        shareButton.setShareContent(content);
+        shareButton = (ShareButton) findViewById(R.id.shareButton);
+        //shareButton.setShareContent(content);
         //shareButton.performClick();
         likeView = (LikeView) findViewById(R.id.like_view);
         likeView.setLikeViewStyle(LikeView.Style.STANDARD);
         likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE);
+
+
+//        likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.OPEN_GRAPH);
+//        likeView.performClick();
+
+
         //Facebook like button
         // likeView = (LikeView) findViewById(R.id.like_view);
         // Set the object for which you want to get likes from your users (Photo, Link or even your FB Fan page)
@@ -465,11 +479,55 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_share:
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+//                Intent sendIntent = new Intent();
+//                sendIntent.setAction(Intent.ACTION_SEND);
+//                sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+//                sendIntent.setType("text/plain");
+//                startActivity(sendIntent);
+                // shareOnFacebook();
+//                new GraphRequest(
+//                        AccessToken.getCurrentAccessToken(),
+//                        "/" + latestFeedsModel.getFb_feed_id(),
+//                        null,
+//                        HttpMethod.GET,
+//                        new GraphRequest.Callback() {
+//                            public void onCompleted(GraphResponse response) {
+//            /* handle the result */
+//                                Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
+//                                        "" + response.getRawResponse());
+//                                Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
+//                                        "" + response.getJSONObject());
+//                                JSONObject object = response.getJSONObject();
+//                                JSONObject jsonObject = null;
+//                                try {
+//                                    jsonObject = object.getJSONObject(Constants.KEY_DATA);
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                JSONObject urlObject1 = null;
+//                                try {
+//                                    urlObject1 = jsonObject.getJSONObject(Constants.POST);
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                String url = "";
+//                                try {
+//                                    url = urlObject1.getString(Constants.KEY_URL);
+//                                    Utils.debug(Constants.FACEBOOK, "url : " + url);
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//                                likeView.setObjectIdAndType(url, LikeView.ObjectType.OPEN_GRAPH);
+//                                likeView.performClick();
+//
+////                                ShareLinkContent content = new ShareLinkContent.Builder()
+////                                        .setContentUrl(Uri.parse(url))
+////                                        .build();
+////                                shareButton.setShareContent(content);
+////                                shareButton.performClick();
+//                            }
+//                        }
+//                ).executeAsync();
                 break;
             case R.id.ibtn_dots:
 
@@ -518,6 +576,51 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 startActivity(intent);
                 break;
         }
+    }
+
+    private void shareOnFacebook() {
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "dsjfhgu")//613292//
+                .putString("og:title", latestFeedsModel.getTitle())
+                .putString("og:description", latestFeedsModel.getDescription())
+                .build();
+//        SharePhoto photo = new SharePhoto.Builder()
+//                .setBitmap(bitmap)
+//                .build();
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("capstone_app:create")
+                .putObject("capstone_app:post", object)
+                .build();
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("capstone_app:post")
+                .setAction(action)
+                .build();
+
+        shareButton = (ShareButton) findViewById(R.id.shareButton);
+        shareButton.setShareContent(content);
+        shareButton.performClick();
+        shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Utils.debug(TAG, "post Id : " + result.getPostId());
+                //getLikes(result.getPostId());
+                if (!mFeedId.equalsIgnoreCase(Constants.EMPTY) && latestFeedsModel.getFb_feed_id
+                        () != null) {
+                    //updateFacebookFeedId(result.getPostId());
+                }
+            }
+
+            @Override
+            public void onCancel() {
+                Utils.debug(TAG, "Cancelled");
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Utils.debug(TAG, "error : " + error);
+            }
+        });
     }
 
     private boolean deleteFeed() {

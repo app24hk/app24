@@ -14,6 +14,7 @@ import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -202,12 +203,9 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                             .getThumbnail(
                                     getContentResolver(), id,
                                     MediaStore.Images.Thumbnails.MINI_KIND, bmOptions), isVideo);
-                    mGalleryList.get(i).setId(id);
-                    mGalleryList.get(i).setImage(MediaStore.Images.Thumbnails.getThumbnail(
-                            getContentResolver(), id,
-                            MediaStore.Images.Thumbnails.MINI_KIND, bmOptions));
-                    mGalleryList.get(i).setPath(cursor.getString
-                            (dataColumnIndex));
+                    mGalleryList.get(i).setId(galleryModel.getId());
+                    mGalleryList.get(i).setImage(galleryModel.getImage());
+                    mGalleryList.get(i).setPath(galleryModel.getPath());
                     mGalleryList.get(i).setIsVideo(isVideo);
                 } else if (t == 3) {
                     isVideo = true;
@@ -218,12 +216,9 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                             (dataColumnIndex), MediaStore.Video.Thumbnails.getThumbnail(
                             getContentResolver(), id,
                             MediaStore.Video.Thumbnails.MINI_KIND, bmOptions), isVideo);
-                    mGalleryList.get(i).setId(id);
-                    mGalleryList.get(i).setImage(MediaStore.Video.Thumbnails.getThumbnail(
-                            getContentResolver(), id,
-                            MediaStore.Video.Thumbnails.MINI_KIND, bmOptions));
-                    mGalleryList.get(i).setPath(cursor.getString
-                            (dataColumnIndex));
+                    mGalleryList.get(i).setId(galleryModel.getId());
+                    mGalleryList.get(i).setImage(galleryModel.getImage());
+                    mGalleryList.get(i).setPath(galleryModel.getPath());
                     mGalleryList.get(i).setIsVideo(isVideo);
                 }
 
@@ -597,7 +592,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                 .color.colorPrimary));
                     }
                 }
-
 
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override

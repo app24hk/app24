@@ -146,11 +146,12 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
          it will show (Searching...)
          */
 
-        if (mPageNo == 1)
+        if (mPageNo == 1) {
             mDialog = Utils.showSweetProgressDialog(getActivity(),
                     getResources
                             ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-        mDialog.setCancelable(true);
+            mDialog.setCancelable(true);
+        }
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_RECENT_FEEDS,
@@ -287,8 +288,8 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 try {
                     Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
-                            .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
+//                            .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
