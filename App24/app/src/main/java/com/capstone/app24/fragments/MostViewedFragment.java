@@ -279,9 +279,9 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                     }
                     if (jsonArray.length() == 0) {
                         try {
-                            Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
-                                            ().getResources().getString(R.string.no_more_data)),
-                                    SweetAlertDialog.ERROR_TYPE);
+//                            Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
+//                                            ().getResources().getString(R.string.no_more_data)),
+//                                    SweetAlertDialog.ERROR_TYPE);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

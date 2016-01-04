@@ -25,6 +25,7 @@ import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Base64;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.FacebookUtils;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
@@ -98,17 +99,70 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private boolean isVideo;
     private int likeCount;
     private String mFeedId = "";
+    private String fb_share_url = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
+        mSimpleFacebook = SimpleFacebook.getInstance(this);
         setContentView(R.layout.activity_create_post);
         callbackManager = CallbackManager.Factory.create();
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.post));
         initializeViews();
         setClickListeners();
         //getLikes("");
+        //planATrip();
+    }
+
+    private void planATrip() {
+        SharePhoto photo = new SharePhoto.Builder()
+                .setBitmap(bitmap)
+                .setUserGenerated(true)
+                .build();
+        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+                .putString("og:type", "dsjfhgu")//613292//
+                .putString("og:title", "title")
+                .putString("og:description", "description")
+                        //.putString("og:image", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_1451478575.png")
+                .putString("og:video", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1451565010_.mp4")
+                        //.putPhoto("capstone_app:picture", photo)
+                .build();
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("capstone_app:plan")
+                .putObject("capstone_app:trip", object)
+                .build();
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("capstone_app:trip")
+                .setAction(action)
+                .build();
+
+        shareButton = (ShareButton) findViewById(R.id.shareButton);
+        shareButton.setShareContent(content);
+        // shareButton.performClick();
+        shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Utils.debug(TAG, "post Id : " + result.getPostId());
+                //getLikes(result.getPostId());
+                String fbUrl = "";
+                fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
+                if (!mFeedId.equalsIgnoreCase(Constants.EMPTY) && result.getPostId() != null) {
+                    updateFacebookFeedId(result.getPostId(), fbUrl);
+                }
+            }
+
+            @Override
+            public void onCancel() {
+                Utils.debug(TAG, "Cancelled");
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Utils.debug(TAG, "error : " + error);
+            }
+        });
     }
 
     private void createPost(String title, String description) {
@@ -144,18 +198,45 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         /**
          * Client facebook
          */
+        ShareOpenGraphObject object = null;
+        if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY) && !fb_share_url.endsWith(".mp4")) {
+            object = new ShareOpenGraphObject.Builder()
+                    .putString("og:type", "dsjfhgu")//613292//
+                    .putString("og:title", title)
+                    .putString("og:description", description)
+                    .putString("og:image", fb_share_url)
+                    .build();
+        }
+        if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY)) {
+            if (fb_share_url.endsWith(".mp4") || fb_share_url.endsWith(".3gp"))
+                object = new ShareOpenGraphObject.Builder()
+                        .putString("og:type", "dsjfhgu")//613292//
+                        .putString("og:title", title)
+                        .putString("og:description", description)
+                        .putString("og:video", fb_share_url)
+                        .build();
+        } else {
+            object = new ShareOpenGraphObject.Builder()
+                    .putString("og:type", "dsjfhgu")//613292//
+                    .putString("og:title", title)
+                    .putString("og:description", description)
+                    .build();
+        }
 
-        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("og:type", "dsjfhgu")//613292//
-                .putString("og:title", title)
-                .putString("og:description", description)
-                .build();
+//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+//                .putString("og:type", "dsjfhgu")//613292//
+//                .putString("og:title", title)
+//                .putString("og:description", description)
+//                .putString("og:image", fb_share_url)
+//                .build();
         SharePhoto photo = new SharePhoto.Builder()
                 .setBitmap(bitmap)
                 .build();
         ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
                 .setActionType("capstone_app:create")
                 .putObject("capstone_app:post", object)
+//                .putString("fb:explicitly_shared", "true")
+//                .putPhoto("capstone_app:pic", photo)
                 .build();
         ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
                 .setPreviewPropertyName("capstone_app:post")
@@ -170,8 +251,10 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             public void onSuccess(Sharer.Result result) {
                 Utils.debug(TAG, "post Id : " + result.getPostId());
                 //getLikes(result.getPostId());
+                String fbUrl = "";
+                fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
                 if (!mFeedId.equalsIgnoreCase(Constants.EMPTY) && result.getPostId() != null) {
-                    updateFacebookFeedId(result.getPostId());
+                    updateFacebookFeedId(result.getPostId(), fbUrl);
                 }
             }
 
@@ -189,7 +272,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     }
 
-    private boolean updateFacebookFeedId(final String postId) {
+    private boolean updateFacebookFeedId(final String postId, final String fbUrl) {
 
         final SweetAlertDialog pd = Utils.showSweetProgressDialog(CreatePostActivity.this,
                 getResources
@@ -223,6 +306,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_FEED_ID, mFeedId);
                 params.put(APIsConstants.KEY_FB_FEED_ID, postId);
+                params.put(APIsConstants.KEY_FB_SHARE_URL, fbUrl);
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -266,8 +350,10 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
         if (isFromMediaActivity) {
             try {
-                Bundle bundle = intent.getBundleExtra(Constants.KEY_BUNDLE);
-                bitmap = (Bitmap) bundle.get(Constants.KEY_DATA);
+                if (intent.hasExtra(Constants.KEY_BUNDLE)) {
+                    Bundle bundle = intent.getBundleExtra(Constants.KEY_BUNDLE);
+                    bitmap = (Bitmap) bundle.get(Constants.KEY_DATA);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -632,7 +718,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //    mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
         Utils.debug(TAG, "onActivityResult " + isFromMediaActivity);
         callbackManager.onActivityResult(requestCode, resultCode, data);
@@ -754,8 +839,9 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     }
 
     //CallbackManager callbackManager;
-    private void postToWall() {
-        createPost(edit_post_title.getText().toString().trim(), edit_write_post.getText().toString().trim());
+    private void postToWall(String fb_share_url) {
+        createPost(edit_post_title.getText().toString().trim(), edit_write_post.getText()
+                .toString().trim());
 
     }
 
@@ -801,9 +887,25 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, jsonObject
                                 .getString(APIsConstants.KEY_MESSAGE), SweetAlertDialog
                                 .SUCCESS_TYPE);
-                        mFeedId = jsonObject.getString(APIsConstants.KEY_FEED_ID);
+                        try {
+                            mFeedId = jsonObject.getString(APIsConstants.KEY_FEED_ID);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        JSONObject object = null;
+                        try {
+                            object = jsonObject.getJSONObject(APIsConstants.KEY_FEED_DATA);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                            fb_share_url = object.getString(APIsConstants.KEY_MEDIA);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         Utils.debug(TAG, "mFeedId : " + mFeedId);
-                        postToWall();
+                        Utils.debug(TAG, "fb_share_url : " + fb_share_url);
+                        postToWall(fb_share_url);
                         mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {

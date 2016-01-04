@@ -197,6 +197,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     private List<LatestFeedsModel> refreshLatestFeeds(String res) throws JSONException {
+        Utils.debug(TAG, "Response of Latest feed Fragment  :  " + res);
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject != null) {
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
@@ -271,6 +272,9 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             try {
                                 latestFeedsModel.setFb_feed_id(object.getString(APIsConstants
                                         .KEY_FB_FEED_ID));
+                                Utils.debug(TAG, "object.getString(APIsConstants.KEY_FB_FEED_ID)"
+                                        + object.getString(APIsConstants
+                                        .KEY_FB_FEED_ID));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -281,9 +285,9 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     }
                 }
                 if (jsonArray.length() == 0) {
-                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
-                                    ().getResources().getString(R.string.no_more_data)),
-                            SweetAlertDialog.ERROR_TYPE);
+//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
+//                                    ().getResources().getString(R.string.no_more_data)),
+//                            SweetAlertDialog.ERROR_TYPE);
                 }
             } else {
                 try {

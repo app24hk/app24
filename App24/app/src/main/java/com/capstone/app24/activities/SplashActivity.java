@@ -79,7 +79,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
+        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
@@ -107,7 +107,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
 
         txt_terms_of_use = (TextView) findViewById(R.id.txt_terms_of_use);
         btn_login_with_facebook = (Button) findViewById(R.id.btn_login_with_facebook);
-
         fb_btn = (LoginButton) findViewById(R.id.login_button);
         getKeyHash();
         permissions.add("public_profile");
@@ -115,7 +114,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         permissions.add("user_birthday");
         permissions.add("publish_actions");
 
-      /*  //Facebook Button Initialization
+      /*//Facebook Button Initialization
         fb_btn.setReadPermissions(permissions);
 
 

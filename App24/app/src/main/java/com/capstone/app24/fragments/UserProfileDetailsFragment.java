@@ -289,15 +289,15 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                     }
                 }
                 if (jsonArray.length() == 0) {
-                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
-                                    ().getResources().getString(R.string.no_more_data)),
-                            SweetAlertDialog.ERROR_TYPE);
+//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
+//                                    ().getResources().getString(R.string.no_more_data)),
+//                            SweetAlertDialog.ERROR_TYPE);
                 }
             } else {
                 try {
                     Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
-                            .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
+//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
+//                            .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

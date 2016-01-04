@@ -53,6 +53,7 @@ public class APIsConstants {
     public static final String KEY_THUMBNAIL = "thumbnail";
     public static final String KEY_FEED_OWNER = "feed_owner";
     public static final String KEY_FEED_ID = "feed_id";
+    public static final String KEY_FB_SHARE_URL = "fb_share_url";
     public static final String TAB_TYPE = "tabType";
     public static final String ONE = "1";
     public static final String TWO = "2";

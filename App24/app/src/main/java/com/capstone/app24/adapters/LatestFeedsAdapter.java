@@ -100,6 +100,8 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                     .into(holder.img_preview);
             holder.img_video_preview.setVisibility(View.GONE);
             holder.layout_img_video_preview.setVisibility(View.VISIBLE);
+            Utils.debug("image_url", "latestFeedsModel.getThumbnail()" + latestFeedsModel.getThumbnail());
+
         } else if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
