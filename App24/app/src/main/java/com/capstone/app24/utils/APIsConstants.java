@@ -18,6 +18,7 @@ public class APIsConstants {
     public static final String API_MOST_VIEWED = "/mostViewed";
     public static final String API_FEED_DATA = "/getFeedData";
     public static final String API_DELETE_FEED = "/deleteFeed";
+    public static final String API_ADD_SHARE_USER = "/addShareUser";
     public static final String API_ADD_EDIT_PAYPAL_INFO = "/addEditPaypalInfo";
     public static final String API_GET_PAYPAL_INFO = "/getPaypalInfo";
     public static final String API_UPDATE_FB_FEED_ID = "/updateFbFeedId";

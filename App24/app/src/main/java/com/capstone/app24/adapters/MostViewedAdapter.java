@@ -110,11 +110,13 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         holder.txt_feed_heading.setText(mostViewedModel.getTitle());
         holder.txt_feed_body.setText(mostViewedModel.getDescription());
         holder.txt_creator.setText(mostViewedModel.getUser_name());
-        holder.txt_seen.setText(mostViewedModel.getViewcount());
+        if (mostViewedModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
+            holder.txt_profile_count_login_user.setText(Constants.DOLLAR_SIGN + mostViewedModel.getProfit_amount());
+        else
+            holder.txt_profile_count_login_user.setText(mostViewedModel.getProfit_amount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long
                 .parseLong(mostViewedModel.getCreated())));
-        holder.txt_profile_count_login_user.setText(mostViewedModel.getProfit_amount());
-
+        holder.txt_seen.setText(mostViewedModel.getViewcount());
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

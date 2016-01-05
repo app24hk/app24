@@ -117,9 +117,12 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         holder.txt_feed_heading.setText(latestFeedsModel.getTitle());
         holder.txt_feed_body.setText(latestFeedsModel.getDescription());
         holder.txt_creator.setText(latestFeedsModel.getUser_name());
+        if (latestFeedsModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
+            holder.txt_profile_count_login_user.setText(Constants.DOLLAR_SIGN + latestFeedsModel.getProfit_amount());
+        else
+            holder.txt_profile_count_login_user.setText(latestFeedsModel.getProfit_amount());
         holder.txt_seen.setText(latestFeedsModel.getViewcount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated())));
-        holder.txt_profile_count_login_user.setText(latestFeedsModel.getProfit_amount());
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

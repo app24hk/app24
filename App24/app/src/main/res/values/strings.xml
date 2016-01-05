@@ -117,4 +117,5 @@
     <string name="check_your_internet_connection">Please check your internet connection</string>
     <string name="deleting_feed">Deleting Feed</string>
     <string name="please_enter_valid_email">Please enter valid details</string>
+    <string name="sharing_feed">Sharing Feed</string>
 </resources>

@@ -113,9 +113,12 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
         holder.txt_feed_body.setText(userFeedModel.getDescription());
         holder.txt_creator.setText(userFeedModel.getUser_name());
         holder.txt_seen.setText(userFeedModel.getViewcount());
+        if (userFeedModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
+            holder.txt_profile_count_login_user.setText(Constants.DOLLAR_SIGN + userFeedModel.getProfit_amount());
+        else
+            holder.txt_profile_count_login_user.setText(userFeedModel.getProfit_amount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(userFeedModel.getCreated
                 ())));
-        holder.txt_profile_count_login_user.setText(userFeedModel.getProfit_amount());
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

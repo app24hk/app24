@@ -111,6 +111,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.post));
         initializeViews();
         setClickListeners();
+        Intent intent = getIntent();
         //getLikes("");
         //planATrip();
     }
@@ -407,7 +408,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 feedModel.setMedia(Constants.EMPTY);
             } else {
                 if (feedModel.getType() != null && !feedModel.getType().equalsIgnoreCase(Constants
-                        .EMPTY) && feedModel.getMedia() != null) {
+                        .EMPTY)) {
                     if (feedModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
                         try {
                             if (feedModel.getMedia() != null && isFromMediaActivity)
