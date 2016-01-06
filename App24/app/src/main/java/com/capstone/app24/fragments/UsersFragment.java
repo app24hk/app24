@@ -142,6 +142,9 @@ public class UsersFragment extends Fragment implements TextWatcher {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, new Utils(getActivity())
+                        .getSharedPreferences
+                                (getActivity(), Constants.KEY_USER_DETAILS, ""));
                 return params;
             }
             // Adding request to request queue
@@ -214,6 +217,12 @@ public class UsersFragment extends Fragment implements TextWatcher {
                             }
                             try {
                                 userFeedModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                userFeedModel.setProfit_amount(object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }

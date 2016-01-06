@@ -29,24 +29,30 @@ public class FacebookUtils {
                                 "" + response.getJSONObject());
                         JSONObject object = response.getJSONObject();
                         JSONObject jsonObject = null;
-                        try {
-                            jsonObject = object.getJSONObject(Constants.KEY_DATA);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (object != null) {
+                            try {
+                                jsonObject = object.getJSONObject(Constants.KEY_DATA);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                         JSONObject urlObject1 = null;
-                        try {
-                            urlObject1 = jsonObject.getJSONObject(Constants.POST);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                        if (jsonObject != null) {
+                            try {
+                                urlObject1 = jsonObject.getJSONObject(Constants.POST);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
-                        try {
-                            String url = urlObject1.getString(Constants.KEY_URL);
-                            Utils.debug(Constants.FACEBOOK, "url : " + url);
-                            mUrl = url;
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                   if (urlObject1!=null){
+                       try {
+                           String url = urlObject1.getString(Constants.KEY_URL);
+                           Utils.debug(Constants.FACEBOOK, "url : " + url);
+                           mUrl = url;
+                       } catch (JSONException e) {
+                           e.printStackTrace();
+                       }
+                   }
 //                        likeView.setObjectIdAndType(url, LikeView.ObjectType.OPEN_GRAPH);
 //                        likeView.performClick();
 

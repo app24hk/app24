@@ -73,7 +73,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         initializeViews();
         MainActivity.tabs.setVisibility(View.VISIBLE);
         MainActivity.layout_user_profle.setVisibility(View.GONE);
-        // updateUI();
         return mView;
     }
 
@@ -179,7 +178,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }) {
             @Override
             protected Map<String, String> getParams() {
-//                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_PAGE_NUMBER, mPageNo + "");
                 params.put(APIsConstants.TAB_TYPE, APIsConstants.ONE);
@@ -187,7 +185,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         Constants.KEY_USER_DETAILS, ""));
                 Utils.debug("params", new Utils(getActivity())
                         .getSharedPreferences(getActivity(), Constants.KEY_USER_DETAILS, ""));
-                Utils.info("params...", params.toString());
+                Utils.info("params... of " + APIsConstants.API_RECENT_FEEDS, params.toString());
                 return params;
             }
             // Adding request to request queue
@@ -284,16 +282,9 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         }
                     }
                 }
-                if (jsonArray.length() == 0) {
-//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
-//                                    ().getResources().getString(R.string.no_more_data)),
-//                            SweetAlertDialog.ERROR_TYPE);
-                }
             } else {
                 try {
                     Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
-//                            .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -309,7 +300,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         mPageNo = mPageNo + 1;
-        Utils.debug(TAG, "swipeRefreshLayout mPAge Number" + mPageNo);
         getLatestFeeds();
     }
 

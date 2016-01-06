@@ -254,6 +254,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 //getLikes(result.getPostId());
                 String fbUrl = "";
                 fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
+                Utils.debug(TAG, "fbUrl : " + fbUrl);
                 if (!mFeedId.equalsIgnoreCase(Constants.EMPTY) && result.getPostId() != null) {
                     updateFacebookFeedId(result.getPostId(), fbUrl);
                 }

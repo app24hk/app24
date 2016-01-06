@@ -111,7 +111,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         holder.txt_feed_body.setText(mostViewedModel.getDescription());
         holder.txt_creator.setText(mostViewedModel.getUser_name());
         if (mostViewedModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
-            holder.txt_profile_count_login_user.setText(Constants.DOLLAR_SIGN + mostViewedModel.getProfit_amount());
+            holder.txt_profile_count_login_user.setText(Constants.EMPTY);
         else
             holder.txt_profile_count_login_user.setText(mostViewedModel.getProfit_amount());
         holder.txt_created_time.setText(Utils.getTimeAgo(Long

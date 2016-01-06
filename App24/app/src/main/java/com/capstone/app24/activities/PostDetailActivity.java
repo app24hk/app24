@@ -1,13 +1,19 @@
 package com.capstone.app24.activities;
 
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.LabeledIntent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.Display;
 import android.view.View;
@@ -50,11 +56,9 @@ import com.facebook.share.model.ShareOpenGraphContent;
 import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.LikeView;
 import com.facebook.share.widget.ShareButton;
-import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.entities.Feed;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
 import org.json.JSONArray;
@@ -235,7 +239,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated
                     ())));
             profitAmount = latestFeedsModel.getProfit_amount();
-            setHeader(profitAmount, true, true, false, false, isOwner, null);
+            if (profitAmount.equalsIgnoreCase(Constants.ZERO)) {
+                setHeader(Constants.EMPTY, true, true, false, false, isOwner, null);
+            } else {
+                setHeader(profitAmount, true, true, false, false, isOwner, null);
+            }
             getLikes(latestFeedsModel.getFb_feed_id());
             getComments(latestFeedsModel.getFb_feed_id());
             setSharedContent();
@@ -428,6 +436,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         likeView = (LikeView) findViewById(R.id.like_view);
         likeView.setLikeViewStyle(LikeView.Style.STANDARD);
         likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE);
+        Bundle params = new Bundle();
+        //incrementLike();
 
 
 //        likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.OPEN_GRAPH);
@@ -440,6 +450,24 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         //likeView.setObjectId("https://www.facebook.com/AndroidProgrammerGuru");
         // Set foreground color fpr Like count text
         //likeView.setForegroundColor(-256);
+
+    }
+
+    private void incrementLike() {
+        Bundle params = new Bundle();
+        params.putString("object", "http://samples.ogp.me/226075010839791");
+/* make the API call */
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me/og.likes",
+                params,
+                HttpMethod.POST,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                    }
+                }
+        ).executeAsync();
     }
 
     private void setClickListeners() {
@@ -456,8 +484,10 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_share:
-                // String url = FacebookUtils.getFeedUrl(latestFeedsModel.getFb_feed_id());
+                String url = FacebookUtils.getFeedUrl(latestFeedsModel.getFb_feed_id());
+                Utils.debug(TAG, "url : ###" + url);
                 shareFeed();
+                //  onShareClick(v);
 //                Feed feed = new Feed.Builder()
 //                        .setName(latestFeedsModel.getTitle())
 //                        .setDescription(latestFeedsModel.getDescription())
@@ -594,6 +624,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private void handleShareResponse(String res) {
         Utils.debug(TAG, "Response from AddSharerUser Web Service : " + res);
         Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+        getFeedOwnerData();
         shareButton.performClick();
 
     }
@@ -791,10 +822,21 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                 if (object.getString(APIsConstants.KEY_FEED_OWNER)
                                         .equalsIgnoreCase(Constants.YES)) {
                                     isOwner = true;
-                                    setHeader(profitAmount, true, true, false, false, isOwner, null);
+//                                    if (profitAmount.equalsIgnoreCase(Constants.ZERO))
+//                                        setHeader("", true, true, false, false,
+//                                                isOwner, null);
+//                                    else
+//                                        setHeader(profitAmount, true, true, false, false,
+//                                                isOwner, null);
                                 } else {
                                     isOwner = false;
-                                    setHeader(profitAmount, true, true, false, false, isOwner, null);
+//                                    if (profitAmount.equalsIgnoreCase(Constants.ZERO))
+//                                        setHeader("", true, true, false, false,
+//                                                isOwner, null);
+//                                    else
+//                                        setHeader(profitAmount, true, true, false, false,
+//                                                isOwner, null);
+//                                    setHeader(profitAmount, true, true, false, false, isOwner, null);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -802,6 +844,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             try {
                                 mOwnerDataModel.setProfit_amount(object.getString(APIsConstants
                                         .KEY_PROFIT_AMOUNT));
+                                profitAmount = object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -811,6 +855,12 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
+                            if (profitAmount.equalsIgnoreCase(Constants.ZERO))
+                                setHeader("", true, true, false, false,
+                                        isOwner, null);
+                            else
+                                setHeader(profitAmount, true, true, false, false,
+                                        isOwner, null);
                             Session.setOwnerModel(mOwnerDataModel);
                         }
                     }
@@ -828,6 +878,63 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             }
         }
 
+    }
+
+    public void onShareClick(View v) {
+        Resources resources = getResources();
+
+        Intent emailIntent = new Intent();
+        emailIntent.setAction(Intent.ACTION_SEND);
+        // Native email client doesn't currently support HTML, but it doesn't hurt to try in case they fix it
+        emailIntent.putExtra(Intent.EXTRA_TEXT, Html.fromHtml(resources.getString(R.string.share_email_native)));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, resources.getString(R.string.share_email_subject));
+        emailIntent.setType("message/rfc822");
+
+        PackageManager pm = getPackageManager();
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+
+
+        Intent openInChooser = Intent.createChooser(emailIntent, resources.getString(R.string.share_chooser_text));
+
+        List<ResolveInfo> resInfo = pm.queryIntentActivities(sendIntent, 0);
+        List<LabeledIntent> intentList = new ArrayList<LabeledIntent>();
+        for (int i = 0; i < resInfo.size(); i++) {
+            // Extract the label, append it, and repackage it in a LabeledIntent
+            ResolveInfo ri = resInfo.get(i);
+            String packageName = ri.activityInfo.packageName;
+            if (packageName.contains("android.email")) {
+                emailIntent.setPackage(packageName);
+            } else if (packageName.contains("twitter") || packageName.contains("facebook")
+                    || packageName.contains("mms") || packageName.contains("android.gm")) {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(packageName, ri.activityInfo.name));
+                intent.setAction(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                if (packageName.contains("twitter")) {
+                    intent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_twitter));
+                } else if (packageName.contains("facebook")) {
+                    // Warning: Facebook IGNORES our text. They say "These fields are intended for users to express themselves. Pre-filling these fields erodes the authenticity of the user voice."
+                    // One workaround is to use the Facebook SDK to post, but that doesn't allow the user to choose how they want to share. We can also make a custom landing page, and the link
+                    // will show the <meta content ="..."> text from that page with our link in Facebook.
+                    intent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_facebook));
+                } else if (packageName.contains("mms")) {
+                    intent.putExtra(Intent.EXTRA_TEXT, mUrl);
+                } else if (packageName.contains("android.gm")) { // If Gmail shows up twice, try removing this else-if clause and the reference to "android.gm" above
+                    intent.putExtra(Intent.EXTRA_TEXT, mUrl);
+                    intent.putExtra(Intent.EXTRA_SUBJECT, resources.getString(R.string.share_email_subject));
+                    intent.setType("message/rfc822");
+                }
+
+                intentList.add(new LabeledIntent(intent, packageName, ri.loadLabel(pm), ri.icon));
+            }
+        }
+
+        // convert intentList to array
+        LabeledIntent[] extraIntents = intentList.toArray(new LabeledIntent[intentList.size()]);
+
+        openInChooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents);
+        startActivity(openInChooser);
     }
 
     private void handleDeleteResponse(String res) {

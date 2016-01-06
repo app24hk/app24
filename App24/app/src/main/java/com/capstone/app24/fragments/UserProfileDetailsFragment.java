@@ -85,6 +85,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
         else
             Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
                     .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+
         mLatestFeedsAdapter = new UserProfitAdapter(getActivity(), userFeedList);
         user_feeds_list.setLayoutManager(new LinearLayoutManager(getActivity()));
         user_feeds_list.setAdapter(mLatestFeedsAdapter);

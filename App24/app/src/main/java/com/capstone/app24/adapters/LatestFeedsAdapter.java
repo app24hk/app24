@@ -118,7 +118,7 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
         holder.txt_feed_body.setText(latestFeedsModel.getDescription());
         holder.txt_creator.setText(latestFeedsModel.getUser_name());
         if (latestFeedsModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
-            holder.txt_profile_count_login_user.setText(Constants.DOLLAR_SIGN + latestFeedsModel.getProfit_amount());
+            holder.txt_profile_count_login_user.setText(Constants.EMPTY);
         else
             holder.txt_profile_count_login_user.setText(latestFeedsModel.getProfit_amount());
         holder.txt_seen.setText(latestFeedsModel.getViewcount());
