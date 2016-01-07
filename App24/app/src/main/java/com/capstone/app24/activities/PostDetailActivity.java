@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.bean.LatestFeedsModel;
 import com.capstone.app24.bean.OwnerDataModel;
@@ -34,6 +35,7 @@ import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.CustomDialog;
 import com.capstone.app24.utils.FacebookUtils;
 import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
@@ -113,6 +115,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private String mFeedId;
     private String mUrl;
     private SimpleFacebook mSimpleFacebook;
+    private RelativeLayout comment;
+    private String mPostId = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,8 +151,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Utils.debug(TAG, response.toString());
-
+                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                         res = response.toString();
                         try {
                             makeOwnerDataModel(res);
@@ -159,8 +162,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (mPageNo == 1)
-                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -244,97 +246,88 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             } else {
                 setHeader(profitAmount, true, true, false, false, isOwner, null);
             }
-            getLikes(latestFeedsModel.getFb_feed_id());
-            getComments(latestFeedsModel.getFb_feed_id());
-            setSharedContent();
+            if (latestFeedsModel.getFb_feed_id() != null && !latestFeedsModel.getFb_feed_id()
+                    .equalsIgnoreCase(Constants.EMPTY)) {
+                getLikes(latestFeedsModel.getFb_feed_id());
+                getComments(latestFeedsModel.getFb_feed_id());
+                setSharedContent(latestFeedsModel.getFb_feed_id());
+                mPostId = latestFeedsModel.getFb_feed_id();
+            }
+
+            makeSeenPostRequest(latestFeedsModel.getUser_id(), latestFeedsModel.getId());
+
             likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.DEFAULT);
         }
 
     }
 
-    private void setSharedContent() {
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/" + latestFeedsModel.getFb_feed_id(),
-                null,
-                HttpMethod.GET,
-                new GraphRequest.Callback() {
-                    public String url;
-
-                    public void onCompleted(GraphResponse response) {
-                        if (response != null) {
-
-            /* handle the result */
-                            Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
-                                    "" + response.getRawResponse());
-                            Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
-                                    "" + response.getJSONObject());
-                            if (response.getRawResponse() != null) {
-                                JSONObject object = response.getJSONObject();
-                                JSONObject jsonObject = null;
-                                try {
-                                    jsonObject = object.getJSONObject(Constants.KEY_DATA);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                JSONObject urlObject1 = null;
-                                try {
-                                    urlObject1 = jsonObject.getJSONObject(Constants.POST);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                try {
-                                    try {
-                                        url = urlObject1.getString(Constants.KEY_URL);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    Utils.debug(Constants.FACEBOOK, "url : " + url);
-                                    ShareLinkContent content = new ShareLinkContent.Builder()
-                                            .setContentUrl(Uri.parse(url))
-                                            .build();
-                                    shareButton = (ShareButton) findViewById(R.id.shareButton);
-                                    shareButton.setShareContent(content);
-                                    ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
-                                        @Override
-                                        public void onSuccess(Sharer.Result result) {
-                                            Utils.debug(TAG, "Sharer.Result : " + result + "");
-
-                                        }
-
-                                        @Override
-                                        public void onCancel() {
-
-                                        }
-
-                                        @Override
-                                        public void onError(FacebookException error) {
-                                            Utils.debug(TAG, "Sharer.error : " + error + "");
-
-                                        }
-                                    });
-                                    mUrl = url;
-//                          fffffffff
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-//                        likeView.setObjectIdAndType(url, LikeView.ObjectType.OPEN_GRAPH);
-//                        likeView.performClick();
-
-//                                ShareLinkContent content = new ShareLinkContent.Builder()
-//                                        .setContentUrl(Uri.parse(url))
-//                                        .build();
-//                                shareButton.setShareContent(content);
-//                                shareButton.performClick();
-                            }
+    private boolean makeSeenPostRequest(final String user_id, final String id) {
+        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this,
+                getResources
+                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                        Utils.debug(TAG, response.toString());
+                        res = response.toString();
+                        try {
+                            handleResponse(res);
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, user_id);
+                params.put(APIsConstants.KEY_FEED_ID, id);
+                Utils.info("params...", params.toString());
+                return params;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleResponse(String res) {
+        //  Utils.debug(TAG, "Response :  " + res);
+        JSONObject object = null;
+        try {
+            object = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (object != null) {
+            Utils.debug(TAG, object + "");
+            try {
+                boolean seen = object.getBoolean(APIsConstants.KEY_RESULT);
+                if (seen) {
+                    int seenCount = Integer.parseInt(latestFeedsModel.getViewcount()) + 1;
+                    txt_seen.setText(seenCount + "");
+                } else {
+                    txt_seen.setText(latestFeedsModel.getViewcount());
+
                 }
-        ).executeAsync();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
-    private void getComments(String postId) {
+
+    private void getComments(final String postId) {
     /* make the API call */
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
@@ -361,6 +354,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 }
         ).executeAsync();
     }
+
 
     /**
      * this method is used to get the like counts
@@ -409,6 +403,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         layout_media_preview = (RelativeLayout) findViewById(R.id.layout_media_preview);
         layout_img_video_preview = (RelativeLayout) findViewById(R.id.layout_img_video_preview);
         txt_comment = (TextView) findViewById(R.id.txt_comment);
+        comment = (RelativeLayout) findViewById(R.id.comment);
         txt_post_title = (TextView) findViewById(R.id.txt_post_title);
         txt_description = (TextView) findViewById(R.id.txt_description);
         txt_seen = (TextView) findViewById(R.id.txt_seen);
@@ -478,6 +473,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         txt_delete.setOnClickListener(this);
         img_video_preview.setOnClickListener(this);
         layout_img_video_preview.setOnClickListener(this);
+        comment.setOnClickListener(this);
     }
 
     @Override
@@ -521,12 +517,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 //                        }
 //                    });
 //                }
-
-
-//                String url = FacebookUtils.getFeedUrl(latestFeedsModel.getFb_feed_id());
-//                Utils.debug(Constants.FACEBOOK, "url : " + url);
-//                likeView.setObjectIdAndType(url, LikeView.ObjectType.OPEN_GRAPH);
-//                likeView.performClick();
 
 
                 break;
@@ -576,6 +566,24 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 intent = new Intent(PostDetailActivity.this, VideoActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.comment:
+                if (latestFeedsModel.getFb_feed_id() != null && !latestFeedsModel.getFb_feed_id()
+                        .equalsIgnoreCase(Constants.EMPTY) && mPostId != null) {
+                    CustomDialog customDialog = new CustomDialog(this, this, Constants
+                            .FB_COMMENT_DIALOG, "");
+                    customDialog.setFacebookCommentDetails(mPostId);
+                    customDialog.show();
+
+
+
+                /*    //
+                    Dialog dialog = new Dialog(this,android.R.style.Theme_Translucent_NoTitleBar);
+                    dialog.setContentView(R.layout.dialog_add_comment);
+                    dialog.show();*/
+
+                } else
+                    AlertToastManager.showToast("Comment Section is under Development", this);
+                break;
         }
     }
 
@@ -588,6 +596,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                         Utils.debug(TAG, response.toString());
                         res = response.toString();
                         try {
@@ -637,9 +646,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 .putString("og:title", latestFeedsModel.getTitle())
                 .putString("og:description", latestFeedsModel.getDescription())
                 .build();
-//        SharePhoto photo = new SharePhoto.Builder()
-//                .setBitmap(bitmap)
-//                .build();
         ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
                 .setActionType("capstone_app:create")
                 .putObject("capstone_app:post", object)
@@ -708,8 +714,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                         Utils.debug(TAG, response.toString());
-
                         res = response.toString();
                         try {
                             handleDeleteResponse(res);
@@ -720,8 +726,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (mPageNo == 1)
-                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -741,144 +746,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         return false;
     }
 
-    private void makeOwnerDataModel(String res) {
-        Utils.debug(TAG, "Response  : " + res);
-        latestFeedList.clear();
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(res);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (jsonObject != null) {
-            try {
-                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-                    JSONObject object = jsonObject.getJSONObject(APIsConstants.KEY_FEED_DATA);
-                    if (object != null) {
-                        mOwnerDataModel = new OwnerDataModel();
-                        if (object != null) {
-                            try {
-                                mOwnerDataModel.setId(object.getString(APIsConstants.KEY_ID));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setTitle(object.getString(APIsConstants.KEY_TITLE));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setDescription(object.getString(APIsConstants.KEY_DESCRIPTION));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setMedia(object.getString(APIsConstants.KEY_MEDIA));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setType(object.getString(APIsConstants.KEY_TYPE));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setUser_id(object.getString(APIsConstants.KEY_USER_ID));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setCreated(object.getString(APIsConstants.KEY_CREATED));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setModified(object.getString(APIsConstants.KEY_MODIFIED));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setUser_name(object.getString(APIsConstants.KEY_USER_NAME));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setViewcount(object.getString(APIsConstants.KEY_VIEWCOUNT));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_PROFIT_AMOUNT));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setFeed_owner(object.getString(APIsConstants.KEY_FEED_OWNER));
-                                if (object.getString(APIsConstants.KEY_FEED_OWNER)
-                                        .equalsIgnoreCase(Constants.YES)) {
-                                    isOwner = true;
-//                                    if (profitAmount.equalsIgnoreCase(Constants.ZERO))
-//                                        setHeader("", true, true, false, false,
-//                                                isOwner, null);
-//                                    else
-//                                        setHeader(profitAmount, true, true, false, false,
-//                                                isOwner, null);
-                                } else {
-                                    isOwner = false;
-//                                    if (profitAmount.equalsIgnoreCase(Constants.ZERO))
-//                                        setHeader("", true, true, false, false,
-//                                                isOwner, null);
-//                                    else
-//                                        setHeader(profitAmount, true, true, false, false,
-//                                                isOwner, null);
-//                                    setHeader(profitAmount, true, true, false, false, isOwner, null);
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setProfit_amount(object.getString(APIsConstants
-                                        .KEY_PROFIT_AMOUNT));
-                                profitAmount = object.getString(APIsConstants
-                                        .KEY_PROFIT_AMOUNT);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            try {
-                                mOwnerDataModel.setFb_feed_id(object.getString(APIsConstants
-                                        .KEY_FB_FEED_ID));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            if (profitAmount.equalsIgnoreCase(Constants.ZERO))
-                                setHeader("", true, true, false, false,
-                                        isOwner, null);
-                            else
-                                setHeader(profitAmount, true, true, false, false,
-                                        isOwner, null);
-                            Session.setOwnerModel(mOwnerDataModel);
-                        }
-                    }
-                } else {
-                    try {
-                        Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-//                        Utils.showSweetProgressDialog(PostDetailActivity.this, jsonObject.getString(APIsConstants
-//                                .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
 
     public void onShareClick(View v) {
         Resources resources = getResources();
@@ -937,6 +804,130 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         startActivity(openInChooser);
     }
 
+    private void makeOwnerDataModel(String res) {
+        //Utils.debug(TAG, "Response  : " + res);
+        latestFeedList.clear();
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    JSONObject object = jsonObject.getJSONObject(APIsConstants.KEY_FEED_DATA);
+                    if (object != null) {
+                        mOwnerDataModel = new OwnerDataModel();
+                        if (object != null) {
+                            try {
+                                mOwnerDataModel.setId(object.getString(APIsConstants.KEY_ID));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setTitle(object.getString(APIsConstants.KEY_TITLE));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setDescription(object.getString(APIsConstants.KEY_DESCRIPTION));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setMedia(object.getString(APIsConstants.KEY_MEDIA));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setType(object.getString(APIsConstants.KEY_TYPE));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setUser_id(object.getString(APIsConstants.KEY_USER_ID));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setCreated(object.getString(APIsConstants.KEY_CREATED));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setModified(object.getString(APIsConstants.KEY_MODIFIED));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setUser_name(object.getString(APIsConstants.KEY_USER_NAME));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setViewcount(object.getString(APIsConstants.KEY_VIEWCOUNT));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_THUMBNAIL));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_PROFIT_AMOUNT));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setFeed_owner(object.getString(APIsConstants.KEY_FEED_OWNER));
+                                if (object.getString(APIsConstants.KEY_FEED_OWNER)
+                                        .equalsIgnoreCase(Constants.YES)) {
+                                    isOwner = true;
+                                } else {
+                                    isOwner = false;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setProfit_amount(object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT));
+                                profitAmount = object.getString(APIsConstants
+                                        .KEY_PROFIT_AMOUNT);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                mOwnerDataModel.setFb_feed_id(object.getString(APIsConstants
+                                        .KEY_FB_FEED_ID));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            if (profitAmount.equalsIgnoreCase(Constants.ZERO))
+                                setHeader("", true, true, false, false,
+                                        isOwner, null);
+                            else
+                                setHeader(profitAmount, true, true, false, false,
+                                        isOwner, null);
+                            Session.setOwnerModel(mOwnerDataModel);
+                        }
+                    }
+                } else {
+                    try {
+                        Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     private void handleDeleteResponse(String res) {
         Utils.debug(TAG, "Result of delete API: " + res);
         JSONObject jsonObject = null;
@@ -969,6 +960,79 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    private void setSharedContent(String postId) {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + postId,
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public String url;
+
+                    public void onCompleted(GraphResponse response) {
+                        if (response != null) {
+
+            /* handle the result */
+                            Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
+                                    "" + response.getRawResponse());
+                            Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
+                                    "" + response.getJSONObject());
+                            if (response.getRawResponse() != null) {
+                                JSONObject object = response.getJSONObject();
+                                JSONObject jsonObject = null;
+                                try {
+                                    jsonObject = object.getJSONObject(Constants.KEY_DATA);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                JSONObject urlObject1 = null;
+                                try {
+                                    urlObject1 = jsonObject.getJSONObject(Constants.POST);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    try {
+                                        url = urlObject1.getString(Constants.KEY_URL);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Utils.debug(Constants.FACEBOOK, "url : " + url);
+                                    ShareLinkContent content = new ShareLinkContent.Builder()
+                                            .setContentUrl(Uri.parse(url))
+                                            .build();
+                                    shareButton = (ShareButton) findViewById(R.id.shareButton);
+                                    shareButton.setShareContent(content);
+                                    ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
+                                        @Override
+                                        public void onSuccess(Sharer.Result result) {
+                                            Utils.debug(TAG, "Sharer.Result : " + result + "");
+
+                                        }
+
+                                        @Override
+                                        public void onCancel() {
+                                            Utils.debug(TAG, "onCancel ");
+
+                                        }
+
+                                        @Override
+                                        public void onError(FacebookException error) {
+                                            Utils.debug(TAG, "Sharer.error : " + error + "");
+
+                                        }
+                                    });
+                                    mUrl = url;
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }
+        ).executeAsync();
+
+    }
     //............FullView imageView..............//
 
     public void showImageDialog(String media) {

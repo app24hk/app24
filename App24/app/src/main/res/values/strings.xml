@@ -125,4 +125,6 @@
     <!--<string name="share_email_gmail">Gmail</string>-->
     <string name="share_email_native">Mail</string>
     <string name="share_chooser_text">Share With..</string>
+    <string name="write_a_comment">Write a comment</string>
+    <string name="please_wait">Please wait</string>
 </resources>

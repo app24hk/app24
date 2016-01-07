@@ -197,7 +197,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                             (getLayoutPosition()));
                     Utils.debug(TAG, "Data of Latest Feed Model : " + new Utils(mActivity)
                             .getLatestFeedPreferences(mActivity));
-                    makeSeenPostRequest(mLatestFeedList.get(getLayoutPosition()).getUser_id(), mLatestFeedList.get(getLayoutPosition()).getId());
                     mActivity.finish();
                     intent = new Intent(mActivity, PostDetailActivity.class);
                     mActivity.startActivity(intent);
@@ -236,48 +235,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
             }
         });
         dialog.show();
-    }
-
-    private boolean makeSeenPostRequest(final String user_id, final String id) {
-        mDialog = Utils.showSweetProgressDialog(mActivity,
-                mActivity.getResources
-                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-        StringRequest strReq = new StringRequest(Request.Method.POST,
-                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
-                new volley.Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Utils.debug(TAG, response.toString());
-                        try {
-                            Utils.closeSweetProgressDialog(mActivity, mDialog);
-                        } catch (Exception e) {
-                        }
-                        res = response.toString();
-                        try {
-                            handleResponse(res);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Utils.closeSweetProgressDialog(mActivity, mDialog);
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                res = error.toString();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(APIsConstants.KEY_USER_ID, user_id);
-                params.put(APIsConstants.KEY_FEED_ID, id);
-                Utils.info("params...", params.toString());
-                return params;
-            }
-        };
-        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
-        return false;
     }
 
     private void handleResponse(String res) {

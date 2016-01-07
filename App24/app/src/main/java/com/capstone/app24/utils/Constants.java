@@ -48,6 +48,7 @@ public class Constants {
     public static final String ADD_TO_QUEUE = "feeds_req";
 
     public static final int SIMPLE_DIALOG = 1;
+    public static final int FB_COMMENT_DIALOG = 2;
     public static final String KEY_FACEBOOK_ACCESS_TOKEN = "";
     public static final String KEY_FACEBOOK_ID = "facebook_id";
     public static final String LATEST_FEED_MODEL = "LATEST_FEED_MODEL";

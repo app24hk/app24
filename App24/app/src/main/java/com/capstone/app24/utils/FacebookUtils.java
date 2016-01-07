@@ -44,23 +44,15 @@ public class FacebookUtils {
                                 e.printStackTrace();
                             }
                         }
-                   if (urlObject1!=null){
-                       try {
-                           String url = urlObject1.getString(Constants.KEY_URL);
-                           Utils.debug(Constants.FACEBOOK, "url : " + url);
-                           mUrl = url;
-                       } catch (JSONException e) {
-                           e.printStackTrace();
-                       }
-                   }
-//                        likeView.setObjectIdAndType(url, LikeView.ObjectType.OPEN_GRAPH);
-//                        likeView.performClick();
-
-//                                ShareLinkContent content = new ShareLinkContent.Builder()
-//                                        .setContentUrl(Uri.parse(url))
-//                                        .build();
-//                                shareButton.setShareContent(content);
-//                                shareButton.performClick();
+                        if (urlObject1 != null) {
+                            try {
+                                String url = urlObject1.getString(Constants.KEY_URL);
+                                Utils.debug(Constants.FACEBOOK, "url : " + url);
+                                mUrl = url;
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
         ).executeAsync();

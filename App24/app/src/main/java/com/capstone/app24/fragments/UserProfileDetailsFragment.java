@@ -205,7 +205,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
     }
 
     private List<UserFeedModel> refreshUserFeeds(String res) throws JSONException {
-        Utils.debug(TAG, "Response for UserProfile   : " + res);
+    //    Utils.debug(TAG, "Response for UserProfile   : " + res);
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject != null) {
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
