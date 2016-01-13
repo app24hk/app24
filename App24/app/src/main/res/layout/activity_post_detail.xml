@@ -53,6 +53,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
                         android:ellipsize="marquee"
                         android:fadingEdge="horizontal"
                         android:gravity="center"
@@ -65,11 +66,16 @@
 
                     <TextView
                         android:id="@+id/txt_created_time"
-                        android:layout_width="100dp"
+                        android:layout_width="70dp"
                         android:layout_height="match_parent"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="5dp"
                         android:layout_toRightOf="@+id/txt_creator"
+                        android:ellipsize="marquee"
+                        android:fadingEdge="horizontal"
+                        android:lines="1"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:scrollHorizontally="true"
                         android:singleLine="true"
                         android:text="@string/created_time"
                         android:textSize="@dimen/grey_heading_text"/>
@@ -78,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toLeftOf="@+id/like_view"
+                        android:layout_toLeftOf="@+id/like"
                         android:background="@drawable/round_rect_shape">
                         <ImageView
                             android:id="@+id/img_comment"
@@ -99,81 +105,41 @@
                             android:textSize="15sp"/>
                     </RelativeLayout>
 
-                    <!--android:id="@+id/fb_likes"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_marginRight="5dp"-->
-                    <!--android:layout_toLeftOf="@+id/fb_likes_count"-->
-                    <!--android:background="@drawable/round_rect_shape_fb"-->
-                    <!--android:drawableLeft="@drawable/fb"-->
-                    <!--android:drawablePadding="5dp"-->
-                    <!--android:padding="2dp"-->
-                    <!--android:text="+1"-->
-                    <!--android:textColor="@color/white"-->
-                    <!--android:textSize="10sp"/>-->
-                    <!--<com.capstone.app24.custom.CustomTextView-->
-                    <!--android:id="@+id/fb_likes_count"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentRight="true"-->
-                    <!--android:background="@drawable/round_rect_shape_fb_count"-->
-                    <!--android:drawablePadding="5dp"-->
-                    <!--android:padding="2dp"-->
-                    <!--android:text="412"-->
-                    <!--android:textColor="@color/fb_like_count"-->
-                    <!--android:textSize="10sp"/>-->
 
                     <TextView
                         android:id="@+id/txt_seen"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toEndOf="@+id/txt_created_time"
+                        android:layout_alignTop="@+id/comment"
+                        android:layout_toStartOf="@+id/comment"
                         android:drawableLeft="@drawable/seen"
                         android:drawablePadding="5dp"
                         android:singleLine="true"
                         android:text="3,027"
                         android:textSize="@dimen/grey_heading_text"/>
-                    <!--<com.facebook.share.widget.LikeView-->
-                    <!--android:id="@+id/like_view"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_gravity="center_horizontal"-->
-                    <!--android:layout_toRightOf="@+id/txt_seen"-->
-                    <!--android:text="Like"/>-->
-                    <!--<com.shamanland.facebook.likebutton.FacebookLikePlugin-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_toRightOf="@+id/txt_seen"-->
-                    <!--android:orientation="horizontal"-->
-                    <!-->-->
-                    <!--<com.shamanland.facebook.likebutton.FacebookLikeButton-->
-                    <!--style="@style/Widget.FacebookLikeButton"-->
-                    <!--app:pagePicture="@drawable/ic_launcher"-->
-                    <!--app:pageText="This is blog about Android development."-->
-                    <!--app:pageTitle="Developer's notes"-->
-                    <!--app:pageUrl="http://blog.shamanland.com/"-->
-                    <!--/>-->
-                    <!--<com.shamanland.facebook.likebutton.FacebookLikeBox-->
-                    <!--style="@style/Widget.FacebookLikeBox"-->
-                    <!--app:calloutMarker="left"-->
-                    <!--/>-->
-                    <!--</com.shamanland.facebook.likebutton.FacebookLikePlugin>-->
-                    <!--<com.facebook.share.widget.ShareButton-->
-                    <!--android:id="@+id/shareButton"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_toRightOf="@+id/txt_seen"-->
-                    <!--android:singleLine="true"/>-->
                     <com.facebook.share.widget.LikeView
                         android:id="@+id/like_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="5dp"
                         android:layout_toStartOf="@+id/like_count">
                     </com.facebook.share.widget.LikeView>
+                    <Button
+                        android:id="@+id/like"
+                        android:layout_width="60dp"
+                        android:layout_height="30dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toStartOf="@+id/like_count"
+                        android:background="@color/fb_color"
+                        android:drawableLeft="@drawable/fb"
+                        android:paddingLeft="5dp"
+                        android:text="Like"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textStyle="bold">
+                    </Button>
                     <TextView
                         android:id="@+id/like_count"
                         android:layout_width="wrap_content"

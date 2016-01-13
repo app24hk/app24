@@ -19,6 +19,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -27,7 +28,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.bean.LatestFeedsModel;
 import com.capstone.app24.bean.OwnerDataModel;
@@ -53,14 +53,14 @@ import com.facebook.HttpMethod;
 import com.facebook.share.ShareApi;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
-import com.facebook.share.model.ShareOpenGraphAction;
 import com.facebook.share.model.ShareOpenGraphContent;
-import com.facebook.share.model.ShareOpenGraphObject;
 import com.facebook.share.widget.LikeView;
 import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.entities.Post;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
 import org.json.JSONArray;
@@ -108,8 +108,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private int likeCount = 0;
     private TextView txt_like_count;
     private LikeView likeView;
-    private TextView txt_comment;
-    private int commentCount;
+    public static TextView txt_comment;
+    public static int commentCount;
     private ShareButton shareButton;
     private CallbackManager callbackManager;
     private String mFeedId;
@@ -117,6 +117,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private SimpleFacebook mSimpleFacebook;
     private RelativeLayout comment;
     private String mPostId = null;
+    private boolean isFeedLiked;
+    private ShareOpenGraphContent content1;
+    private Button like;
+    private ShareDialog shareDialog;
+    private ShareLinkContent linkContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +146,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mSimpleFacebook.onActivityResult(requestCode, resultCode, data);
-
     }
 
     private boolean getFeedOwnerData() {
@@ -256,21 +260,20 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
             makeSeenPostRequest(latestFeedsModel.getUser_id(), latestFeedsModel.getId());
 
-            likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.DEFAULT);
         }
 
     }
 
     private boolean makeSeenPostRequest(final String user_id, final String id) {
-        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this,
-                getResources
-                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+//        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this,
+//                getResources
+//                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
                 new volley.Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+//                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                         Utils.debug(TAG, response.toString());
                         res = response.toString();
                         try {
@@ -282,7 +285,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+//                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -301,7 +304,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void handleResponse(String res) {
-        //  Utils.debug(TAG, "Response :  " + res);
+        int seenCount = 0;
+        Utils.debug(TAG, "Response :  " + res);
         JSONObject object = null;
         try {
             object = new JSONObject(res);
@@ -313,7 +317,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             try {
                 boolean seen = object.getBoolean(APIsConstants.KEY_RESULT);
                 if (seen) {
-                    int seenCount = Integer.parseInt(latestFeedsModel.getViewcount()) + 1;
+                    if (latestFeedsModel.getViewcount().equalsIgnoreCase(Constants.EMPTY))
+                        seenCount = 1;
+                    else {
+                        seenCount = Integer.parseInt(latestFeedsModel.getViewcount()) + 1;
+                    }
                     txt_seen.setText(seenCount + "");
                 } else {
                     txt_seen.setText(latestFeedsModel.getViewcount());
@@ -329,6 +337,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
     private void getComments(final String postId) {
     /* make the API call */
+//        if (mDialog == null)
+//            mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
+//                    .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
                 "/" + postId + "/comments",
@@ -348,8 +359,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             commentCount = jsonArray.length();
                         } catch (Exception e) {
                             e.printStackTrace();
+//                            Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                         }
                         txt_comment.setText(commentCount + "");
+//                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+
                     }
                 }
         ).executeAsync();
@@ -363,6 +377,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void getLikes(String postId) {
         //Post id  : : : : : 130220790685225
+//        if (mDialog == null)
+//            mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
+//                    .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
         if (postId != null) {
             new GraphRequest(
                     AccessToken.getCurrentAccessToken(),
@@ -379,16 +396,40 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             try {
                                 JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
                                 Utils.debug(TAG, "jsonArray : " + jsonArray);
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject likedPerson = jsonArray.getJSONObject(i);
+                                    Utils.debug(TAG, "likedPerson : " + likedPerson);
+
+                                    String likedId = likedPerson.getString("id");
+                                    if (likedId.equalsIgnoreCase(new Utils(PostDetailActivity.this)
+                                            .getSharedPreferences(PostDetailActivity.this,
+                                                    Constants.KEY_FACEBOOK_ID, ""))) {
+                                        isFeedLiked = true;
+                                        like.setText("Liked");
+                                    } else {
+                                        isFeedLiked = false;
+                                        like.setText("Like");
+                                    }
+                                }
                                 likeCount = jsonArray.length();
+
                             } catch (Exception e) {
                                 e.printStackTrace();
+//                                Utils.closeSweetProgressDialog
+//                                        (PostDetailActivity.this, mDialog);
                             }
                             txt_like_count.setText(likeCount + "");
+//                            if (mDialog != null)
+//                                Utils.closeSweetProgressDialog
+//                                        (PostDetailActivity.this, mDialog);
                         }
                     }
             ).executeAsync();
         } else {
             txt_like_count.setText(likeCount + "");
+//            if (mDialog != null)
+//                Utils.closeSweetProgressDialog
+//                        (PostDetailActivity.this, mDialog);
         }
     }
 
@@ -412,57 +453,98 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         txt_creator = (TextView) findViewById(R.id.txt_creator);
         txt_creator.setSelected(true);  // Set focus to the textview
         txt_creator.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-
-
-//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-//                .putString("og:type", "dsjfhgu")//613292//
-//                .putString("og:title", latestFeedsModel.getTitle())
-//                .putString("og:description", latestFeedsModel.getDescription())
-//                .build();
-//        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-//                .setActionType("capstone_app:create")
-//                .putObject("capstone_app:post", object)
-//                .build();
-//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-//                .setPreviewPropertyName("capstone_app:post")
-//                .setAction(action)
-//                .build();
-
+        txt_created_time.setSelected(true);  // Set focus to the textview
+        txt_created_time.setEllipsize(TextUtils.TruncateAt.MARQUEE);
+        like = (Button) findViewById(R.id.like);
+        like.setOnClickListener(this);
+        //LikeView Facebook
         likeView = (LikeView) findViewById(R.id.like_view);
-        likeView.setLikeViewStyle(LikeView.Style.STANDARD);
         likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE);
-        Bundle params = new Bundle();
-        //incrementLike();
-
-
-//        likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.OPEN_GRAPH);
-//        likeView.performClick();
-
-
-        //Facebook like button
-        // likeView = (LikeView) findViewById(R.id.like_view);
-        // Set the object for which you want to get likes from your users (Photo, Link or even your FB Fan page)
-        //likeView.setObjectId("https://www.facebook.com/AndroidProgrammerGuru");
-        // Set foreground color fpr Like count text
-        //likeView.setForegroundColor(-256);
-
+        likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.DEFAULT);
+        likeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFeedLiked) {
+                    unLike();
+                } else {
+                    like();
+                }
+            }
+        });
     }
 
-    private void incrementLike() {
-        Bundle params = new Bundle();
-        params.putString("object", "http://samples.ogp.me/226075010839791");
-/* make the API call */
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/me/og.likes",
-                params,
-                HttpMethod.POST,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
+    private void unLike() {
+//        mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
+//                .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
+        if (latestFeedsModel.getFb_feed_id() != null) {
+            new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/"/*130220790685225*/ + latestFeedsModel.getFb_feed_id() + "/likes",
+                    null,
+                    HttpMethod.DELETE,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
             /* handle the result */
+                            try {
+                                Utils.debug(Constants.FACEBOOK, response.toString());
+                                JSONObject graphResponse = response.getJSONObject();
+                                Utils.debug(TAG, "graphResponse : " + graphResponse);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            isFeedLiked = false;
+                            like.setText("Like");
+                            getLikes(latestFeedsModel.getFb_feed_id());
+                        }
                     }
-                }
-        ).executeAsync();
+            ).executeAsync();
+        }
+    }
+
+    private void like() {
+//        Bundle params = new Bundle();
+////        params.putString("object", "http://samples.ogp.me/226075010839791");
+//
+//        params.putString("object", url);
+///* make the API call */
+//        new GraphRequest(
+//                AccessToken.getCurrentAccessToken(),
+//                "/me/likes",
+//                params,
+//                HttpMethod.POST,
+//                new GraphRequest.Callback() {
+//                    public void onCompleted(GraphResponse response) {
+//                        Utils.debug(TAG, "Like response : " + response.getRawResponse());
+//            /* handle the result */
+//                    }
+//                }
+//        ).executeAsync();
+
+
+        //Post id  : : : : : 130220790685225
+        if (latestFeedsModel.getFb_feed_id() != null) {
+            new GraphRequest(
+                    AccessToken.getCurrentAccessToken(),
+                    "/"/*130220790685225*/ + latestFeedsModel.getFb_feed_id() + "/likes",
+                    null,
+                    HttpMethod.POST,
+                    new GraphRequest.Callback() {
+                        public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                            try {
+                                Utils.debug(Constants.FACEBOOK, response.toString());
+                                JSONObject graphResponse = response.getJSONObject();
+                                Utils.debug(TAG, "graphResponse : " + graphResponse);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            isFeedLiked = true;
+                            like.setText("Liked");
+                            getLikes(latestFeedsModel.getFb_feed_id());
+                        }
+                    }
+            ).executeAsync();
+        }
     }
 
     private void setClickListeners() {
@@ -480,10 +562,35 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_share:
-                String url = FacebookUtils.getFeedUrl(latestFeedsModel.getFb_feed_id());
-                Utils.debug(TAG, "url : ###" + url);
-                shareFeed();
-                //  onShareClick(v);
+                mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources()
+                        .getString(R.string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
+                getSharedUrl(v);
+
+
+//                shareDialog = new ShareDialog(this);
+//                MessageDialog.show(PostDetailActivity.this, linkContent);
+//                shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+//                    @Override
+//                    public void onSuccess(Sharer.Result result) {
+//                        if (result != null) {
+//                            Utils.debug(TAG, "result.getPostId() : " + result.getPostId());
+//                        } else {
+//                            Utils.debug(TAG, "result.getPostId() : NULL");
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(FacebookException error) {
+//
+//                    }
+//                });
+
+
 //                Feed feed = new Feed.Builder()
 //                        .setName(latestFeedsModel.getTitle())
 //                        .setDescription(latestFeedsModel.getDescription())
@@ -519,6 +626,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 //                }
 
 
+                break;
+            case R.id.like:
+                if (isFeedLiked) {
+                    unLike();
+                } else {
+                    like();
+                }
                 break;
             case R.id.ibtn_dots:
 
@@ -573,9 +687,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             .FB_COMMENT_DIALOG, "");
                     customDialog.setFacebookCommentDetails(mPostId);
                     customDialog.show();
-
-
-
                 /*    //
                     Dialog dialog = new Dialog(this,android.R.style.Theme_Translucent_NoTitleBar);
                     dialog.setContentView(R.layout.dialog_add_comment);
@@ -587,9 +698,125 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         }
     }
 
+    private void getSharedUrl(final View v) {
+        //String url = FacebookUtils.getFeedUrl(latestFeedsModel.getFb_feed_id());
+        // Utils.debug(TAG, "url : ###" + url);
+//                shareFeed();
+        //  onShareClick(v);
+
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + latestFeedsModel.getFb_feed_id(),
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                        JSONObject object = response.getJSONObject();
+                        JSONObject jsonObject = null;
+                        if (object != null) {
+                            try {
+                                jsonObject = object.getJSONObject(Constants.KEY_DATA);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                            }
+                        }
+                        JSONObject urlObject1 = null;
+                        if (jsonObject != null) {
+                            try {
+                                urlObject1 = jsonObject.getJSONObject(Constants.POST);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                            }
+                        }
+                        if (urlObject1 != null) {
+                            try {
+                                String url = urlObject1.getString(Constants.KEY_URL);
+                                Utils.debug(Constants.FACEBOOK, "url : " + url);
+                                mUrl = url;
+                                linkContent = new ShareLinkContent.Builder()
+                                        .setContentTitle(latestFeedsModel.getTitle())
+                                        .setContentDescription(latestFeedsModel.getDescription())
+                                        .setContentUrl(Uri.parse(mUrl))
+                                        .build();
+                                //onShareClick(v);
+                                //   shareIt(linkContent);
+                                share();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                            }
+                        }
+                    }
+                }
+        ).executeAsync();
+    }
+
+    private void share() {
+        String urlToShare = mUrl /*"http://stackoverflow.com/questions/7545254"*//*"http://trigma.com/"*/ ;
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, urlToShare);
+        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+        startActivity(sendIntent);
+    }
+
+    private void shareIt(ShareLinkContent linkContent) {
+        ShareApi.share(linkContent, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                if (result != null) {
+                    Utils.debug(TAG, "ShareApi result.getPostId() : " + result.getPostId());
+                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                    mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, "Shared " +
+                                    "Successfully",
+                            SweetAlertDialog.SUCCESS_TYPE);
+                    mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                        @Override
+                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+                            finish();
+                            intent = new Intent(PostDetailActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    Utils.debug(TAG, "ShareApi result.getPostId() : NULL");
+                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                }
+
+            }
+
+            @Override
+            public void onCancel() {
+                Utils.debug(TAG, "ShareApi result.getPostId() : NULLLLLL");
+                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, "Error Occurred",
+                        SweetAlertDialog.SUCCESS_TYPE);
+                mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+                        finish();
+                        intent = new Intent(PostDetailActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+            }
+        });
+    }
+
     private boolean shareFeed() {
         mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources().getString(R
                 .string.sharing_feed), SweetAlertDialog.PROGRESS_TYPE);
+
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_ADD_SHARE_USER,
@@ -634,55 +861,74 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         Utils.debug(TAG, "Response from AddSharerUser Web Service : " + res);
         Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
         getFeedOwnerData();
-        shareButton.performClick();
+//        if (content1 != null) {
+//            shareButton.setShareContent(content1);
+//            shareButton.performClick();
+//            shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+//                @Override
+//                public void onSuccess(Sharer.Result result) {
+//                    Utils.debug(TAG, result.getPostId());
+//                    Utils.debug(TAG, result + "result Content1 : " + result);
+//                }
+//
+//                @Override
+//                public void onCancel() {
+//
+//                }
+//
+//                @Override
+//                public void onError(FacebookException error) {
+//                    Utils.debug(TAG, error + "");
+//
+//                }
+//            });
+//        }
 
     }
 
-    private void shareOnFacebook() {
-
-
-        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("og:type", "Create a Post")//613292//
-                .putString("og:title", latestFeedsModel.getTitle())
-                .putString("og:description", latestFeedsModel.getDescription())
-                .build();
-        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                .setActionType("capstone_app:create")
-                .putObject("capstone_app:post", object)
-                .build();
-        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                .setPreviewPropertyName("capstone_app:post")
-                .setAction(action)
-                .build();
-
-        shareButton = (ShareButton) findViewById(R.id.shareButton);
-        shareButton.setShareContent(content);
-        shareButton.performClick();
-        shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-                Utils.debug(TAG, "post Id : " + result.getPostId());
-                //getLikes(result.getPostId());
-                if (!mFeedId.equalsIgnoreCase(Constants.EMPTY) && latestFeedsModel.getFb_feed_id
-                        () != null) {
-                    //updateFacebookFeedId(result.getPostId());
-                }
-            }
-
-            @Override
-            public void onCancel() {
-                Utils.debug(TAG, "Cancelled");
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Utils.debug(TAG, "error : " + error);
-            }
-        });
-
-
-    }
+//    private void shareOnFacebook() {
+//
+//
+//        ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
+//                .putString("og:type", "Create a Post")//613292//
+//                .putString("og:title", latestFeedsModel.getTitle())
+//                .putString("og:description", latestFeedsModel.getDescription())
+//                .build();
+//        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+//                .setActionType("capstone_app:create")
+//                .putObject("capstone_app:post", object)
+//                .build();
+//        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+//                .setPreviewPropertyName("capstone_app:post")
+//                .setAction(action)
+//                .build();
+//
+//        shareButton = (ShareButton) findViewById(R.id.shareButton);
+//        shareButton.setShareContent(content);
+//        shareButton.performClick();
+//        shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+//            @Override
+//            public void onSuccess(Sharer.Result result) {
+//                Utils.debug(TAG, "post Id : " + result.getPostId());
+//                //getLikes(result.getPostId());
+//                if (!mFeedId.equalsIgnoreCase(Constants.EMPTY) && latestFeedsModel.getFb_feed_id
+//                        () != null) {
+//                    //updateFacebookFeedId(result.getPostId());
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                Utils.debug(TAG, "Cancelled");
+//
+//            }
+//
+//            @Override
+//            public void onError(FacebookException error) {
+//                Utils.debug(TAG, "error : " + error);
+//            }
+//        });
+//    }
 
 
     OnPublishListener onPublishListener = new OnPublishListener() {
@@ -705,7 +951,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
          If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
          it will show (Searching...)
          */
-        final SweetAlertDialog pd = Utils.showSweetProgressDialog(PostDetailActivity.this,
+        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this,
                 getResources
                         ().getString(R.string.deleting_feed), SweetAlertDialog.PROGRESS_TYPE);
 
@@ -748,6 +994,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
 
     public void onShareClick(View v) {
+        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
         Resources resources = getResources();
 
         Intent emailIntent = new Intent();
@@ -784,7 +1031,19 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                     // Warning: Facebook IGNORES our text. They say "These fields are intended for users to express themselves. Pre-filling these fields erodes the authenticity of the user voice."
                     // One workaround is to use the Facebook SDK to post, but that doesn't allow the user to choose how they want to share. We can also make a custom landing page, and the link
                     // will show the <meta content ="..."> text from that page with our link in Facebook.
-                    intent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_facebook));
+//                    intent.putExtra(Intent.EXTRA_TEXT, resources.getString(R.string.share_facebook));
+//                    shareOnFB();
+
+                    // if (linkContent != null) {
+//                        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this,
+//                                getResources().getString(R.string.please_wait), SweetAlertDialog
+//                                        .PROGRESS_TYPE);
+//                        shareIt(linkContent);
+//                    }
+                    //ShareDialog.show(PostDetailActivity.this, linkContent);
+                    //shareIt(linkContent);
+                    shareOnFB();
+                    //intent.putExtra(Intent.EXTRA_TEXT, mUrl);
                 } else if (packageName.contains("mms")) {
                     intent.putExtra(Intent.EXTRA_TEXT, mUrl);
                 } else if (packageName.contains("android.gm")) { // If Gmail shows up twice, try removing this else-if clause and the reference to "android.gm" above
@@ -804,8 +1063,39 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         startActivity(openInChooser);
     }
 
+    private void shareOnFB() {
+        String urlToShare = /*mUrl *//*"http://stackoverflow.com/questions/7545254"*/"http://trigma.com / ";
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+// intent.putExtra(Intent.EXTRA_SUBJECT, "Foo bar"); // NB: has no effect!
+        Utils.debug(TAG, "mUrl : " + mUrl);
+        // intent.putExtra(Intent.EXTRA_TEXT, mUrl);
+        intent.putExtra(Intent.EXTRA_TEXT, urlToShare);
+
+// See if official Facebook app is found
+        boolean facebookAppFound = false;
+        List<ResolveInfo> matches = getPackageManager().queryIntentActivities(intent, 0);
+        for (ResolveInfo info : matches) {
+            if (info.activityInfo.packageName.toLowerCase().startsWith("com.facebook.katana")) {
+                intent.setPackage(info.activityInfo.packageName);
+                facebookAppFound = true;
+                break;
+            }
+        }
+
+// As fallback, launch sharer.php in a browser
+        if (!facebookAppFound) {
+//            String sharerUrl = mUrl;
+            String sharerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + urlToShare;
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sharerUrl));
+            //intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
+        }
+
+        startActivity(intent);
+    }
+
     private void makeOwnerDataModel(String res) {
-        //Utils.debug(TAG, "Response  : " + res);
+        //Utils.debug(TAG, "Response owner Model:" + res);
         latestFeedList.clear();
         JSONObject jsonObject = null;
         try {

@@ -109,7 +109,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         ShareOpenGraphObject object = null;
         if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY) && !fb_share_url.endsWith(".mp4")) {
             object = new ShareOpenGraphObject.Builder()
-                    .putString("og:type", "dsjfhgu")
+                    .putString("og:type", "Create a Post")
                     .putString("og:title", title)
                     .putString("og:description", description)
                     .putString("og:image", fb_share_url)
@@ -118,14 +118,14 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY)) {
             if (fb_share_url.endsWith(".mp4") || fb_share_url.endsWith(".3gp"))
                 object = new ShareOpenGraphObject.Builder()
-                        .putString("og:type", "dsjfhgu")
+                        .putString("og:type", "Create a Post")
                         .putString("og:title", title)
                         .putString("og:description", description)
                         .putString("og:video", fb_share_url)
                         .build();
         } else {
             object = new ShareOpenGraphObject.Builder()
-                    .putString("og:type", "dsjfhgu")
+                    .putString("og:type", "Create a Post")
                     .putString("og:title", title)
                     .putString("og:description", description)
                     .build();
@@ -145,6 +145,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
         shareButton = (ShareButton) findViewById(R.id.shareButton);
         shareButton.setShareContent(content);
+        shareButton.performClick();
         shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
             @Override
             public void onSuccess(final Sharer.Result result) {
@@ -152,7 +153,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 final String fbUrl = "";
                 Utils.debug(TAG, "fbUrl : " + fbUrl);
                 //fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
-                if (result != null && !result.getPostId().equalsIgnoreCase(Constants.EMPTY)) {
+                if (result != null && result.getPostId() != null) {
                     new GraphRequest(
                             AccessToken.getCurrentAccessToken(),
                             "/" + result.getPostId(),
@@ -222,7 +223,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 Utils.debug(TAG, "error : " + error);
             }
         });
-        shareButton.performClick();
 
     }
 
@@ -922,6 +922,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     .setDescription(description)
                     .setPicture("http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1449576680_.jpg")
                     .build();
+
             // mSimpleFacebook.publish(feed, onPublishListener);
         }
         if (mType.equalsIgnoreCase(Constants.KEY_VIDEOS)) {

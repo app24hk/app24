@@ -12,17 +12,24 @@ import android.widget.TextView;
 
 import com.capstone.app24.R;
 import com.capstone.app24.activities.EditPostActivity;
+import com.capstone.app24.activities.PostDetailActivity;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 2/12/15.
  */
 public class CustomDialog extends Dialog implements View.OnClickListener {
+    private static final String TAG = CustomDialog.class.getSimpleName();
     private final String mMessage;
     Activity mActivity;
     int mDilogId;
@@ -31,6 +38,7 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
     private EditText edit_comment;
     private String mPostId = null;
     private SweetAlertDialog mDilog;
+    private SweetAlertDialog mDialog;
 
     public CustomDialog(Context context, Activity activity, int dialogId, String message) {
         super(context);
@@ -100,6 +108,10 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
     }
 
     private void postComment(String message) {
+        if (mDilog == null)
+            mDialog = Utils.showSweetProgressDialog(mActivity, mActivity.getResources()
+                    .getString(R
+                            .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
         dismiss();
         Bundle params = new Bundle();
         params.putString("message", message);
@@ -114,8 +126,68 @@ public class CustomDialog extends Dialog implements View.OnClickListener {
             /* handle the result */
                         Utils.closeSweetProgressDialog(mActivity, mDilog);
                         Utils.debug(Constants.FACEBOOK, "response of Comments : " + response);
+                        Utils.debug(TAG, response.getRawResponse() + "");
+                        String s = response.getRawResponse();
+                        try {
+                            JSONObject object = new JSONObject(s);
+                            String id = object.getString(Constants.KEY_ID);
+                            if (id != null && !id.equalsIgnoreCase(Constants.EMPTY)) {
+                                getComments(mPostId);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            if (mDilog != null)
+                                Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        }
+
+                        Utils.debug(TAG, response.getRawResponse());
+                        JSONObject graphResponse = response.getJSONObject();
+                        Utils.debug(TAG, "graphResponse : " + graphResponse);
                     }
                 }
         ).executeAsync();
     }
+
+    private void getComments(final String postId) {
+    /* make the API call */
+        if (mDilog == null)
+            mDilog = Utils.showSweetProgressDialog(mActivity, mActivity.getResources().getString(R.string
+                    .please_wait), SweetAlertDialog.PROGRESS_TYPE);
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + postId + "/comments",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+
+                        Utils.debug(Constants.FACEBOOK, response.toString());
+
+                        JSONObject graphResponse = response.getJSONObject();
+                        Utils.debug(TAG, "graphResponse : " + graphResponse);
+                        try {
+                            JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
+                            Utils.debug(TAG, "jsonArray : " + jsonArray);
+                            PostDetailActivity.commentCount = jsonArray.length();
+                            if (mDilog != null)
+                                Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            if (mDilog != null)
+                                Utils.closeSweetProgressDialog(mActivity, mDialog);
+                        }
+                        mActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                PostDetailActivity.txt_comment.setText(PostDetailActivity
+                                        .commentCount + "");
+                            }
+                        });
+//                        txt_comment.setText(commentCount + "");
+                    }
+                }
+        ).executeAsync();
+    }
+
 }

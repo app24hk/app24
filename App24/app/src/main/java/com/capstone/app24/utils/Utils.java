@@ -309,7 +309,7 @@ public class Utils {
         // TODO: localize
         final long diff = now - time;
         if (diff < MINUTE_MILLIS) {
-            return " just now";
+            return " Just now";
         } else if (diff < 2 * MINUTE_MILLIS) {
             return " a minute ago";
         } else if (diff < 50 * MINUTE_MILLIS) {
