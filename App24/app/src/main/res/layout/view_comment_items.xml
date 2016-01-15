@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/img_comment_creator_pic"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/logo"
+            />
+        <TextView
+            android:id="@+id/txt_comment_creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@+id/comment_time"
+            android:layout_toRightOf="@+id/img_comment_creator_pic"
+            android:singleLine="true"
+            android:text="title"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/txt_comment_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/txt_comment_creator"
+            android:layout_toRightOf="@+id/img_comment_creator_pic"
+            android:padding="5dp"
+            android:text="comment description"/>
+        <TextView
+            android:id="@+id/comment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="Just now"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

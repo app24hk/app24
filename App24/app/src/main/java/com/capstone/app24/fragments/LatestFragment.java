@@ -270,9 +270,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             try {
                                 latestFeedsModel.setFb_feed_id(object.getString(APIsConstants
                                         .KEY_FB_FEED_ID));
-                                Utils.debug(TAG, "object.getString(APIsConstants.KEY_FB_FEED_ID)"
-                                        + object.getString(APIsConstants
-                                        .KEY_FB_FEED_ID));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -292,8 +289,8 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
         mLatestFeedsAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
-        if (mPageNo == 1)
-            Utils.closeSweetProgressDialog(getActivity(), mDialog);
+//        if (mPageNo == 1)
+        Utils.closeSweetProgressDialog(getActivity(), mDialog);
         return latestFeedList;
     }
 

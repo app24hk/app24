@@ -12,7 +12,7 @@ import org.json.JSONObject;
  * Created by amritpal on 4/1/16.
  */
 public class FacebookUtils {
-    private static String mUrl;
+    public static String mUrl;
 
     public static String getFeedUrl(String feedId) {
         new GraphRequest(

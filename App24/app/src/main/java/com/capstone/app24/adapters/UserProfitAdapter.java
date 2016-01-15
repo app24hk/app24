@@ -28,6 +28,9 @@ import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,12 +55,172 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
     Intent intent;
     private String res = "";
     private SweetAlertDialog mDialog;
+    private String mUnreceivedProfit;
+    private String mReceivedProfit;
+    private String mTotalAmount;
+    private String mProfitAmount;
 
     public UserProfitAdapter(Activity activity, List<UserFeedModel> userFeedList) {
         mActivity = activity;
         mInflater = LayoutInflater.from(activity);
         mUserFeedList = userFeedList;
         mImageHeight = Utils.getHeight(mActivity);
+        getProfit();
+        getMonthProfit();
+    }
+
+    private boolean getMonthProfit() {
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_MONTH_PROFIT,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Utils.debug(TAG, response.toString());
+
+                        res = response.toString();
+                        try {
+                            setMonthProfitDetails(res);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(mActivity,
+                        Constants.KEY_USER_DETAILS, ""));
+                Utils.debug("params", new Utils(mActivity)
+                        .getSharedPreferences(mActivity, Constants.KEY_USER_DETAILS, ""));
+                Utils.info("params... of " + APIsConstants.API_RECENT_FEEDS, params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void setMonthProfitDetails(String res) {
+        Utils.debug("month_profit_web_service", res);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    try {
+                        mProfitAmount = jsonObject.getString("profitAmount");
+                        Utils.debug("profit_web_service profitAmount: ", mProfitAmount);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private boolean getProfit() {
+        /*
+         Starting a progress Dialog...
+         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
+         it will show (Searching...)
+         */
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_TOTAL_MONTHS_PROFIT,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Utils.debug(TAG, response.toString());
+
+                        res = response.toString();
+                        try {
+                            setProfitDetails(res);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(mActivity,
+                        Constants.KEY_USER_DETAILS, ""));
+                Utils.debug("params", new Utils(mActivity)
+                        .getSharedPreferences(mActivity, Constants.KEY_USER_DETAILS, ""));
+                Utils.info("params... of " + APIsConstants.API_RECENT_FEEDS, params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void setProfitDetails(String res) {
+        Utils.debug("profit_web_service", res);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    try {
+                        mUnreceivedProfit = jsonObject.getString("UnreceivedProfit");
+                        Utils.debug("profit_web_service mUnreceivedProfit: ", mUnreceivedProfit);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mReceivedProfit = jsonObject.getString("ReceivedProfit");
+                        Utils.debug("profit_web_service ReceivedProfit: ", res);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mTotalAmount = jsonObject.getString("TotalAmount");
+                        Utils.debug("profit_web_service TotalAmount : ", res);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+                notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
 
@@ -154,6 +317,13 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
                 }
             }
         });
+        holder.txt_todays_profit_value.setVisibility(View.GONE);
+//        holder.txt_todays_profit_value.setText(Constants.DOLLAR_SIGN + " " + mProfitAmount);
+        holder.txt_this_month_profit_value.setText(Constants.DOLLAR_SIGN + " " + mProfitAmount);
+        holder.txt_unreceived_profit_value.setText(Constants.DOLLAR_SIGN + " " + mUnreceivedProfit);
+        holder.txt_heading_todays_profit_value.setText(Constants.DOLLAR_SIGN + " " + mTotalAmount);
+
+
     }
 
 
@@ -167,6 +337,8 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
 
         private final LinearLayout layout_feed_body;
         private final LinearLayout view_profit_and_feeds;
+        private final TextView txt_todays_profit_value, txt_this_month_profit_value,
+                txt_unreceived_profit_value, txt_heading_todays_profit_value;
         TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
         ImageView img_preview, img_video_preview;
@@ -188,6 +360,11 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
             xtra_layout = (RelativeLayout) itemView.findViewById(R.id.xtra_layout);
             progress_dialog = (FrameLayout) itemView.findViewById(R.id.progress_dialog);
 
+            //header items
+            txt_todays_profit_value = (TextView) itemView.findViewById(R.id.txt_todays_profit_value);
+            txt_this_month_profit_value = (TextView) itemView.findViewById(R.id.txt_this_month_profit_value);
+            txt_unreceived_profit_value = (TextView) itemView.findViewById(R.id.txt_unreceived_profit_value);
+            txt_heading_todays_profit_value = (TextView) itemView.findViewById(R.id.txt_heading_todays_profit_value);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

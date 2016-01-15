@@ -28,6 +28,7 @@
                 android:text="@string/total_profit"
                 android:textColor="@color/black"/>
             <TextView
+                android:id="@+id/txt_heading_todays_profit_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txt_total"
@@ -52,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:gravity="left"
-                android:text="@string/total_profit"
+                android:text="@string/todays_profit"
                 android:textColor="@color/black"/>
             <TextView
                 android:id="@+id/txt_todays_profit_value"

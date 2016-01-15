@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.util.Util;
 import com.capstone.app24.R;
 import com.capstone.app24.bean.LatestFeedsModel;
 import com.capstone.app24.bean.OwnerDataModel;
@@ -95,9 +96,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     LatestFeedsModel latestFeedsModel;
     /* Volley Request Tags */
     private String res = "";
-    private String tag_string_req = "feeds_req";
-    private int mPageNo = 1;
-    private SwipeRefreshLayout swipeRefreshLayout;
     List<LatestFeedsModel> latestFeedList = new ArrayList<>();
     /* End of Volley Request Tags */
     private SweetAlertDialog mDialog;
@@ -112,16 +110,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     public static int commentCount;
     private ShareButton shareButton;
     private CallbackManager callbackManager;
-    private String mFeedId;
     private String mUrl;
     private SimpleFacebook mSimpleFacebook;
     private RelativeLayout comment;
     private String mPostId = null;
     private boolean isFeedLiked;
-    private ShareOpenGraphContent content1;
     private Button like;
-    private ShareDialog shareDialog;
     private ShareLinkContent linkContent;
+    private String s;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,14 +128,20 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         callbackManager = CallbackManager.Factory.create();
         latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
         setHeader(null, true, true, false, false, false, null);
-        getFeedOwnerData();
+//        getFeedOwnerData();
         type = getIntent().getIntExtra("type", 0);
         initializeViews();
         AdView mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
         setClickListeners();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         updateUI();
+
     }
 
     @Override
@@ -264,82 +266,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
     }
 
-    private boolean makeSeenPostRequest(final String user_id, final String id) {
-//        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this,
-//                getResources
-//                        ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-        StringRequest strReq = new StringRequest(Request.Method.POST,
-                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
-                new volley.Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-//                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
-                        Utils.debug(TAG, response.toString());
-                        res = response.toString();
-                        try {
-                            handleResponse(res);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-//                Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                res = error.toString();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(APIsConstants.KEY_USER_ID, user_id);
-                params.put(APIsConstants.KEY_FEED_ID, id);
-                Utils.info("params...", params.toString());
-                return params;
-            }
-        };
-        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
-        return false;
-    }
-
-    private void handleResponse(String res) {
-        int seenCount = 0;
-        Utils.debug(TAG, "Response :  " + res);
-        JSONObject object = null;
-        try {
-            object = new JSONObject(res);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (object != null) {
-            Utils.debug(TAG, object + "");
-            try {
-                boolean seen = object.getBoolean(APIsConstants.KEY_RESULT);
-                if (seen) {
-                    if (latestFeedsModel.getViewcount().equalsIgnoreCase(Constants.EMPTY))
-                        seenCount = 1;
-                    else {
-                        seenCount = Integer.parseInt(latestFeedsModel.getViewcount()) + 1;
-                    }
-                    txt_seen.setText(seenCount + "");
-                } else {
-                    txt_seen.setText(latestFeedsModel.getViewcount());
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
 
     private void getComments(final String postId) {
     /* make the API call */
-//        if (mDialog == null)
-//            mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
-//                    .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
                 "/" + postId + "/comments",
@@ -359,11 +288,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             commentCount = jsonArray.length();
                         } catch (Exception e) {
                             e.printStackTrace();
-//                            Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                         }
                         txt_comment.setText(commentCount + "");
-//                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
-
                     }
                 }
         ).executeAsync();
@@ -377,9 +303,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void getLikes(String postId) {
         //Post id  : : : : : 130220790685225
-//        if (mDialog == null)
-//            mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
-//                    .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
         if (postId != null) {
             new GraphRequest(
                     AccessToken.getCurrentAccessToken(),
@@ -415,21 +338,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
                             } catch (Exception e) {
                                 e.printStackTrace();
-//                                Utils.closeSweetProgressDialog
-//                                        (PostDetailActivity.this, mDialog);
                             }
                             txt_like_count.setText(likeCount + "");
-//                            if (mDialog != null)
-//                                Utils.closeSweetProgressDialog
-//                                        (PostDetailActivity.this, mDialog);
                         }
                     }
             ).executeAsync();
         } else {
             txt_like_count.setText(likeCount + "");
-//            if (mDialog != null)
-//                Utils.closeSweetProgressDialog
-//                        (PostDetailActivity.this, mDialog);
         }
     }
 
@@ -460,22 +375,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         //LikeView Facebook
         likeView = (LikeView) findViewById(R.id.like_view);
         likeView.setAuxiliaryViewPosition(LikeView.AuxiliaryViewPosition.INLINE);
-        likeView.setObjectIdAndType(latestFeedsModel.getFb_feed_id(), LikeView.ObjectType.DEFAULT);
-        likeView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isFeedLiked) {
-                    unLike();
-                } else {
-                    like();
-                }
-            }
-        });
+        s = FacebookUtils.getFeedUrl(latestFeedsModel.getFb_feed_id());
+        Utils.debug(TAG, "Open Graph URL" + s);
+        Utils.debug(TAG, "Open Graph URL" + FacebookUtils.mUrl);
+        likeView.setObjectIdAndType(FacebookUtils.mUrl, LikeView.ObjectType.OPEN_GRAPH);
     }
 
     private void unLike() {
-//        mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
-//                .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
         if (latestFeedsModel.getFb_feed_id() != null) {
             new GraphRequest(
                     AccessToken.getCurrentAccessToken(),
@@ -494,6 +400,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             }
                             isFeedLiked = false;
                             like.setText("Like");
+                            Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                             getLikes(latestFeedsModel.getFb_feed_id());
                         }
                     }
@@ -502,25 +409,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void like() {
-//        Bundle params = new Bundle();
-////        params.putString("object", "http://samples.ogp.me/226075010839791");
-//
-//        params.putString("object", url);
-///* make the API call */
-//        new GraphRequest(
-//                AccessToken.getCurrentAccessToken(),
-//                "/me/likes",
-//                params,
-//                HttpMethod.POST,
-//                new GraphRequest.Callback() {
-//                    public void onCompleted(GraphResponse response) {
-//                        Utils.debug(TAG, "Like response : " + response.getRawResponse());
-//            /* handle the result */
-//                    }
-//                }
-//        ).executeAsync();
-
-
         //Post id  : : : : : 130220790685225
         if (latestFeedsModel.getFb_feed_id() != null) {
             new GraphRequest(
@@ -540,6 +428,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             }
                             isFeedLiked = true;
                             like.setText("Liked");
+                            Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
                             getLikes(latestFeedsModel.getFb_feed_id());
                         }
                     }
@@ -565,8 +454,6 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources()
                         .getString(R.string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
                 getSharedUrl(v);
-
-
 //                shareDialog = new ShareDialog(this);
 //                MessageDialog.show(PostDetailActivity.this, linkContent);
 //                shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
@@ -628,6 +515,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
                 break;
             case R.id.like:
+                mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources()
+                        .getString(R
+                                .string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
                 if (isFeedLiked) {
                     unLike();
                 } else {
@@ -683,15 +573,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
             case R.id.comment:
                 if (latestFeedsModel.getFb_feed_id() != null && !latestFeedsModel.getFb_feed_id()
                         .equalsIgnoreCase(Constants.EMPTY) && mPostId != null) {
-                    CustomDialog customDialog = new CustomDialog(this, this, Constants
-                            .FB_COMMENT_DIALOG, "");
-                    customDialog.setFacebookCommentDetails(mPostId);
-                    customDialog.show();
-                /*    //
-                    Dialog dialog = new Dialog(this,android.R.style.Theme_Translucent_NoTitleBar);
-                    dialog.setContentView(R.layout.dialog_add_comment);
-                    dialog.show();*/
-
+//                    CustomDialog customDialog = new CustomDialog(this, this, Constants
+//                            .FB_COMMENT_DIALOG, "");
+//                    customDialog.setFacebookCommentDetails(mPostId);
+//                    customDialog.show();
+                    Intent intent = new Intent(PostDetailActivity.this, CommentActivity.class);
+                    intent.putExtra(Constants.POST_ID, latestFeedsModel.getFb_feed_id());
+                    startActivity(intent);
                 } else
                     AlertToastManager.showToast("Comment Section is under Development", this);
                 break;
@@ -713,6 +601,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                     public void onCompleted(GraphResponse response) {
             /* handle the result */
                         JSONObject object = response.getJSONObject();
+
+                        if (object == null) {
+                            Utils.closeSweetProgressDialog(PostDetailActivity.this,
+                                    mDialog);
+                            AlertToastManager.showToast("This Feed can't be shared",
+                                    PostDetailActivity.this);
+                        }
+
                         JSONObject jsonObject = null;
                         if (object != null) {
                             try {
@@ -743,7 +639,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                         .build();
                                 //onShareClick(v);
                                 //   shareIt(linkContent);
-                                share();
+                                shareFeed();
                             } catch (JSONException e) {
                                 e.printStackTrace();
                                 Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
@@ -755,13 +651,15 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private void share() {
-        String urlToShare = mUrl /*"http://stackoverflow.com/questions/7545254"*//*"http://trigma.com/"*/ ;
+        getFeedOwnerData();
+        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+        String urlToShare = mUrl /*"http://stackoverflow.com/questions/7545254"*//*"http://trigma.com/"*/;
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.setType("text/plain");
         sendIntent.putExtra(Intent.EXTRA_TEXT, urlToShare);
-        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
         startActivity(sendIntent);
+
     }
 
     private void shareIt(ShareLinkContent linkContent) {
@@ -814,8 +712,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
 
     private boolean shareFeed() {
-        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources().getString(R
-                .string.sharing_feed), SweetAlertDialog.PROGRESS_TYPE);
+//        mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources().getString(R
+//                .string.sharing_feed), SweetAlertDialog.PROGRESS_TYPE);
 
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
@@ -860,29 +758,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private void handleShareResponse(String res) {
         Utils.debug(TAG, "Response from AddSharerUser Web Service : " + res);
         Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
-        getFeedOwnerData();
-//        if (content1 != null) {
-//            shareButton.setShareContent(content1);
-//            shareButton.performClick();
-//            shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
-//                @Override
-//                public void onSuccess(Sharer.Result result) {
-//                    Utils.debug(TAG, result.getPostId());
-//                    Utils.debug(TAG, result + "result Content1 : " + result);
-//                }
-//
-//                @Override
-//                public void onCancel() {
-//
-//                }
-//
-//                @Override
-//                public void onError(FacebookException error) {
-//                    Utils.debug(TAG, error + "");
-//
-//                }
-//            });
-//        }
+        share();
 
     }
 
@@ -1067,12 +943,12 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         String urlToShare = /*mUrl *//*"http://stackoverflow.com/questions/7545254"*/"http://trigma.com / ";
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-// intent.putExtra(Intent.EXTRA_SUBJECT, "Foo bar"); // NB: has no effect!
+        // intent.putExtra(Intent.EXTRA_SUBJECT, "Foo bar"); // NB: has no effect!
         Utils.debug(TAG, "mUrl : " + mUrl);
         // intent.putExtra(Intent.EXTRA_TEXT, mUrl);
         intent.putExtra(Intent.EXTRA_TEXT, urlToShare);
 
-// See if official Facebook app is found
+        // See if official Facebook app is found
         boolean facebookAppFound = false;
         List<ResolveInfo> matches = getPackageManager().queryIntentActivities(intent, 0);
         for (ResolveInfo info : matches) {
@@ -1088,14 +964,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 //            String sharerUrl = mUrl;
             String sharerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + urlToShare;
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sharerUrl));
-            //intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mUrl));
         }
 
         startActivity(intent);
     }
 
     private void makeOwnerDataModel(String res) {
-        //Utils.debug(TAG, "Response owner Model:" + res);
+        Utils.debug(TAG, "Response owner Model:" + res);
         latestFeedList.clear();
         JSONObject jsonObject = null;
         try {
@@ -1321,6 +1196,71 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                     }
                 }
         ).executeAsync();
+
+    }
+
+    private boolean makeSeenPostRequest(final String user_id, final String id) {
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_FEED_SEEN,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.debug(TAG, response.toString());
+                        res = response.toString();
+                        try {
+                            handleResponse(res);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, user_id);
+                params.put(APIsConstants.KEY_FEED_ID, id);
+                Utils.info("params...", params.toString());
+                return params;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleResponse(String res) {
+        int seenCount = 0;
+        Utils.debug(TAG, "Response :  " + res);
+        getFeedOwnerData();
+        JSONObject object = null;
+        try {
+            object = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (object != null) {
+            Utils.debug(TAG, object + "");
+            try {
+                boolean seen = object.getBoolean(APIsConstants.KEY_RESULT);
+                if (seen) {
+                    if (latestFeedsModel.getViewcount().equalsIgnoreCase(Constants.EMPTY))
+                        seenCount = 1;
+                    else {
+                        seenCount = Integer.parseInt(latestFeedsModel.getViewcount()) + 1;
+                    }
+                    txt_seen.setText(seenCount + "");
+                } else {
+                    txt_seen.setText(latestFeedsModel.getViewcount());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
     //............FullView imageView..............//

@@ -26,6 +26,7 @@ import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Base64;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.FacebookUtils;
+import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
 import com.capstone.app24.webservices_model.FeedRequestModel;
@@ -102,133 +103,86 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     }
 
 
-    private void createPost(String title, String description) {
-        /**
-         * Client facebook
+    private boolean deletePost() {
+
+        /*
+         Starting a progress Dialog...
+         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
+         it will show (Searching...)
          */
-        ShareOpenGraphObject object = null;
-        if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY) && !fb_share_url.endsWith(".mp4")) {
-            object = new ShareOpenGraphObject.Builder()
-                    .putString("og:type", "Create a Post")
-                    .putString("og:title", title)
-                    .putString("og:description", description)
-                    .putString("og:image", fb_share_url)
-                    .build();
+
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_DELETE_FEED,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
+                        Utils.debug(TAG, response.toString());
+                        res = response.toString();
+                        try {
+                            handleDeleteResponse(res);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+//                        user_id(int)
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_FEED_ID, mFeedId);
+                params.put(APIsConstants.KEY_USER_ID, new Utils(CreatePostActivity.this)
+                        .getSharedPreferences(CreatePostActivity.this, Constants
+                                .KEY_USER_DETAILS, ""));
+                Utils.info("params...", params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void handleDeleteResponse(String res) {
+        Utils.debug(TAG, "Result of delete API: " + res);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY)) {
-            if (fb_share_url.endsWith(".mp4") || fb_share_url.endsWith(".3gp"))
-                object = new ShareOpenGraphObject.Builder()
-                        .putString("og:type", "Create a Post")
-                        .putString("og:title", title)
-                        .putString("og:description", description)
-                        .putString("og:video", fb_share_url)
-                        .build();
-        } else {
-            object = new ShareOpenGraphObject.Builder()
-                    .putString("og:type", "Create a Post")
-                    .putString("og:title", title)
-                    .putString("og:description", description)
-                    .build();
-        }
-
-        SharePhoto photo = new SharePhoto.Builder()
-                .setBitmap(bitmap)
-                .build();
-        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                .setActionType("capstone_app:create")
-                .putObject("capstone_app:post", object)
-                .build();
-        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                .setPreviewPropertyName("capstone_app:post")
-                .setAction(action)
-                .build();
-
-        shareButton = (ShareButton) findViewById(R.id.shareButton);
-        shareButton.setShareContent(content);
-        shareButton.performClick();
-        shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(final Sharer.Result result) {
-//                Utils.debug(TAG, "post Id : " + result.getPostId());
-                final String fbUrl = "";
-                Utils.debug(TAG, "fbUrl : " + fbUrl);
-                //fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
-                if (result != null && result.getPostId() != null) {
-                    new GraphRequest(
-                            AccessToken.getCurrentAccessToken(),
-                            "/" + result.getPostId(),
-                            null,
-                            HttpMethod.GET,
-                            new GraphRequest.Callback() {
-                                public void onCompleted(GraphResponse response) {
-            /* handle the result */
-                                    Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
-                                            "" + response.getRawResponse());
-                                    Utils.debug(Constants.FACEBOOK, "response.getRawResponse() :  " +
-                                            "" + response.getJSONObject());
-                                    JSONObject object = response.getJSONObject();
-                                    JSONObject jsonObject = null;
-                                    if (object != null) {
-                                        try {
-                                            jsonObject = object.getJSONObject(Constants.KEY_DATA);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    JSONObject urlObject1 = null;
-                                    if (jsonObject != null) {
-                                        try {
-                                            urlObject1 = jsonObject.getJSONObject(Constants.POST);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    if (urlObject1 != null) {
-                                        try {
-                                            String url = urlObject1.getString(Constants.KEY_URL);
-                                            Utils.debug(Constants.FACEBOOK, "url : " + url);
-                                            if (result != null && result.getPostId() != null) {
-                                                makePostFeedRequest(result.getPostId(), url);
-                                            } else {
-                                                mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, "Unable to create" +
-                                                                " a feed",
-                                                        SweetAlertDialog.ERROR_TYPE);
-                                                mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                                    @Override
-                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                                        finish();
-                                                        Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
-                                                        startActivity(intent);
-                                                    }
-                                                });
-                                            }
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
-                            }
-                    ).executeAsync();
-                }
-
-            }
-
-            @Override
-            public void onCancel() {
-                Utils.debug(TAG, "Cancelled");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Utils.debug(TAG, "error : " + error);
-            }
-        });
-
+//        if (jsonObject != null) {
+//            try {
+//                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+//                    mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, jsonObject
+//                            .getString
+//                                    (APIsConstants.KEY_MESSAGE), SweetAlertDialog.SUCCESS_TYPE);
+//                    mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                        @Override
+//                        public void onClick(SweetAlertDialog sweetAlertDialog) {
+//                            Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
+//                            startActivity(intent);
+//                            finish();
+//
+//                        }
+//                    });
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private boolean updateFacebookFeedId(final String postId, final String fbUrl) {
 
-        final SweetAlertDialog pd = Utils.showSweetProgressDialog(CreatePostActivity.this,
+        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this,
                 getResources
                         ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
 
@@ -238,7 +192,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     @Override
                     public void onResponse(String response) {
                         Utils.debug(TAG, response.toString());
-                        Utils.closeSweetProgressDialog(CreatePostActivity.this, pd);
+                        Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
                         res = response.toString();
                         try {
                             setFBFeedData(res);
@@ -250,7 +204,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Utils.closeSweetProgressDialog(CreatePostActivity.this, pd);
+                Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -273,6 +227,18 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     private void setFBFeedData(String res) {
         Utils.debug(Constants.FACEBOOK, "Feed id updated" + res);
+        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, getResources().getString(R
+                .string
+                .feed_saved_successfully), SweetAlertDialog.SUCCESS_TYPE);
+        mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sweetAlertDialog) {
+                Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+
+            }
+        });
 //        makePostFeedRequest();
     }
 
@@ -626,7 +592,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 break;
             case R.id.txt_save:
                 if (NetworkUtils.isOnline(this)) {
-                    postToWall();
+                    makePostFeedRequest();//postToWall();
                 } else {
                     Utils.showSweetProgressDialog(this, "Please check internet connection",
                             SweetAlertDialog.WARNING_TYPE);
@@ -722,8 +688,8 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     }
 
 
-    private boolean makePostFeedRequest(final String postId, final String url) {
-        final SweetAlertDialog pd = Utils.showSweetProgressDialog(CreatePostActivity.this,
+    private boolean makePostFeedRequest() {
+        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this,
                 getResources
                         ().getString(R.string.posting_feed), SweetAlertDialog.PROGRESS_TYPE);
 
@@ -733,10 +699,10 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     @Override
                     public void onResponse(String response) {
                         Utils.debug(TAG, response.toString());
-                        Utils.closeSweetProgressDialog(CreatePostActivity.this, pd);
+                        Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
                         res = response.toString();
                         try {
-                            setFeedData(res, postId, url);
+                            setFeedData(res);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -744,7 +710,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 }, new volley.Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Utils.closeSweetProgressDialog(CreatePostActivity.this, pd);
+                Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
                 VolleyLog.d(TAG, "Error: " + error.getMessage());
                 res = error.toString();
             }
@@ -791,38 +757,141 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     }
 
-    private void postTextToWall() {
-        Feed feed = new Feed.Builder()
-                .setMessage(Utils.getFeed().getTitle())
-                .setDescription(Utils.getFeed().getDescription())
+    private void createPost(String title, String description) {
+        /**
+         * Client facebook
+         */
+        ShareOpenGraphObject object = null;
+        if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY) && !fb_share_url.endsWith(".mp4")) {
+            object = new ShareOpenGraphObject.Builder()
+                    .putString("og:type", "Create a Post")
+                    //.putString("og:like", "post.post")
+                    .putString("og:title", title)
+                    .putString("og:description", description)
+                    .putString("og:image", fb_share_url)
+                    .build();
+        }
+        if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY)) {
+            if (fb_share_url.endsWith(".mp4") || fb_share_url.endsWith(".3gp"))
+                object = new ShareOpenGraphObject.Builder()
+                        .putString("og:type", "Create a Post")
+                        //.putString("og:like", "post.post")
+                        .putString("og:title", title)
+                        .putString("og:description", description)
+                        .putString("og:video", fb_share_url)
+                        .build();
+        } else {
+            object = new ShareOpenGraphObject.Builder()
+                    .putString("og:type", "Create a Post")
+                    //.putString("og:like", "post.post")
+                    .putString("og:title", title)
+                    .putString("og:description", description)
+                    .build();
+        }
+
+        SharePhoto photo = new SharePhoto.Builder()
+                .setBitmap(bitmap)
                 .build();
-        // mSimpleFacebook.publish(feed, false, onPublishListener);
+        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
+                .setActionType("capstone_app:create")
+                .putObject("capstone_app:post", object)
+                .build();
+        ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
+                .setPreviewPropertyName("capstone_app:post")
+                .setAction(action)
+                .build();
+
+        shareButton = (ShareButton) findViewById(R.id.shareButton);
+        shareButton.setShareContent(content);
+        shareButton.performClick();
+        shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(final Sharer.Result result) {
+//                Utils.debug(TAG, "post Id : " + result.getPostId());
+                final String fbUrl = "";
+                Utils.debug(TAG, "fbUrl : " + fbUrl);
+                //fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
+                if (result != null && result.getPostId() != null) {
+                    new GraphRequest(
+                            AccessToken.getCurrentAccessToken(),
+                            "/" + result.getPostId(),
+                            null,
+                            HttpMethod.GET,
+                            new GraphRequest.Callback() {
+                                public void onCompleted(GraphResponse response) {
+                                    /* handle the result */
+                                    JSONObject object = response.getJSONObject();
+                                    JSONObject jsonObject = null;
+                                    if (object != null) {
+                                        try {
+                                            jsonObject = object.getJSONObject(Constants.KEY_DATA);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    JSONObject urlObject1 = null;
+                                    if (jsonObject != null) {
+                                        try {
+                                            urlObject1 = jsonObject.getJSONObject(Constants.POST);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                    if (urlObject1 != null) {
+                                        try {
+                                            String url = urlObject1.getString(Constants.KEY_URL);
+                                            Utils.debug(Constants.FACEBOOK, "url : " + url);
+                                            if (result != null && result.getPostId() != null) {
+                                                //makePostFeedRequest(result.getPostId(), url);
+                                                //postToWall();
+                                                updateFacebookFeedId(result.getPostId(), url);
+                                            } else {
+                                                if (NetworkUtils.isOnline(CreatePostActivity
+                                                        .this)) {
+                                                    deletePost();
+                                                } else {
+                                                    Utils.showSweetProgressDialog
+                                                            (CreatePostActivity.this,
+                                                                    getResources().getString(R.string
+                                                                            .check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+                                                }
+//                                                mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, "Unable to create" +
+//                                                                " a feed",
+//                                                        SweetAlertDialog.ERROR_TYPE);
+//                                                mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                                                    @Override
+//                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
+//                                                        finish();
+//                                                        Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
+//                                                        startActivity(intent);
+//                                                    }
+//                                                });
+                                            }
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }
+                    ).executeAsync();
+                }
+
+            }
+
+            @Override
+            public void onCancel() {
+                Utils.debug(TAG, "Cancelled");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Utils.debug(TAG, "error : " + error);
+            }
+        });
+
     }
 
-    private void postPhotoToWall() {
-        Photo photo = new Photo.Builder()
-                .setImage(mBitmap)
-                .setName(edit_post_title.getText().toString())
-                        //.setPlace("110619208966868")
-                .build();
-        // mSimpleFacebook.publish(photo, false, onPublishListener);
-    }
-
-    private void postVideoToWall() {
-        File videoFile = null;
-
-// create a Video instance and add some properties
-        Video video = new Video.Builder()
-                .setVideo(videoFile)
-                .setDescription("Video from #android_simple_facebook sample application")
-                .setName("Cool video")
-                .build();
-//        Publish video to "Videos" album
-
-        //    mSimpleFacebook.publish(video, onPublishListener);
-    }
-
-    private void setFeedData(String res, String postId, String url) throws JSONException {
+    private void setFeedData(String res) throws JSONException {
         Utils.debug(TAG, "Response : AFTER fEED CREATE " + res);
         try {
             JSONObject jsonObject = new JSONObject(res);
@@ -845,13 +914,14 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                             e.printStackTrace();
                         }
                         try {
-                            fb_share_url = object.getString(APIsConstants.KEY_FB_SHARE_URL);
+                            fb_share_url = object.getString(APIsConstants.KEY_MEDIA);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        Utils.debug(TAG, "mFeedId : " + postId);
-                        Utils.debug(TAG, "fb_share_url : " + url);
-                        updateFacebookFeedId(postId, url);//postToWall(fb_share_url);
+                        //Utils.debug(TAG, "mFeedId : " + postId);
+                        //Utils.debug(TAG, "fb_share_url : " + url);
+                        //updateFacebookFeedId(postId, url);//postToWall(fb_share_url);
+                        postToWall();
                         mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                             @Override
                             public void onClick(SweetAlertDialog sweetAlertDialog) {
@@ -942,5 +1012,36 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     .build();
             //  mSimpleFacebook.publish(feed, onPublishListener);
         }
+    }
+
+    private void postTextToWall() {
+        Feed feed = new Feed.Builder()
+                .setMessage(Utils.getFeed().getTitle())
+                .setDescription(Utils.getFeed().getDescription())
+                .build();
+        // mSimpleFacebook.publish(feed, false, onPublishListener);
+    }
+
+    private void postPhotoToWall() {
+        Photo photo = new Photo.Builder()
+                .setImage(mBitmap)
+                .setName(edit_post_title.getText().toString())
+                        //.setPlace("110619208966868")
+                .build();
+        // mSimpleFacebook.publish(photo, false, onPublishListener);
+    }
+
+    private void postVideoToWall() {
+        File videoFile = null;
+
+// create a Video instance and add some properties
+        Video video = new Video.Builder()
+                .setVideo(videoFile)
+                .setDescription("Video from #android_simple_facebook sample application")
+                .setName("Cool video")
+                .build();
+//        Publish video to "Videos" album
+
+        //    mSimpleFacebook.publish(video, onPublishListener);
     }
 }

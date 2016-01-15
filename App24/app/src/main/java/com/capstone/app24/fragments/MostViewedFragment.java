@@ -301,7 +301,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
         }
         mMostViewedAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
-        if (mPageNo == 1)
+//        if (mPageNo == 1)
             Utils.closeSweetProgressDialog(getActivity(), mDialog);
         return mMostViewedFeedList;
     }

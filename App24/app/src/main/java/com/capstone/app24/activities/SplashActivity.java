@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.SpannableString;
@@ -79,7 +80,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
+        Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
@@ -150,6 +151,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 intent = new Intent(SplashActivity.this, TermsNConditionsActivity.class);
                 startActivity(intent);
                 break;
+
             case R.id.btn_login_with_facebook:
              /*   mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R.string
                         .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
@@ -216,7 +218,13 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                     }
 
                                     URL image_value = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=large");
+                                    URL image_small = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=small");
                                     pictureobj = image_value.toString();
+                                    String pictureObjSmall = image_small.toString();
+                                    Utils.debug(TAG, "pictureobj : " + pictureobj);
+                                    Utils.debug(TAG, "pictureObjSmall : " + pictureObjSmall);
+                                    new Utils(SplashActivity.this).setPreferences
+                                            (SplashActivity.this, Constants.FB_IMAGE_SMALL, pictureobj);
                                     userModel = new UserLoginModel(facebookid, email,
                                             first_name, last_name, gender, Constants
                                             .ANDROID,

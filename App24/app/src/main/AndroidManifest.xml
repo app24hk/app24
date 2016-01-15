@@ -72,6 +72,9 @@
         <activity
             android:name=".activities.EditPostActivity"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".activities.CommentActivity"
+            android:screenOrientation="portrait"></activity>
 
         <receiver android:name=".receiver.AlarmReceiver"
                   android:enabled="false">

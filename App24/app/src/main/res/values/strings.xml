@@ -127,4 +127,5 @@
     <string name="share_chooser_text">Share With..</string>
     <string name="write_a_comment">Write a comment</string>
     <string name="please_wait">Please wait</string>
+    <string name="feed_saved_successfully">Feed saved successfully!</string>
 </resources>

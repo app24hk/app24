@@ -71,4 +71,6 @@ public class Constants {
     public static final String POST = "post";
     public static final String ZERO = "0";
     public static final String DOLLAR_SIGN = "$";
+    public static final String FB_IMAGE_SMALL = "fb_image_small";
+    public static final String POST_ID = "postId";
 }

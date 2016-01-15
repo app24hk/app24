@@ -22,7 +22,8 @@ public class APIsConstants {
     public static final String API_ADD_EDIT_PAYPAL_INFO = "/addEditPaypalInfo";
     public static final String API_GET_PAYPAL_INFO = "/getPaypalInfo";
     public static final String API_UPDATE_FB_FEED_ID = "/updateFbFeedId";
-
+    public static final String API_TOTAL_MONTHS_PROFIT = "/TotalMonthsProfit";
+    public static final String API_MONTH_PROFIT = "/monthProfit";
     public static final String KEY_RESULT = "result";
     public static final String KEY_USERINFO = "userInfo";
 
@@ -66,4 +67,7 @@ public class APIsConstants {
     public static final String KEY_PROFIT_AMOUNT = "profitAmount";
     public static final String KEY_FB_FEED_ID = "fb_feed_id";
 
+    public static final String CREATED_TIME = "created_time";
+    public static final String KEY_FROM = "from";
+    public static final String NAME = "name";
 }
