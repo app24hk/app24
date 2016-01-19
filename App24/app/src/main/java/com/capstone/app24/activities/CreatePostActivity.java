@@ -867,7 +867,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 //                                                    }
 //                                                });
                                             }
-                                        } catch (JSONException e) {
+                                        } catch (Exception e) {
                                             e.printStackTrace();
                                         }
                                     }

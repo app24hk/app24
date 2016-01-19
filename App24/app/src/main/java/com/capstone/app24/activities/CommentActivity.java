@@ -131,9 +131,9 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
                                     Utils.closeSweetProgressDialog(CommentActivity.this, mDialog);
                             }
 
-                            Utils.debug(TAG, response.getRawResponse());
-                            JSONObject graphResponse = response.getJSONObject();
-                            Utils.debug(TAG, "graphResponse : " + graphResponse);
+//                            Utils.debug(TAG, response.getRawResponse());
+                          //  JSONObject graphResponse = response.getJSONObject();
+                           // Utils.debug(TAG, "graphResponse : " + graphResponse);
                         }
                     }
                 }

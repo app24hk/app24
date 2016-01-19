@@ -129,6 +129,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         latestFeedsModel = new Utils(this).getLatestFeedPreferences(this);
         setHeader(null, true, true, false, false, false, null);
 //        getFeedOwnerData();
+        AccessToken.refreshCurrentAccessTokenAsync();
+
         type = getIntent().getIntExtra("type", 0);
         initializeViews();
         AdView mAdView = (AdView) findViewById(R.id.adView);
@@ -303,6 +305,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void getLikes(String postId) {
         //Post id  : : : : : 130220790685225
+        String accessToken = AccessToken.getCurrentAccessToken().toString();
+        Utils.debug(TAG, "AccessToken.getCurrentAccessToken().toString() : " + AccessToken.getCurrentAccessToken().toString());
         if (postId != null) {
             new GraphRequest(
                     AccessToken.getCurrentAccessToken(),
