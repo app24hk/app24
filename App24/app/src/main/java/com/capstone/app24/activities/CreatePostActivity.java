@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -90,6 +91,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private boolean isVideo;
     private String mFeedId = "";
     private String fb_share_url = "";
+    private URLSpan[] urls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -765,7 +767,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         if (!fb_share_url.equalsIgnoreCase(Constants.EMPTY) && !fb_share_url.endsWith(".mp4")) {
             object = new ShareOpenGraphObject.Builder()
                     .putString("og:type", "Create a Post")
-                    //.putString("og:like", "post.post")
+                            //.putString("og:like", "post.post")
                     .putString("og:title", title)
                     .putString("og:description", description)
                     .putString("og:image", fb_share_url)
@@ -775,7 +777,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             if (fb_share_url.endsWith(".mp4") || fb_share_url.endsWith(".3gp"))
                 object = new ShareOpenGraphObject.Builder()
                         .putString("og:type", "Create a Post")
-                        //.putString("og:like", "post.post")
+                                //.putString("og:like", "post.post")
                         .putString("og:title", title)
                         .putString("og:description", description)
                         .putString("og:video", fb_share_url)
@@ -783,7 +785,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         } else {
             object = new ShareOpenGraphObject.Builder()
                     .putString("og:type", "Create a Post")
-                    //.putString("og:like", "post.post")
+                            //.putString("og:like", "post.post")
                     .putString("og:title", title)
                     .putString("og:description", description)
                     .build();
@@ -807,10 +809,11 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
         shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
             @Override
             public void onSuccess(final Sharer.Result result) {
-//                Utils.debug(TAG, "post Id : " + result.getPostId());
-                final String fbUrl = "";
-                Utils.debug(TAG, "fbUrl : " + fbUrl);
+                Utils.debug(TAG, "post Id : " + result.getPostId());
+//                Utils.debug(TAG, "fbUrl : " + fbUrl);
                 //fbUrl = FacebookUtils.getFeedUrl(result.getPostId());
+
+
                 if (result != null && result.getPostId() != null) {
                     new GraphRequest(
                             AccessToken.getCurrentAccessToken(),
@@ -874,6 +877,17 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                                 }
                             }
                     ).executeAsync();
+                } else {
+                    Utils.debug(TAG, "# Post not created #");
+                    if (NetworkUtils.isOnline(CreatePostActivity
+                            .this)) {
+                        deletePost();
+                    } else {
+                        Utils.showSweetProgressDialog
+                                (CreatePostActivity.this,
+                                        getResources().getString(R.string
+                                                .check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+                    }
                 }
 
             }
@@ -918,9 +932,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        //Utils.debug(TAG, "mFeedId : " + postId);
-                        //Utils.debug(TAG, "fb_share_url : " + url);
-                        //updateFacebookFeedId(postId, url);//postToWall(fb_share_url);
                         postToWall();
                         mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                             @Override

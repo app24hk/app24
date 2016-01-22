@@ -270,7 +270,8 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
 
     private void getComments(final String postId) {
-    /* make the API call */
+        /* make the API call */
+        Utils.debug("accessToken", "AccessToken.getCurrentAccessToken() : " + AccessToken.getCurrentAccessToken());
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
                 "/" + postId + "/comments",
@@ -278,7 +279,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 HttpMethod.GET,
                 new GraphRequest.Callback() {
                     public void onCompleted(GraphResponse response) {
-            /* handle the result */
+                        /* handle the result */
 
                         Utils.debug(Constants.FACEBOOK, response.toString());
 
@@ -305,8 +306,11 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
      */
     private void getLikes(String postId) {
         //Post id  : : : : : 130220790685225
-        String accessToken = AccessToken.getCurrentAccessToken().toString();
+//        AccessToken accessToken = AccessToken.getCurrentAccessToken();
         Utils.debug(TAG, "AccessToken.getCurrentAccessToken().toString() : " + AccessToken.getCurrentAccessToken().toString());
+        Utils.debug(TAG, "AccessToken.getCurrentAccessToken().toString() : " + AccessToken
+                .getCurrentAccessToken().getToken());
+        //AccessTokenManager.getInstance().getCurrentAccessToken()
         if (postId != null) {
             new GraphRequest(
                     AccessToken.getCurrentAccessToken(),
@@ -323,9 +327,14 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             try {
                                 JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
                                 Utils.debug(TAG, "jsonArray : " + jsonArray);
+                                Utils.debug(TAG, "Current Person : " + new Utils
+                                        (PostDetailActivity.this)
+                                        .getSharedPreferences(PostDetailActivity.this,
+                                                Constants.KEY_FACEBOOK_ID, ""));
                                 for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject likedPerson = jsonArray.getJSONObject(i);
                                     Utils.debug(TAG, "likedPerson : " + likedPerson);
+
 
                                     String likedId = likedPerson.getString("id");
                                     if (likedId.equalsIgnoreCase(new Utils(PostDetailActivity.this)
@@ -333,6 +342,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                                     Constants.KEY_FACEBOOK_ID, ""))) {
                                         isFeedLiked = true;
                                         like.setText("Liked");
+                                        break;
                                     } else {
                                         isFeedLiked = false;
                                         like.setText("Like");
@@ -399,13 +409,21 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                 Utils.debug(Constants.FACEBOOK, response.toString());
                                 JSONObject graphResponse = response.getJSONObject();
                                 Utils.debug(TAG, "graphResponse : " + graphResponse);
+                                if (graphResponse != null) {
+                                    boolean b = graphResponse.getBoolean("success");
+                                    Utils.debug("boolean : ", b + "");
+                                    if (b) {
+                                        isFeedLiked = false;
+                                        like.setText("Like");
+                                        Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                                        getLikes(latestFeedsModel.getFb_feed_id());
+                                    }
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            isFeedLiked = false;
-                            like.setText("Like");
                             Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
-                            getLikes(latestFeedsModel.getFb_feed_id());
+
                         }
                     }
             ).executeAsync();
@@ -427,13 +445,21 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                                 Utils.debug(Constants.FACEBOOK, response.toString());
                                 JSONObject graphResponse = response.getJSONObject();
                                 Utils.debug(TAG, "graphResponse : " + graphResponse);
+                                if (graphResponse != null) {
+                                    boolean b = graphResponse.getBoolean("success");
+                                    Utils.debug("boolean : ", b + "");
+                                    Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
+                                    if (b) {
+                                        isFeedLiked = true;
+                                        like.setText("Liked");
+                                        getLikes(latestFeedsModel.getFb_feed_id());
+                                    }
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            isFeedLiked = true;
-                            like.setText("Liked");
                             Utils.closeSweetProgressDialog(PostDetailActivity.this, mDialog);
-                            getLikes(latestFeedsModel.getFb_feed_id());
+
                         }
                     }
             ).executeAsync();
@@ -965,7 +991,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
 
 // As fallback, launch sharer.php in a browser
         if (!facebookAppFound) {
-//            String sharerUrl = mUrl;
+//            String sharerUrl = mUrl;https://www.facebook.com/sharer/sharer.php?fb_object_id=876098475841535
             String sharerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + urlToShare;
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sharerUrl));
         }

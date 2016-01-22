@@ -225,8 +225,6 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
                     /*break;
             }
 */
-            /*Intent intent = new Intent(mActivity, PostDetailActivity.class);
-            mActivity.startActivity(intent);*/
         }
     }
 

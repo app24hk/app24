@@ -132,8 +132,8 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
                             }
 
 //                            Utils.debug(TAG, response.getRawResponse());
-                          //  JSONObject graphResponse = response.getJSONObject();
-                           // Utils.debug(TAG, "graphResponse : " + graphResponse);
+                            //  JSONObject graphResponse = response.getJSONObject();
+                            // Utils.debug(TAG, "graphResponse : " + graphResponse);
                         }
                     }
                 }
@@ -177,26 +177,28 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
                         if (response != null) {
                             JSONObject graphResponse = response.getJSONObject();
                             Utils.debug(TAG, "graphResponse : " + graphResponse);
-                            try {
-                                JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
-                                Utils.debug(TAG, "List of comments array " + jsonArray);
-                                mCommentList.clear();
-                                for (int i = 0; i < jsonArray.length(); i++) {
-                                    JSONObject object = jsonArray.getJSONObject(i);
-                                    CommentModel commentModel = new CommentModel();
-                                    commentModel.setCreated_time(object.getString(APIsConstants
-                                            .CREATED_TIME));
-                                    commentModel.setMessage(object.getString(APIsConstants.KEY_MESSAGE));
-                                    commentModel.setComment_id(object.getString(APIsConstants.KEY_ID));
-                                    JSONObject fromObject = object.getJSONObject(APIsConstants.KEY_FROM);
-                                    commentModel.setName(fromObject.getString(APIsConstants.NAME));
-                                    commentModel.setId(fromObject.getString(APIsConstants.KEY_ID));
-                                    if (!mCommentList.contains(commentModel)) {
-                                        mCommentList.add(commentModel);
+                            if (graphResponse != null) {
+                                try {
+                                    JSONArray jsonArray = graphResponse.getJSONArray(Constants.KEY_DATA);
+                                    Utils.debug(TAG, "List of comments array " + jsonArray);
+                                    mCommentList.clear();
+                                    for (int i = 0; i < jsonArray.length(); i++) {
+                                        JSONObject object = jsonArray.getJSONObject(i);
+                                        CommentModel commentModel = new CommentModel();
+                                        commentModel.setCreated_time(object.getString(APIsConstants
+                                                .CREATED_TIME));
+                                        commentModel.setMessage(object.getString(APIsConstants.KEY_MESSAGE));
+                                        commentModel.setComment_id(object.getString(APIsConstants.KEY_ID));
+                                        JSONObject fromObject = object.getJSONObject(APIsConstants.KEY_FROM);
+                                        commentModel.setName(fromObject.getString(APIsConstants.NAME));
+                                        commentModel.setId(fromObject.getString(APIsConstants.KEY_ID));
+                                        if (!mCommentList.contains(commentModel)) {
+                                            mCommentList.add(commentModel);
+                                        }
                                     }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             }
                         }
                         Utils.closeSweetProgressDialog(CommentActivity.this, mDialog);

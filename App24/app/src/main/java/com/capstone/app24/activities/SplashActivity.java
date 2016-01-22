@@ -26,12 +26,14 @@ import com.capstone.app24.webservices_model.UserLoginModel;
 import com.capstone.app24.webservices_model.UserLoginResponseModel;
 import com.crittercism.app.Crittercism;
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
@@ -42,6 +44,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +66,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     private LoginButton fb_btn;
 
     CallbackManager callbackManager;
-    String accessToken;
+    AccessToken accessToken;
     //private RestAdapter mRestAdapter;
     private UserLoginModel userModel;
     private UserLoginResponseModel mUserBeanResponse;
@@ -72,6 +75,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     /* Volley Request Tags */
     private String res = "";
     private String tag_string_req = "feeds_req";
+    private AccessTokenTracker mAccessTokenTracker;
     /* End of Volley Request Tags */
 
     @Override
@@ -80,13 +84,15 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
+
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_VIDEO, true);
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true);
-        callbackManager = CallbackManager.Factory.create();
 
         setContentView(R.layout.activity_splash);
         if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN, false)) {
+            Utils.debug("accessToken", "AccessToken.getCurrentAccessToken() : " + AccessToken.getCurrentAccessToken());
             finish();
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(intent);
@@ -132,6 +138,17 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     private void setClickListeners() {
         txt_terms_of_use.setOnClickListener(this);
         btn_login_with_facebook.setOnClickListener(this);
+        mAccessTokenTracker = new AccessTokenTracker() {
+
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+
+                Utils.info(TAG, "AccessTokenTracker oldAccessToken: " + oldAccessToken + "" +
+                        " " +
+                        "- " +
+                        "currentAccessToken: " + currentAccessToken);
+            }
+        };
     }
 
     private void updateUI() {
@@ -171,102 +188,219 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     public void facebookIntegration() {
         fb_btn.setReadPermissions(Arrays.asList("public_profile, email, user_birthday," +
                 "user_friends"));
-        fb_btn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(final LoginResult loginResult) {
-                accessToken = loginResult.getAccessToken().getToken();
-                Utils.debug(TAG, "accessToken : " + accessToken);
-                AccessToken.setCurrentAccessToken(loginResult.getAccessToken());
-                Utils.debug(TAG, "Access Token : " + accessToken);
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                // Application code
-                                Log.v("Facebook User Detail : ", response.toString());
-                                Log.v("Facebook  Detail : ", response.getJSONObject().toString());
-                                // if(!response.toString().isEmpty()){
-                                try {
-                                    JSONObject jsonObject = response.getJSONObject();
+//        fb_btn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//            @Override
+//            public void onSuccess(LoginResult loginResult) {
+//
+//                accessToken = loginResult.getAccessToken();
+//                Utils.debug(TAG, "accessToken : " + accessToken);
+//                Utils.debug(TAG, "accessToken : " + accessToken.getToken());
+//                Utils.debug(TAG, "accessToken : " + accessToken.getPermissions());
+//                //
+//                Date date = AccessToken.getCurrentAccessToken().getExpires();
+//                Utils.debug(TAG, "Date of expire token" + date);
+//                //Utils.debug(TAG, "accessToken : " + accessToken);
+//                Utils.debug(TAG, "Access Token after set: " + AccessToken.getCurrentAccessToken());
+//
+//                GraphRequest request = GraphRequest.newMeRequest(
+//                        loginResult.getAccessToken(),
+//                        new GraphRequest.GraphJSONObjectCallback() {
+//                            @Override
+//                            public void onCompleted(
+//                                    JSONObject object,
+//                                    GraphResponse response) {
+//                                // Application code
+//                                Log.v("Facebook User Detail : ", response.toString());
+//                                Log.v("Facebook  Detail : ", response.getJSONObject().toString());
+//                                // if(!response.toString().isEmpty()){
+//                                try {
+//                                    JSONObject jsonObject = response.getJSONObject();
+//
+//                                    String email = "", username, pictureobj, url, facebookid = "", last_name = "",
+//                                            first_name = "", gender = "";
+//
+//
+//                                    Log.v("Facebook  Detail sec : ", jsonObject.toString());
+//                                    if (jsonObject.has(Constants.KEY_LAST_NAME)) {
+//                                        last_name = jsonObject.getString(Constants.KEY_LAST_NAME);
+//                                    }
+//                                    if (jsonObject.has(Constants.KEY_ID)) {
+//                                        facebookid = jsonObject.getString(Constants.KEY_ID);
+//                                    }
+//                                    if (jsonObject.has(Constants.KEY_GENDER)) {
+//                                        gender = jsonObject.getString(Constants.KEY_GENDER);
+//                                    }
+//                                    if (jsonObject.has(Constants.KEY_FIRST_NAME)) {
+//                                        first_name = jsonObject.getString(Constants.KEY_FIRST_NAME);
+//                                    }
+//                                    if (jsonObject.has(Constants.KEY_EMAIL)) {
+//                                        email = jsonObject.getString(Constants.KEY_EMAIL);
+//                                    }
+//                                    if (jsonObject.has(Constants.KEY_NAME)) {
+//                                        username = jsonObject.getString(Constants.KEY_NAME);
+//                                    }
+//
+//                                    URL image_value = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=large");
+//                                    URL image_small = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=small");
+//                                    pictureobj = image_value.toString();
+//                                    String pictureObjSmall = image_small.toString();
+//                                    Utils.debug(TAG, "pictureobj : " + pictureobj);
+//                                    Utils.debug(TAG, "pictureObjSmall : " + pictureObjSmall);
+//                                    new Utils(SplashActivity.this).setPreferences
+//                                            (SplashActivity.this, Constants.FB_IMAGE_SMALL, pictureobj);
+//                                    userModel = new UserLoginModel(facebookid, email,
+//                                            first_name, last_name, gender, Constants
+//                                            .ANDROID,
+//                                            accessToken + "", Constants.FACEBOOK);
+//                                } catch (Exception ex) {
+//                                    ex.printStackTrace();
+//                                }
+//
+////                                            MyAsyncTask task = new MyAsyncTask();
+////                                            task.setListener(SplashActivity.this);
+////                                            task.execute();
+//                                //makeUserLoginRequest();
+//                                if (NetworkUtils.isOnline(SplashActivity.this)) {
+//                                    makeUserLoginRequest();
+//                                } else {
+//                                    Utils.showSweetProgressDialog(SplashActivity.this,
+//                                            getResources().getString(R.string
+//                                                    .check_your_internet_connection),
+//                                            SweetAlertDialog.ERROR_TYPE);
+//                                }
+//                            }
+//                        });
+//                Bundle parameters = new Bundle();
+//                parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
+//                request.setParameters(parameters);
+//                request.executeAsync();
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
+//                        SplashActivity
+//                                .this);
+//                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
+//            }
+//
+//            @Override
+//            public void onError(FacebookException e) {
+//                AlertToastManager.showToast(getResources().getString(R.string
+//                        .error_occured), SplashActivity.this);
+//                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
+//            }
+//        });
 
-                                    String email = "", username, pictureobj, url, facebookid = "", last_name = "",
-                                            first_name = "", gender = "";
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+                        accessToken = loginResult.getAccessToken();
+                        Utils.debug(TAG, "accessToken : " + accessToken);
+                        Utils.debug(TAG, "accessToken : " + accessToken.getToken());
+                        Utils.debug(TAG, "accessToken : " + accessToken.getPermissions());
+                        //
+                        Date date = AccessToken.getCurrentAccessToken().getExpires();
+                        Utils.debug(TAG, "Date of expire token" + date);
+                        //Utils.debug(TAG, "accessToken : " + accessToken);
+                        Utils.debug(TAG, "Access Token after set: " + AccessToken.getCurrentAccessToken());
+
+                        GraphRequest request = GraphRequest.newMeRequest(
+                                loginResult.getAccessToken(),
+                                new GraphRequest.GraphJSONObjectCallback() {
+                                    @Override
+                                    public void onCompleted(
+                                            JSONObject object,
+                                            GraphResponse response) {
+                                        // Application code
+                                        Log.v("Facebook User Detail : ", response.toString());
+                                        Log.v("Facebook  Detail : ", response.getJSONObject().toString());
+                                        // if(!response.toString().isEmpty()){
+                                        try {
+                                            JSONObject jsonObject = response.getJSONObject();
+
+                                            String email = "", username, pictureobj, url, facebookid = "", last_name = "",
+                                                    first_name = "", gender = "";
 
 
-                                    Log.v("Facebook  Detail sec : ", jsonObject.toString());
-                                    if (jsonObject.has(Constants.KEY_LAST_NAME)) {
-                                        last_name = jsonObject.getString(Constants.KEY_LAST_NAME);
-                                    }
-                                    if (jsonObject.has(Constants.KEY_ID)) {
-                                        facebookid = jsonObject.getString(Constants.KEY_ID);
-                                    }
-                                    if (jsonObject.has(Constants.KEY_GENDER)) {
-                                        gender = jsonObject.getString(Constants.KEY_GENDER);
-                                    }
-                                    if (jsonObject.has(Constants.KEY_FIRST_NAME)) {
-                                        first_name = jsonObject.getString(Constants.KEY_FIRST_NAME);
-                                    }
-                                    if (jsonObject.has(Constants.KEY_EMAIL)) {
-                                        email = jsonObject.getString(Constants.KEY_EMAIL);
-                                    }
-                                    if (jsonObject.has(Constants.KEY_NAME)) {
-                                        username = jsonObject.getString(Constants.KEY_NAME);
-                                    }
+                                            Log.v("Facebook  Detail sec : ", jsonObject.toString());
+                                            if (jsonObject.has(Constants.KEY_LAST_NAME)) {
+                                                last_name = jsonObject.getString(Constants.KEY_LAST_NAME);
+                                            }
+                                            if (jsonObject.has(Constants.KEY_ID)) {
+                                                facebookid = jsonObject.getString(Constants.KEY_ID);
+                                            }
+                                            if (jsonObject.has(Constants.KEY_GENDER)) {
+                                                gender = jsonObject.getString(Constants.KEY_GENDER);
+                                            }
+                                            if (jsonObject.has(Constants.KEY_FIRST_NAME)) {
+                                                first_name = jsonObject.getString(Constants.KEY_FIRST_NAME);
+                                            }
+                                            if (jsonObject.has(Constants.KEY_EMAIL)) {
+                                                email = jsonObject.getString(Constants.KEY_EMAIL);
+                                            }
+                                            if (jsonObject.has(Constants.KEY_NAME)) {
+                                                username = jsonObject.getString(Constants.KEY_NAME);
+                                            }
 
-                                    URL image_value = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=large");
-                                    URL image_small = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=small");
-                                    pictureobj = image_value.toString();
-                                    String pictureObjSmall = image_small.toString();
-                                    Utils.debug(TAG, "pictureobj : " + pictureobj);
-                                    Utils.debug(TAG, "pictureObjSmall : " + pictureObjSmall);
-                                    new Utils(SplashActivity.this).setPreferences
-                                            (SplashActivity.this, Constants.FB_IMAGE_SMALL, pictureobj);
-                                    userModel = new UserLoginModel(facebookid, email,
-                                            first_name, last_name, gender, Constants
-                                            .ANDROID,
-                                            accessToken + "", Constants.FACEBOOK);
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
+                                            URL image_value = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=large");
+                                            URL image_small = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=small");
+                                            pictureobj = image_value.toString();
+                                            String pictureObjSmall = image_small.toString();
+                                            Utils.debug(TAG, "pictureobj : " + pictureobj);
+                                            Utils.debug(TAG, "pictureObjSmall : " + pictureObjSmall);
+                                            new Utils(SplashActivity.this).setPreferences
+                                                    (SplashActivity.this, Constants.FB_IMAGE_SMALL, pictureobj);
+                                            userModel = new UserLoginModel(facebookid, email,
+                                                    first_name, last_name, gender, Constants
+                                                    .ANDROID,
+                                                    accessToken + "", Constants.FACEBOOK);
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                        }
 
 //                                            MyAsyncTask task = new MyAsyncTask();
 //                                            task.setListener(SplashActivity.this);
 //                                            task.execute();
-                                //makeUserLoginRequest();
-                                if (NetworkUtils.isOnline(SplashActivity.this)) {
-                                    makeUserLoginRequest();
-                                } else {
-                                    Utils.showSweetProgressDialog(SplashActivity.this,
-                                            getResources().getString(R.string
-                                                    .check_your_internet_connection),
-                                            SweetAlertDialog.ERROR_TYPE);
-                                }
-                            }
-                        });
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
-                request.setParameters(parameters);
-                request.executeAsync();
-            }
+                                        //makeUserLoginRequest();
+                                        if (NetworkUtils.isOnline(SplashActivity.this)) {
+                                            makeUserLoginRequest();
+                                        } else {
+                                            Utils.showSweetProgressDialog(SplashActivity.this,
+                                                    getResources().getString(R.string
+                                                            .check_your_internet_connection),
+                                                    SweetAlertDialog.ERROR_TYPE);
+                                        }
+                                    }
+                                });
+                        Bundle parameters = new Bundle();
+                        parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
+                        request.setParameters(parameters);
+                        request.executeAsync();
 
-            @Override
-            public void onCancel() {
-                AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
-                        SplashActivity
-                                .this);
-                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
-            }
+                    }
 
-            @Override
-            public void onError(FacebookException e) {
-                AlertToastManager.showToast(getResources().getString(R.string
-                        .error_occured), SplashActivity.this);
-                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
-            }
-        });
+                    @Override
+                    public void onCancel() {
+                        // App code
+
+                        AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
+                                SplashActivity
+                                        .this);
+                        Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                        AlertToastManager.showToast(getResources().getString(R.string
+                                .error_occured), SplashActivity.this);
+                        Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
+                    }
+                });
+
     }
 
     @Override
