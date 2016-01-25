@@ -475,9 +475,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         img_video_preview.setOnClickListener(this);
         layout_img_video_preview.setOnClickListener(this);
         comment.setOnClickListener(this);
-    }
-
-    @Override
+    }    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_share:

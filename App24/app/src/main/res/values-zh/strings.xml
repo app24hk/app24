@@ -1,0 +1,75 @@
+<resources>
+    <string name="app_name">App24</string>
+    <!-- Facebook Data-->
+    <!--trigma facebook id-->
+    <!--<string name="app_id">1673090976236867</string>-->
+    <!--capstone facebook id -->
+    <string name="app_id">1626774610922182</string>
+    <!--Banner ad unit-id-->
+    <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383
+    </string>
+    <!-- Splash Screen-->
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="by_continuing">By continuing, you accept the</string>
+    <string name="terms_of_use_heading">This is Terms of Use Heading</string>
+    <string name="splash_app_heading">24hours Life Share</string>
+    <string name="login_with_facebook">Login with Facebook</string>
+
+    <!-- Dummy Data-->
+    <string name="key_to_success">Key to Success: Celebrate failures readers digest</string>
+    <string name="creator_name">Xie Yun</string>
+    <string name="created_time">6 Hours before</string>
+    <string name="view_count">12005</string>
+    <string name="profile_count_login_user">0.8700 HKD</string>
+    <string name="create_post">Title:</string>
+
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="delete_post">Delete Post</string>
+    <string name="user_name">User</string>
+    <string name="total_profit">Total Profit</string>
+    <string name="todays_profit">Todays Profit</string>
+    <string name="this_month_profit">This Month Profit</string>
+    <string name="unreceived_profit">Unreceived Profit</string>
+    <string name="paypal">Paypal</string>
+    <string name="about">About</string>
+    <string name="logout">Logout</string>
+    <string name="setting">Setting</string>
+    <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
+    <string name="post">Post</string>
+    <string name="edit_post">Edit Post</string>
+
+    <!--Toasts to Users-->
+    <string name="please_try_again">Please Try Again</string>
+    <string name="error_occured">Error Occured</string>
+    <!--Create Post Screen -->
+
+    <string name="enter_the_title">Enter the title</string>
+
+
+    <string name="progress_loading">Loading</string>
+    <string name="progress_fetching_images_and_videos">Fetching gallery images &amp; videos</string>
+    <string name="progress_fetching_videos">Fetching gallery videos</string>
+    <string name="progress_fetching_images">Fetching gallery images</string>
+    <string name="posting_feed">Posting Feed...</string>
+    <string name="updating_feed">Updating Feed...</string>
+    <string name="no_more_data">No more data</string>
+    <string name="check_your_internet_connection">Please check your internet connection</string>
+    <string name="deleting_feed">Deleting Feed</string>
+    <string name="please_enter_valid_email">Please enter valid details</string>
+    <string name="sharing_feed">Sharing Feed</string>
+    <string name="share_twitter">Twitter</string>
+    <string name="share_facebook">Facebook</string>
+    <string name="share_email_subject">App24</string>
+    <string name="share_email_native">Mail</string>
+    <string name="share_chooser_text">Share With..</string>
+    <string name="write_a_comment">Write a comment...</string>
+    <string name="post_comment">Post Comment</string>
+    <string name="please_wait">Please wait</string>
+    <string name="feed_saved_successfully">Feed saved successfully!</string>
+    <string name="whats_in_your_mind">Whats in your mind</string>
+    <string name="comment_description">comment description</string>
+    <string name="title">title</string>
+    <string name="just_now">Just now</string>
+</resources>

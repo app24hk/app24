@@ -858,17 +858,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                                                                     getResources().getString(R.string
                                                                             .check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
                                                 }
-//                                                mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, "Unable to create" +
-//                                                                " a feed",
-//                                                        SweetAlertDialog.ERROR_TYPE);
-//                                                mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-//                                                    @Override
-//                                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-//                                                        finish();
-//                                                        Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
-//                                                        startActivity(intent);
-//                                                    }
-//                                                });
                                             }
                                         } catch (Exception e) {
                                             e.printStackTrace();

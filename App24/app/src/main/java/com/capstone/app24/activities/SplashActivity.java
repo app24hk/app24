@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.SpannableString;
@@ -46,6 +47,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -81,7 +83,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
+        Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
         //.............Facebook Integartion...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
@@ -89,6 +91,13 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE, true);
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_VIDEO, true);
         new Utils(this).setPreferences(this, Constants.FETCH_GALLERY_IMAGE_AND_VIDEOS, true);
+
+        Locale locale = new Locale("zh");
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
 
         setContentView(R.layout.activity_splash);
         if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN, false)) {
@@ -105,6 +114,12 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         setClickListeners();
         updateUI();
         //LoginManager.getInstance().logOut();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     private void initialize() {

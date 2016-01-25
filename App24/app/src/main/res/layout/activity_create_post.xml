@@ -77,7 +77,7 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:gravity="left"
-                    android:hint="Whats in your mind"
+                    android:hint="@string/whats_in_your_mind"
                     android:isScrollContainer="true"
                     android:lines="5"
                     android:overScrollMode="ifContentScrolls"
