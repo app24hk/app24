@@ -71,7 +71,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     boolean isFabOpened;
     private RelativeLayout layout_tab_buttons;
     private static RelativeLayout layout;
-    // private RelativeLayout animated_layout;
     InterstitialAd mInterstitialAd;
     private LoginButton fb_btn;
     public static SlidingTabLayout tabs;

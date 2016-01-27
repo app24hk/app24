@@ -28,6 +28,7 @@ dependencies {
     compile files('libs/PayPalAndroidSDK-2.11.2.jar')
     compile files('libs/crittercism_v5_4_0_sdkonly.jar')
     compile files('libs/PayPalAndroidSDK.jar')
+    compile files('libs/commons-lang-2.5.jar')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.android.support:appcompat-v7:21.0.0'

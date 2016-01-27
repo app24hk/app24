@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#EE324A</color>
+    <!--<color name="colorPrimary">#EE324A</color>-->
+    <color name="colorPrimary">#3B5999</color>
     <color name="colorPrimaryDark">#E64A19</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
@@ -11,7 +12,8 @@
     <color name="facebook_button">#E45668</color>
     <color name="text_small_blue">#4F93E0</color>
     <color name="view_color">#BDBDBD</color>
-    <color name="tabsScrollColor">#EE324A</color>
+    <color name="tabsScrollColor">#3B5999</color>
+    <!--<color name="tabsScrollColor">#EE324A</color>-->
     <color name="linear_background">#DDDDDD</color>
     <color name="list_item_color">#F6F6F6</color>
     <!-- Arc Layout -->

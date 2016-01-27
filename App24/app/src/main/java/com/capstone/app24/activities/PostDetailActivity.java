@@ -67,6 +67,7 @@ import com.sromku.simple.fb.listeners.OnPublishListener;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -229,10 +230,10 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 img_video_preview.setOnClickListener(this);
                 img_preview.setOnClickListener(this);
 
-                Uri videoURI = Uri.parse("android.resource://" + getPackageName() + "/"
-                        + R.raw.itcuties);
-                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(this, videoURI);
+//                Uri videoURI = Uri.parse("android.resource://" + getPackageName() + "/"
+//                        + R.raw.itcuties);
+//                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+//                retriever.setDataSource(this, videoURI);
 
                 FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
                         .LayoutParams.MATCH_PARENT, (Utils.getHeight(this) / 2) - 100); // (width,
@@ -242,8 +243,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                         .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                         .into(img_preview);
             }
-            txt_post_title.setText(latestFeedsModel.getTitle());
-            txt_description.setText(latestFeedsModel.getDescription());
+            txt_post_title.setText(StringEscapeUtils.unescapeJava(latestFeedsModel.getTitle()));
+            txt_description.setText(StringEscapeUtils.unescapeJava(latestFeedsModel
+                    .getDescription()));
             txt_seen.setText(latestFeedsModel.getViewcount());
             txt_creator.setText(latestFeedsModel.getUser_name());
             txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(latestFeedsModel.getCreated
@@ -475,7 +477,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         img_video_preview.setOnClickListener(this);
         layout_img_video_preview.setOnClickListener(this);
         comment.setOnClickListener(this);
-    }    @Override
+    }
+
+    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_share:

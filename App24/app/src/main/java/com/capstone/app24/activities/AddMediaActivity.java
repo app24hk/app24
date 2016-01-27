@@ -85,7 +85,8 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_media);
-        setHeader("Add Media", true, false, true, true, false, null);
+        setHeader(getResources().getString(R.string.add_media), true, false, true, true, false,
+                null);
         intent = getIntent();
         if (intent != null) {
             try {

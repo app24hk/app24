@@ -108,7 +108,7 @@ public class SettingsActivity extends BaseActivity {
                 startActivity(intent);
                 break;
             case R.id.layout_logout:
-                AlertToastManager.showToast("Logout ", this);
+                AlertToastManager.showToast(getResources().getString(R.string.logout), this);
                 logout();
                 LoginManager.getInstance().logOut();
 

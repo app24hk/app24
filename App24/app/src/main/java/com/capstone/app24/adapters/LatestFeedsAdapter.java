@@ -31,6 +31,7 @@ import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
 import org.json.JSONException;
+import org.parceler.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -114,8 +115,11 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter<LatestFeedsAdapter.
                     .into(holder.img_preview);
             holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         }
-        holder.txt_feed_heading.setText(latestFeedsModel.getTitle());
-        holder.txt_feed_body.setText(latestFeedsModel.getDescription());
+        holder.txt_feed_heading.setText(StringEscapeUtils.unescapeJava(latestFeedsModel.getTitle()));
+        holder.txt_feed_body.setText(StringEscapeUtils.unescapeJava(latestFeedsModel
+                .getDescription()));
+
+
         holder.txt_creator.setText(latestFeedsModel.getUser_name());
         if (latestFeedsModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
             holder.txt_profile_count_login_user.setText(Constants.EMPTY);

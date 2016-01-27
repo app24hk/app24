@@ -133,4 +133,8 @@
     <string name="comment_description">comment description</string>
     <string name="title">title</string>
     <string name="just_now">Just now</string>
+    <string name="add_media">Add Media</string>
+    <string name="please_add_a_comment">Please add a comment</string>
+    <string name="please_add_a_title">Please add a title</string>
+    <string name="please_add_description">Please add description</string>
 </resources>

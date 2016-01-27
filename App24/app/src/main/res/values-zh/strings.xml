@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">App24</string>
+    <string name="app_name">Feedbook</string>
     <!-- Facebook Data-->
     <!--trigma facebook id-->
     <!--<string name="app_id">1673090976236867</string>-->
@@ -10,66 +10,66 @@
     <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383
     </string>
     <!-- Splash Screen-->
-    <string name="terms_of_use">Terms of Use</string>
-    <string name="by_continuing">By continuing, you accept the</string>
-    <string name="terms_of_use_heading">This is Terms of Use Heading</string>
-    <string name="splash_app_heading">24hours Life Share</string>
-    <string name="login_with_facebook">Login with Facebook</string>
+    <string name="terms_of_use">使用條款</string>
+    <string name="by_continuing">如果繼續，即表示你同意</string>
+    <string name="terms_of_use_heading">使用條款</string>
+    <string name="splash_app_heading">JUST FEED IT</string>
+    <string name="login_with_facebook">使用 Facebook 登入</string>
 
     <!-- Dummy Data-->
-    <string name="key_to_success">Key to Success: Celebrate failures readers digest</string>
-    <string name="creator_name">Xie Yun</string>
-    <string name="created_time">6 Hours before</string>
-    <string name="view_count">12005</string>
-    <string name="profile_count_login_user">0.8700 HKD</string>
-    <string name="create_post">Title:</string>
+    <string name="key_to_success">標題</string>
+    <string name="creator_name">帳戶名稱</string>
+    <string name="created_time">上載日期</string>
+    <string name="view_count">點擊數</string>
+    <string name="profile_count_login_user">0.000 HKD</string>
+    <string name="create_post">標題：</string>
 
-    <string name="edit">Edit</string>
-    <string name="delete">Delete</string>
-    <string name="delete_post">Delete Post</string>
-    <string name="user_name">User</string>
-    <string name="total_profit">Total Profit</string>
-    <string name="todays_profit">Todays Profit</string>
-    <string name="this_month_profit">This Month Profit</string>
-    <string name="unreceived_profit">Unreceived Profit</string>
+    <string name="edit">編輯</string>
+    <string name="delete">刪除</string>
+    <string name="delete_post">刪除 Feed</string>
+    <string name="user_name">帳戶名稱</string>
+    <string name="total_profit">總利潤分成</string>
+    <string name="todays_profit">今日利潤分成</string>
+    <string name="this_month_profit">今月利潤分成</string>
+    <string name="unreceived_profit">未領利潤分成</string>
     <string name="paypal">Paypal</string>
-    <string name="about">About</string>
-    <string name="logout">Logout</string>
-    <string name="setting">Setting</string>
+    <string name="about">關於</string>
+    <string name="logout">登出</string>
+    <string name="setting">設定</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
-    <string name="post">Post</string>
-    <string name="edit_post">Edit Post</string>
+    <string name="post">發佈</string>
+    <string name="edit_post">編輯 Feed</string>
 
     <!--Toasts to Users-->
-    <string name="please_try_again">Please Try Again</string>
-    <string name="error_occured">Error Occured</string>
+    <string name="please_try_again">請再嘗試一次</string>
+    <string name="error_occured">發生錯誤</string>
     <!--Create Post Screen -->
 
-    <string name="enter_the_title">Enter the title</string>
+    <string name="enter_the_title">請輸入標題</string>
 
 
-    <string name="progress_loading">Loading</string>
-    <string name="progress_fetching_images_and_videos">Fetching gallery images &amp; videos</string>
-    <string name="progress_fetching_videos">Fetching gallery videos</string>
-    <string name="progress_fetching_images">Fetching gallery images</string>
-    <string name="posting_feed">Posting Feed...</string>
-    <string name="updating_feed">Updating Feed...</string>
-    <string name="no_more_data">No more data</string>
-    <string name="check_your_internet_connection">Please check your internet connection</string>
-    <string name="deleting_feed">Deleting Feed</string>
-    <string name="please_enter_valid_email">Please enter valid details</string>
-    <string name="sharing_feed">Sharing Feed</string>
-    <string name="share_twitter">Twitter</string>
-    <string name="share_facebook">Facebook</string>
-    <string name="share_email_subject">App24</string>
-    <string name="share_email_native">Mail</string>
-    <string name="share_chooser_text">Share With..</string>
-    <string name="write_a_comment">Write a comment...</string>
-    <string name="post_comment">Post Comment</string>
-    <string name="please_wait">Please wait</string>
-    <string name="feed_saved_successfully">Feed saved successfully!</string>
-    <string name="whats_in_your_mind">Whats in your mind</string>
-    <string name="comment_description">comment description</string>
-    <string name="title">title</string>
-    <string name="just_now">Just now</string>
+    <string name="progress_loading">載入中</string>
+    <string name="progress_fetching_images_and_videos">讀取中</string>
+    <string name="progress_fetching_videos">讀取中</string>
+    <string name="progress_fetching_images">讀取中</string>
+    <string name="posting_feed">Feed 發佈中</string>
+    <string name="updating_feed">Feed 更新中</string>
+    <string name="no_more_data">找不到 Feed</string>
+    <string name="check_your_internet_connection">請檢查您的網絡連線</string>
+    <string name="deleting_feed">刪除 Feed</string>
+    <string name="please_enter_valid_email">請輸入有效的電郵地址</string>
+    <string name="sharing_feed">分享 Feed</string>
+    <string name="share_twitter">使用 Twitter 分享 Feed</string>
+    <string name="share_facebook">使用 Facebook 分享 Feed</string>
+    <string name="share_email_subject">Feedbook</string>
+    <string name="share_email_native">電郵</string>
+    <string name="share_chooser_text">分享至...</string>
+    <string name="write_a_comment">輸入評論</string>
+    <string name="post_comment">發表評論</string>
+    <string name="please_wait">請稍候...</string>
+    <string name="feed_saved_successfully">已儲存</string>
+    <string name="whats_in_your_mind">請輸入內容</string>
+    <string name="comment_description">新增一則評論</string>
+    <string name="title">標題</string>
+    <string name="just_now">剛剛</string>
 </resources>

@@ -28,6 +28,8 @@ import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.TouchImageView;
 import com.capstone.app24.utils.Utils;
 
+import org.parceler.apache.commons.lang.StringEscapeUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,8 +109,9 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
                     .into(holder.img_preview);
             holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         }
-        holder.txt_feed_heading.setText(mostViewedModel.getTitle());
-        holder.txt_feed_body.setText(mostViewedModel.getDescription());
+        holder.txt_feed_heading.setText(StringEscapeUtils.unescapeJava(mostViewedModel.getTitle()));
+        holder.txt_feed_body.setText(StringEscapeUtils.unescapeJava(mostViewedModel
+                .getDescription()));
         holder.txt_creator.setText(mostViewedModel.getUser_name());
         if (mostViewedModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
             holder.txt_profile_count_login_user.setText(Constants.EMPTY);

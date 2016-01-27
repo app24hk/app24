@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.View;
@@ -52,6 +53,7 @@ import com.sromku.simple.fb.listeners.OnPublishListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.apache.commons.lang.StringEscapeUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -194,7 +196,6 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                     @Override
                     public void onResponse(String response) {
                         Utils.debug(TAG, response.toString());
-                        Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
                         res = response.toString();
                         try {
                             setFBFeedData(res);
@@ -238,6 +239,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 Intent intent = new Intent(CreatePostActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
+                Utils.closeSweetProgressDialog(CreatePostActivity.this, mDialog);
 
             }
         });
@@ -593,6 +595,18 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 startActivity(intent);
                 break;
             case R.id.txt_save:
+                if (TextUtils.isEmpty(edit_post_title.getText().toString().trim())){
+                    edit_post_title.setError(getResources().getString(R.string.please_add_a_title));
+                    return;
+                }
+                if (TextUtils.isEmpty(edit_write_post.getText().toString().trim())){
+                    edit_write_post.setError(getResources().getString(R.string
+                            .please_add_description));
+                    return;
+                }
+
+
+
                 if (NetworkUtils.isOnline(this)) {
                     makePostFeedRequest();//postToWall();
                 } else {
@@ -734,8 +748,8 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 }
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_USER_ID, userId);
-                params.put(APIsConstants.KEY_TITLE, title);
-                params.put(APIsConstants.KEY_DESCRIPTION, description);
+                params.put(APIsConstants.KEY_TITLE, StringEscapeUtils.escapeJava(title));
+                params.put(APIsConstants.KEY_DESCRIPTION, StringEscapeUtils.escapeJava(description));
                 if (!mType.equalsIgnoreCase(Constants.KEY_TEXT) || camera_tumb.getChildCount() > 0) {
                     params.put(APIsConstants.KEY_MEDIA, base64);
                 } else {
@@ -895,16 +909,16 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     }
 
     private void setFeedData(String res) throws JSONException {
-        Utils.debug(TAG, "Response : AFTER fEED CREATE " + res);
+        //Utils.debug(TAG, "Response : AFTER fEED CREATE " + res);
         try {
             JSONObject jsonObject = new JSONObject(res);
             if (jsonObject != null) {
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
                     try {
                         Utils.debug(TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-                        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this, jsonObject
-                                .getString(APIsConstants.KEY_MESSAGE), SweetAlertDialog
-                                .SUCCESS_TYPE);
+                        mDialog = Utils.showSweetProgressDialog(CreatePostActivity.this,
+                                getResources().getString(R.string.feed_saved_successfully),
+                                SweetAlertDialog.SUCCESS_TYPE);
                         try {
                             mFeedId = jsonObject.getString(APIsConstants.KEY_FEED_ID);
                         } catch (Exception e) {

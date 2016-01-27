@@ -29,6 +29,7 @@ import com.facebook.HttpMethod;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +82,8 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     //setPaypalDetails();
-                    postComment(edit_write_comment.getText().toString().trim());
+                    postComment(StringEscapeUtils.escapeJava(edit_write_comment.getText()
+                            .toString().trim()));
                     return true;
                 } else {
                     return false;
@@ -120,7 +122,8 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
                                         if (id != null && !id.equalsIgnoreCase(Constants.EMPTY)) {
                                             // getComments(mPostId);
                                             edit_write_comment.setText("");
-                                            edit_write_comment.setHint("Write a comment...");
+                                            edit_write_comment.setHint(getResources().getString(R
+                                                    .string.write_a_comment));
                                             getCommentList();
                                         }
                                     }
@@ -187,7 +190,8 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
                                         CommentModel commentModel = new CommentModel();
                                         commentModel.setCreated_time(object.getString(APIsConstants
                                                 .CREATED_TIME));
-                                        commentModel.setMessage(object.getString(APIsConstants.KEY_MESSAGE));
+                                        commentModel.setMessage(StringEscapeUtils.unescapeJava
+                                                (object.getString(APIsConstants.KEY_MESSAGE)));
                                         commentModel.setComment_id(object.getString(APIsConstants.KEY_ID));
                                         JSONObject fromObject = object.getJSONObject(APIsConstants.KEY_FROM);
                                         commentModel.setName(fromObject.getString(APIsConstants.NAME));
@@ -217,7 +221,8 @@ public class CommentActivity extends BaseActivity implements View.OnClickListene
                 //postComment(edit_write_comment.getText().toString().trim());
                 if (edit_write_comment
                         .getText().toString().trim().equalsIgnoreCase(Constants.EMPTY)) {
-                    edit_write_comment.setError("Please add a comment");
+                    edit_write_comment.setError(getResources().getString(R.string
+                            .please_add_a_comment));
                     return;
                 }
                 if (mPostId != null && !mPostId.equalsIgnoreCase(Constants.EMPTY)) {

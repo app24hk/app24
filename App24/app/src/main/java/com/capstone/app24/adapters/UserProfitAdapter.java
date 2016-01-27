@@ -30,6 +30,7 @@ import com.capstone.app24.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -272,8 +273,9 @@ public class UserProfitAdapter extends RecyclerView.Adapter<UserProfitAdapter.Vi
                     .into(holder.img_preview);
             holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         }
-        holder.txt_feed_heading.setText(userFeedModel.getTitle());
-        holder.txt_feed_body.setText(userFeedModel.getDescription());
+        holder.txt_feed_heading.setText(StringEscapeUtils.unescapeJava(userFeedModel.getTitle()));
+        holder.txt_feed_body.setText(StringEscapeUtils.unescapeJava(userFeedModel.getDescription
+                ()));
         holder.txt_creator.setText(userFeedModel.getUser_name());
         holder.txt_seen.setText(userFeedModel.getViewcount());
         if (userFeedModel.getProfit_amount().equalsIgnoreCase(Constants.ZERO))
