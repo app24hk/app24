@@ -38,7 +38,7 @@
     <string name="setting">Setting</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
     <string name="post">Post</string>
-    <string name="edit_post">Edit Post</string>
+    <string name="edit_post">Save</string>
 
     <!--Toasts to Users-->
     <string name="please_try_again">Please Try Again</string>
@@ -137,4 +137,6 @@
     <string name="please_add_a_comment">Please add a comment</string>
     <string name="please_add_a_title">Please add a title</string>
     <string name="please_add_description">Please add description</string>
+    <string name="cancel">Cancel</string>
+    <string name="search">Search</string>
 </resources>

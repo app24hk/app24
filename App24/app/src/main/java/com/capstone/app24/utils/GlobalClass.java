@@ -56,6 +56,7 @@ public class GlobalClass {
 
         @Override
         public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
         }
 
         @Override

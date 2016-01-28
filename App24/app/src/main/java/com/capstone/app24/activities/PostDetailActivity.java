@@ -483,6 +483,31 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibtn_share:
+                //Working
+//                String s = "183731428649374";
+//                //Utils.debug(TAG, s);
+//
+//                ShareLinkContent content = new ShareLinkContent.Builder()
+//                        .setContentUrl(Uri.parse("https://www.facebook.com/" + s))
+//                        .build();
+//                shareButton.setShareContent(content);
+//                shareButton.performClick();
+//                shareButton.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+//                    @Override
+//                    public void onSuccess(Sharer.Result result) {
+//                        Utils.debug(TAG, "result.getPostId() : " + result.getPostId());
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(FacebookException error) {
+//
+//                    }
+//                });
                 mDialog = Utils.showSweetProgressDialog(PostDetailActivity.this, getResources()
                         .getString(R.string.please_wait), SweetAlertDialog.PROGRESS_TYPE);
                 getSharedUrl(v);

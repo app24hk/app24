@@ -94,6 +94,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
     private String mFeedId = "";
     private String fb_share_url = "";
     private URLSpan[] urls;
+    private Bundle mParams = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -366,6 +367,14 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                             }
                         }, 1000);
 
+//                        mParams.putByteArray("picture", ful_bytes);
+//                        mParams.putString("message", "This is a test picture message");
+////                        mParams.putString("picture", "http://dev614.trigma" +
+////                                ".us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
+//                        mParams.putString("link", "http://dev614.trigma" +
+//                                ".us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
+//                        onPagePost();
+
                     } else if (feedModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
 //                        mDialog = Utils.showSweetProgressDialog(this, "", SweetAlertDialog.PROGRESS_TYPE);
 
@@ -395,6 +404,14 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         try {
                             byte[] ba = bos.toByteArray();
                             base64 = Base64.encodeBytes(ba);
+                            //Working
+//                            mParams.putByteArray("source", ba);
+//                            //   mParams.putByteArray("thumb");
+//                            mParams.putString("message", "This is a test video message");
+//                            mParams.putString("file_url", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_media1453978433_.mp4");
+////                            mParams.putString("link", "http://dev614.trigma" +
+////                                    ".us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
+//                            onPagePostVideos();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -522,6 +539,68 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
     }
 
+    private void onPagePost() {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + MainActivity.pageId + "/photos",
+                mParams,
+                HttpMethod.POST,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                        Utils.debug(TAG, "response.getRawResponse() postFeedOnPage : " + response
+                                .getRawResponse());
+                        JSONObject object = null;
+                        try {
+                            object = response.getJSONObject();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if (object != null) {
+                            try {
+                                String mPageFeedId = object.getString(Constants.KEY_ID);
+                                Utils.debug(TAG, "Page Feed Id : " + mPageFeedId);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            //getAllPageFeeds(pageId);
+                        }
+                    }
+                }
+        ).executeAsync();
+    }
+
+    private void onPagePostVideos() {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + MainActivity.pageId + "/videos",
+                mParams,
+                HttpMethod.POST,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                        Utils.debug(TAG, "response.getRawResponse() postFeedOnPage : " + response
+                                .getRawResponse());
+                        JSONObject object = null;
+                        try {
+                            object = response.getJSONObject();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if (object != null) {
+                            try {
+                                String mPageFeedId = object.getString(Constants.KEY_ID);
+                                Utils.debug(TAG, "Page Feed Id : " + mPageFeedId);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            //getAllPageFeeds(pageId);
+                        }
+                    }
+                }
+        ).executeAsync();
+    }
+
     Bitmap getPreview(Uri uri) {
         File image = new File(uri.getPath());
 
@@ -595,16 +674,15 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                 startActivity(intent);
                 break;
             case R.id.txt_save:
-                if (TextUtils.isEmpty(edit_post_title.getText().toString().trim())){
+                if (TextUtils.isEmpty(edit_post_title.getText().toString().trim())) {
                     edit_post_title.setError(getResources().getString(R.string.please_add_a_title));
                     return;
                 }
-                if (TextUtils.isEmpty(edit_write_post.getText().toString().trim())){
+                if (TextUtils.isEmpty(edit_write_post.getText().toString().trim())) {
                     edit_write_post.setError(getResources().getString(R.string
                             .please_add_description));
                     return;
                 }
-
 
 
                 if (NetworkUtils.isOnline(this)) {

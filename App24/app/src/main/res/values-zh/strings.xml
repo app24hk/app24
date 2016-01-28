@@ -38,7 +38,8 @@
     <string name="setting">設定</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
     <string name="post">發佈</string>
-    <string name="edit_post">編輯 Feed</string>
+    <!--<string name="edit_post">編輯 Feed</string>-->
+    <string name="edit_post">儲存</string>
 
     <!--Toasts to Users-->
     <string name="please_try_again">請再嘗試一次</string>
@@ -72,4 +73,12 @@
     <string name="comment_description">新增一則評論</string>
     <string name="title">標題</string>
     <string name="just_now">剛剛</string>
+    <string name="add_media">上載相片/影片</string>
+    <string name="please_add_a_comment">Please add a comment</string>
+    <string name="please_add_a_title">請輸入標題</string>
+    <string name="please_add_description">請輸入內容</string>
+    <string name="cancel">取消</string>
+    <string name="search">搜尋</string>
+
+
 </resources>

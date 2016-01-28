@@ -30,7 +30,7 @@ public class ProfileActivity extends FragmentActivity implements View.OnClickLis
     private ViewPager pager;
     private SlidingTabLayout tabs;
     ViewPagerAdapterProfile adapter_profile;
-    CharSequence profile_titles[] = {"Users", "Posts"};
+    CharSequence profile_titles[] = {"作者", "標題"};
     ImageButton ibtn_search, ibtn_settings;
 
     private CustomDrawablEditText editSearch;

@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -34,10 +35,18 @@ import com.capstone.app24.interfaces.OnListUpdateListener;
 import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
 import com.capstone.app24.utils.APIsConstants;
+import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.FacebookUtils;
 import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.Utils;
+import com.facebook.AccessToken;
+import com.facebook.FacebookDialog;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.facebook.login.widget.LoginButton;
+import com.facebook.share.model.ShareLinkContent;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -47,10 +56,27 @@ import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+import volley.Request;
+import volley.VolleyError;
+import volley.VolleyLog;
+import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 3/11/15.
@@ -85,6 +111,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     OnPublishListener onPublishListener;
     private ArrayList<UserFeedModel> userFeedList = new ArrayList<>();
     private static TextView txt_profile_header;
+    public static final String pageId = "103197256730126";
+    private String mPageFeedId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -350,11 +378,28 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         } else {
             showMenu();
         }
-        TimeZone tz = TimeZone.getDefault();
-        Utils.debug("timezone", "TimeZone   " + tz.getDisplayName(false, TimeZone.SHORT) + " " +
-                "Timezon id :: "
-                + tz
-                .getID());
+//        TimeZone tz = TimeZone.getDefault();
+//        Utils.debug("timezone", "TimeZone   " + tz.getDisplayName(false, TimeZone.SHORT) + " " +
+//                "Timezon id :: "
+//                + tz
+//                .getID());
+
+//        Working
+        //postFeedOnPage();
+
+
+        //parsePageContent();
+        //Post id  on Page : 183731428649374
+        //postFeedOnPage();
+        //working
+//        getPageFeeds("103197256730126_183731428649374");
+
+//        String s = "183731428649374";
+//        //Utils.debug(TAG, s);
+//
+//        ShareLinkContent content = new ShareLinkContent.Builder()
+//                .setContentUrl(Uri.parse("https://developers.facebook.com/" + s))
+//                .build();
 
         if (v.isSelected()) {
             btn_app_24.setImageResource(R.drawable.app_button);
@@ -364,6 +409,101 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             isFabOpened = true;
         }
         v.setSelected(!v.isSelected());
+    }
+
+    private void getPageFeeds(String postId) {
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + postId,
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        Utils.debug(TAG, "response : " + response.getRawResponse());
+            /* handle the result */
+                    }
+                }
+        ).executeAsync();
+    }
+
+
+    private boolean parsePageContent() {
+        try {
+            // String OWNER_OF_FEED = "feedbook.hk";
+
+//            HttpClient client = new DefaultHttpClient();
+//            HttpGet get = new HttpGet("https://graph.facebook.com/me?access_token=" + AccessToken
+//                    .getCurrentAccessToken().getToken());
+
+            //  ResponseHandler<String> responseHandler = new BasicResponseHandler();
+
+            // String access_token = client.execute(get, responseHandler);
+            // Utils.debug(TAG, "Response from FB PAGE access_token : " + access_token);
+//            JSONObject object = new JSONObject(access_token);
+            postFeedOnPage();
+            //textview.setText(responseBody);
+//            TextView txtv = (TextView) findViewById(R.id.feed);
+//            txtv.setText(String.valueOf(responseBody));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+
+
+    }
+
+    private void postFeedOnPage() {
+        Bundle params = new Bundle();
+        params.putString("message", "This is a test from abhi");
+        params.putString("picture", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
+        params.putString("link", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
+
+/* make the API call */
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + pageId + "/feed",
+                params,
+                HttpMethod.POST,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                        Utils.debug(TAG, "response.getRawResponse() postFeedOnPage : " + response
+                                .getRawResponse());
+                        JSONObject object = null;
+                        try {
+                            object = response.getJSONObject();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        if (object != null) {
+                            try {
+                                mPageFeedId = object.getString(Constants.KEY_ID);
+                                Utils.debug(TAG, "Page Feed Id : " + mPageFeedId);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            getAllPageFeeds(pageId);
+                        }
+                    }
+                }
+        ).executeAsync();
+    }
+
+    private void getAllPageFeeds(String pageId) {
+        /* make the API call */
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/" + pageId + "/feed",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+            /* handle the result */
+                        Utils.debug(TAG, "response.getRawResponse() getAllPageFeeds : " + response
+                                .getRawResponse());
+                    }
+                }
+        ).executeAsync();
     }
 
     private void showToast(Button btn) {

@@ -27,7 +27,7 @@ public class HomeFragment extends Fragment {
     View mView;
     private static ViewPager pager;
     ViewPagerAdapterHome adapter_home;
-    CharSequence home_titles[] = {"Latest", "Most Viewed"};
+    CharSequence home_titles[] = {"最新", "最熱"};
     SweetAlertDialog dialog;
     private Timer timer;
     final Handler handler = new Handler();
@@ -104,9 +104,7 @@ public class HomeFragment extends Fragment {
         return pager;
     }
 
-    private void setClickListeners() {
-
-    }
+    private void setClickListeners() {}
 
     @Override
     public void onPause() {
