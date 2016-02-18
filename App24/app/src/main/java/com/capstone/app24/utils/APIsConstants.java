@@ -89,4 +89,5 @@ public class APIsConstants {
     public static final String KEY_FINISH = "finish";
     public static final String KEY_START = "start";
     public static final String KEY_FILE_SIZE = "file_size";
+    public static final String KEY_TIME = "time";
 }

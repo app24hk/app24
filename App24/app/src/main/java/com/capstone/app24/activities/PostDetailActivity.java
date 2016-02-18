@@ -107,6 +107,7 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     private String s;
     private String url;
     private boolean isFromListActivity = false;
+    private boolean isFeedWithin24Hours;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -509,7 +510,13 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                 edit_menu.setVisibility(View.GONE);
                 //AlertToastManager.showToast("Delete", this);
                 if (NetworkUtils.isOnline(this)) {
-                    deleteFeed();
+                    if (isFeedWithin24Hours) {
+                        deleteFeed();
+                    } else {
+                        Utils.showSweetProgressDialog(this, getResources().getString(R.string
+                                .cannot_delete_this_feed), SweetAlertDialog.ERROR_TYPE);
+
+                    }
                 } else {
                     Utils.showSweetProgressDialog(this, getResources().getString(R.string
                             .check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
@@ -883,6 +890,18 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
                             }
                             try {
                                 mOwnerDataModel.setThumbnail(object.getString(APIsConstants.KEY_PROFIT_AMOUNT));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                String feed24 = object.getString(APIsConstants
+                                        .KEY_TIME);
+                                if (feed24.equalsIgnoreCase("0")) {
+                                    isFeedWithin24Hours = true;
+                                } else if (feed24.equalsIgnoreCase("1")) {
+                                    isFeedWithin24Hours = false;
+                                }
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

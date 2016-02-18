@@ -155,6 +155,7 @@
     <string name="you_cant_share_this_feed">You can\'t share your own feed!</string>
     <string name="paypal_info_updated_successfully">Paypal Info updated successfully!</string>
     <string name="delete_successfully">Feed delete successfully!</string>
+    <string name="cannot_delete_this_feed">Can\'t delete this feed!</string>
 
 
 </resources>
