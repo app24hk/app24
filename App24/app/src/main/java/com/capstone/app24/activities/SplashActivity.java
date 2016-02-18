@@ -8,6 +8,7 @@ import android.content.pm.Signature;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Base64;
@@ -64,27 +65,26 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     private static final String TAG = SplashActivity.class.getSimpleName();
     private TextView txt_terms_of_use;
     private Button btn_login_with_facebook;
-    // List<String> permissions = new ArrayList<String>();
     private LoginButton fb_btn;
 
     CallbackManager callbackManager;
     AccessToken accessToken;
-    //private RestAdapter mRestAdapter;
     private UserLoginModel userModel;
     private UserLoginResponseModel mUserBeanResponse;
     private SweetAlertDialog mDialog;
 
     /* Volley Request Tags */
     private String res = "";
-    private String tag_string_req = "feeds_req";
     private AccessTokenTracker mAccessTokenTracker;
+    private String mAccessToken;
+    private String mAndroidDeviceId = null;
     /* End of Volley Request Tags */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Crittercism.initialize(getApplicationContext(), Constants.CRITTERCISM_APP_ID);
-        //.............Facebook Integartion...............
+        //.............Facebook SDK Initialization...............
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
@@ -98,7 +98,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         config.locale = locale;
         getBaseContext().getResources().updateConfiguration(config,
                 getBaseContext().getResources().getDisplayMetrics());
-
         setContentView(R.layout.activity_splash);
         if (new Utils(this).getSharedPreferences(this, Constants.KEY_IS_LOGGED_IN, false)) {
             Utils.debug("accessToken", "AccessToken.getCurrentAccessToken() : " + AccessToken.getCurrentAccessToken());
@@ -113,7 +112,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         initialize();
         setClickListeners();
         updateUI();
-        //LoginManager.getInstance().logOut();
     }
 
     @Override
@@ -128,26 +126,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         btn_login_with_facebook = (Button) findViewById(R.id.btn_login_with_facebook);
         fb_btn = (LoginButton) findViewById(R.id.login_button);
         getKeyHash();
-//        permissions.add("public_profile");
-//        permissions.add("email");
-//        permissions.add("user_birthday");
-//        permissions.add("publish_actions");
-
-      /*//Facebook Button Initialization
-        fb_btn.setReadPermissions(permissions);
-
-
-        fb_btn.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-        fb_btn.setCompoundDrawablePadding(0);
-        fb_btn.setPadding(0, 0, 0, 0);
-        fb_btn.setText("");
-        fb_btn.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-        fb_btn.setBackgroundResource(R.drawable.facebook);*/
-
-
         facebookIntegration();
-
-
     }
 
     private void setClickListeners() {
@@ -182,14 +161,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 break;
 
             case R.id.btn_login_with_facebook:
-             /*   mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R.string
-                        .progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-                loginFacebook();*/
-                //finish();
-                // intent = new Intent(SplashActivity.this, MainActivity.class);
-                //startActivity(intent);
-                //finish();
-                final SweetAlertDialog pd = Utils.showSweetProgressDialog(SplashActivity.this,
+                mDialog = Utils.showSweetProgressDialog(SplashActivity.this,
                         getResources
                                 ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
                 fb_btn.performClick();
@@ -199,113 +171,14 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    //------------------------------Facebook SignIn or SignUp---------------------
+    /**
+     * Facebook Integration and Login Response. get AccessToken and user details. These details
+     * sent to web services for User register
+     */
     public void facebookIntegration() {
+        //fb_btn.setPublishPermissions(Arrays.asList("publish_pages,manage_pages"));
         fb_btn.setReadPermissions(Arrays.asList("public_profile, email, user_birthday," +
-                "user_friends"));
-//        fb_btn.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//            @Override
-//            public void onSuccess(LoginResult loginResult) {
-//
-//                accessToken = loginResult.getAccessToken();
-//                Utils.debug(TAG, "accessToken : " + accessToken);
-//                Utils.debug(TAG, "accessToken : " + accessToken.getToken());
-//                Utils.debug(TAG, "accessToken : " + accessToken.getPermissions());
-//                //
-//                Date date = AccessToken.getCurrentAccessToken().getExpires();
-//                Utils.debug(TAG, "Date of expire token" + date);
-//                //Utils.debug(TAG, "accessToken : " + accessToken);
-//                Utils.debug(TAG, "Access Token after set: " + AccessToken.getCurrentAccessToken());
-//
-//                GraphRequest request = GraphRequest.newMeRequest(
-//                        loginResult.getAccessToken(),
-//                        new GraphRequest.GraphJSONObjectCallback() {
-//                            @Override
-//                            public void onCompleted(
-//                                    JSONObject object,
-//                                    GraphResponse response) {
-//                                // Application code
-//                                Log.v("Facebook User Detail : ", response.toString());
-//                                Log.v("Facebook  Detail : ", response.getJSONObject().toString());
-//                                // if(!response.toString().isEmpty()){
-//                                try {
-//                                    JSONObject jsonObject = response.getJSONObject();
-//
-//                                    String email = "", username, pictureobj, url, facebookid = "", last_name = "",
-//                                            first_name = "", gender = "";
-//
-//
-//                                    Log.v("Facebook  Detail sec : ", jsonObject.toString());
-//                                    if (jsonObject.has(Constants.KEY_LAST_NAME)) {
-//                                        last_name = jsonObject.getString(Constants.KEY_LAST_NAME);
-//                                    }
-//                                    if (jsonObject.has(Constants.KEY_ID)) {
-//                                        facebookid = jsonObject.getString(Constants.KEY_ID);
-//                                    }
-//                                    if (jsonObject.has(Constants.KEY_GENDER)) {
-//                                        gender = jsonObject.getString(Constants.KEY_GENDER);
-//                                    }
-//                                    if (jsonObject.has(Constants.KEY_FIRST_NAME)) {
-//                                        first_name = jsonObject.getString(Constants.KEY_FIRST_NAME);
-//                                    }
-//                                    if (jsonObject.has(Constants.KEY_EMAIL)) {
-//                                        email = jsonObject.getString(Constants.KEY_EMAIL);
-//                                    }
-//                                    if (jsonObject.has(Constants.KEY_NAME)) {
-//                                        username = jsonObject.getString(Constants.KEY_NAME);
-//                                    }
-//
-//                                    URL image_value = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=large");
-//                                    URL image_small = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=small");
-//                                    pictureobj = image_value.toString();
-//                                    String pictureObjSmall = image_small.toString();
-//                                    Utils.debug(TAG, "pictureobj : " + pictureobj);
-//                                    Utils.debug(TAG, "pictureObjSmall : " + pictureObjSmall);
-//                                    new Utils(SplashActivity.this).setPreferences
-//                                            (SplashActivity.this, Constants.FB_IMAGE_SMALL, pictureobj);
-//                                    userModel = new UserLoginModel(facebookid, email,
-//                                            first_name, last_name, gender, Constants
-//                                            .ANDROID,
-//                                            accessToken + "", Constants.FACEBOOK);
-//                                } catch (Exception ex) {
-//                                    ex.printStackTrace();
-//                                }
-//
-////                                            MyAsyncTask task = new MyAsyncTask();
-////                                            task.setListener(SplashActivity.this);
-////                                            task.execute();
-//                                //makeUserLoginRequest();
-//                                if (NetworkUtils.isOnline(SplashActivity.this)) {
-//                                    makeUserLoginRequest();
-//                                } else {
-//                                    Utils.showSweetProgressDialog(SplashActivity.this,
-//                                            getResources().getString(R.string
-//                                                    .check_your_internet_connection),
-//                                            SweetAlertDialog.ERROR_TYPE);
-//                                }
-//                            }
-//                        });
-//                Bundle parameters = new Bundle();
-//                parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
-//                request.setParameters(parameters);
-//                request.executeAsync();
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//                AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
-//                        SplashActivity
-//                                .this);
-//                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
-//            }
-//
-//            @Override
-//            public void onError(FacebookException e) {
-//                AlertToastManager.showToast(getResources().getString(R.string
-//                        .error_occured), SplashActivity.this);
-//                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
-//            }
-//        });
+                "user_friends,publish_pages,publish_actions"));
 
         LoginManager.getInstance().registerCallback(callbackManager,
                 new FacebookCallback<LoginResult>() {
@@ -316,12 +189,8 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                         Utils.debug(TAG, "accessToken : " + accessToken);
                         Utils.debug(TAG, "accessToken : " + accessToken.getToken());
                         Utils.debug(TAG, "accessToken : " + accessToken.getPermissions());
-                        //
-                        Date date = AccessToken.getCurrentAccessToken().getExpires();
-                        Utils.debug(TAG, "Date of expire token" + date);
-                        //Utils.debug(TAG, "accessToken : " + accessToken);
-                        Utils.debug(TAG, "Access Token after set: " + AccessToken.getCurrentAccessToken());
-
+                        new Utils().setPreferences(SplashActivity.this, Constants.KEY_FACEBOOK_ACCESS_TOKEN,
+                                accessToken + ""); //
                         GraphRequest request = GraphRequest.newMeRequest(
                                 loginResult.getAccessToken(),
                                 new GraphRequest.GraphJSONObjectCallback() {
@@ -330,17 +199,13 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                             JSONObject object,
                                             GraphResponse response) {
                                         // Application code
-                                        Log.v("Facebook User Detail : ", response.toString());
-                                        Log.v("Facebook  Detail : ", response.getJSONObject().toString());
-                                        // if(!response.toString().isEmpty()){
+                                        Utils.debug(TAG, response.getJSONObject()
+                                                .toString());
                                         try {
                                             JSONObject jsonObject = response.getJSONObject();
 
                                             String email = "", username, pictureobj, url, facebookid = "", last_name = "",
                                                     first_name = "", gender = "";
-
-
-                                            Log.v("Facebook  Detail sec : ", jsonObject.toString());
                                             if (jsonObject.has(Constants.KEY_LAST_NAME)) {
                                                 last_name = jsonObject.getString(Constants.KEY_LAST_NAME);
                                             }
@@ -361,33 +226,33 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                                             }
 
                                             URL image_value = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=large");
-                                            URL image_small = new URL("https://graph.facebook.com/" + facebookid + "/picture?type=small");
                                             pictureobj = image_value.toString();
-                                            String pictureObjSmall = image_small.toString();
                                             Utils.debug(TAG, "pictureobj : " + pictureobj);
-                                            Utils.debug(TAG, "pictureObjSmall : " + pictureObjSmall);
+                                            mAndroidDeviceId = Settings.Secure.getString
+                                                    (getContentResolver(),
+                                                            Settings.Secure.ANDROID_ID);
+                                            Utils.debug(TAG, "" + mAndroidDeviceId);
+                                            //Saving Profile picture
                                             new Utils(SplashActivity.this).setPreferences
                                                     (SplashActivity.this, Constants.FB_IMAGE_SMALL, pictureobj);
+
                                             userModel = new UserLoginModel(facebookid, email,
-                                                    first_name, last_name, gender, Constants
-                                                    .ANDROID,
-                                                    accessToken + "", Constants.FACEBOOK);
+                                                    first_name, last_name, gender, Constants.ANDROID,
+                                                    mAndroidDeviceId, Constants.FACEBOOK);
+
+                                            //Register user to Server
+                                            if (NetworkUtils.isOnline(SplashActivity.this)) {
+                                                makeUserLoginRequest();
+                                            } else {
+                                                Utils.showSweetProgressDialog(SplashActivity.this,
+                                                        getResources().getString(R.string
+                                                                .check_your_internet_connection),
+                                                        SweetAlertDialog.ERROR_TYPE);
+                                            }
                                         } catch (Exception ex) {
                                             ex.printStackTrace();
                                         }
 
-//                                            MyAsyncTask task = new MyAsyncTask();
-//                                            task.setListener(SplashActivity.this);
-//                                            task.execute();
-                                        //makeUserLoginRequest();
-                                        if (NetworkUtils.isOnline(SplashActivity.this)) {
-                                            makeUserLoginRequest();
-                                        } else {
-                                            Utils.showSweetProgressDialog(SplashActivity.this,
-                                                    getResources().getString(R.string
-                                                            .check_your_internet_connection),
-                                                    SweetAlertDialog.ERROR_TYPE);
-                                        }
                                     }
                                 });
                         Bundle parameters = new Bundle();
@@ -400,7 +265,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                     @Override
                     public void onCancel() {
                         // App code
-
                         AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
                                 SplashActivity
                                         .this);
@@ -423,81 +287,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    //Facebook Login
-//    private void loginFacebook() {
-//
-//        fb_btn.registerCallback(callbackManager,
-//                new FacebookCallback<LoginResult>() {
-//                    @Override
-//                    public void onSuccess(LoginResult loginResult) {
-//                        accessToken = loginResult.getAccessToken();
-//                        btn_login_with_facebook.setOnClickListener(null);
-//                        Utils.debug("accesstoken", loginResult.getAccessToken() + "");
-//                        GraphRequest request = GraphRequest.newMeRequest(
-//                                loginResult.getAccessToken(),
-//                                new GraphRequest.GraphJSONObjectCallback() {
-//                                    @Override
-//                                    public void onCompleted(
-//                                            JSONObject object,
-//                                            GraphResponse response) {
-//                                        // Application code
-//                                        Utils.debug("Facebook User Detail ", response
-//                                                .getJSONObject().toString());
-//                                        try {
-//                                            JSONObject obj = response.getJSONObject();
-//                                            String email = obj.getString(Constants.KEY_EMAIL);
-//
-//                                            String username = obj.getString(Constants.KEY_NAME);
-//                                            JSONObject pictureobj = obj.getJSONObject(Constants.KEY_PICTURE)
-//                                                    .getJSONObject(Constants.KEY_DATA);
-//                                            String url = pictureobj.getString(Constants.KEY_URL);
-//
-//                                            String facebookid = obj.getString(Constants.KEY_ID);
-//                                            String last_name = obj.getString(Constants.KEY_LAST_NAME);
-//                                            String first_name = obj.getString(Constants
-//                                                    .KEY_FIRST_NAME);
-//                                            String gender = obj.getString(Constants.KEY_GENDER);
-//                                            userModel = new UserLoginModel(facebookid, email,
-//                                                    first_name, last_name, gender, Constants
-//                                                    .ANDROID,
-//                                                    /*accessToken + ""*/"abcdefgh", Constants
-//                                                    .FACEBOOK);
-////                                            MyAsyncTask task = new MyAsyncTask();
-////                                            task.setListener(SplashActivity.this);
-////                                            task.execute();
-//                                            makeUserLoginRequest();
-//
-//                                        } catch (Exception e) {
-//                                            Utils.debug("error", e.getMessage());
-//                                            e.printStackTrace();
-//                                        }
-//
-//
-//                                    }
-//                                });
-//                        Bundle parameters = new Bundle();
-//                        parameters.putString("fields", "id,name,first_name,last_name,email,gender, birthday,picture");
-//                        request.setParameters(parameters);
-//                        request.executeAsync();
-//
-//                    }
-//
-//                    @Override
-//                    public void onCancel() {
-//                        AlertToastManager.showToast(getResources().getString(R.string.please_try_again),
-//                                SplashActivity
-//                                        .this);
-//                        Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
-//                    }
-//
-//                    @Override
-//                    public void onError(FacebookException e) {
-//                        AlertToastManager.showToast(getResources().getString(R.string
-//                                .error_occured), SplashActivity.this);
-//                        Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
-//                    }
-//                });
-//    }
 
     public void getKeyHash() {
         try {
@@ -523,8 +312,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
          If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
          it will show (Searching...)
          */
-        Utils.debug(TAG, "Inside On makeLogin");
-
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_FACEBOOK_LOGIN,
                 new volley.Response.Listener<String>() {
@@ -550,16 +337,15 @@ public class SplashActivity extends Activity implements View.OnClickListener {
         }) {
             @Override
             protected Map<String, String> getParams() {
-//                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("user_social_id", userModel.getUser_social_id());
-                params.put("user_email", userModel.getUser_email());
-                params.put("user_fname", userModel.getUser_fname());
-                params.put("user_lname", userModel.getUser_lname());
-                params.put("user_gender", userModel.getUser_gender());
-                params.put("user_deviceType", userModel.getUser_deviceType());
-                params.put("user_deviceToken", userModel.getUser_deviceToken());
-                params.put("user_loginType", Constants.FACEBOOK);
+                params.put(APIsConstants.KEY_USER_SOCIAL_ID, userModel.getUser_social_id());
+                params.put(APIsConstants.KEY_USER_EMAIL, userModel.getUser_email());
+                params.put(APIsConstants.KEY_USER_FNAME, userModel.getUser_fname());
+                params.put(APIsConstants.KEY_USER_LNAME, userModel.getUser_lname());
+                params.put(APIsConstants.KEY_USER_GENDER, userModel.getUser_gender());
+                params.put(APIsConstants.KEY_USER_DEVICE_TYPE, userModel.getUser_deviceType());
+                params.put(APIsConstants.KEY_USER_DEVICE_TOKEN, userModel.getUser_deviceToken());
+                params.put(APIsConstants.KEY_USER_LOGINTYPE, Constants.FACEBOOK);
                 Utils.info("params...", params.toString());
                 return params;
             }
@@ -570,19 +356,6 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     }
 
     private void setUserData(String res) throws JSONException {
-//        {
-//            "result": true,
-//                "userInfo": {
-//                    "user_id": "1",
-//                    "user_email": "er.amrit13@gmail.com",
-//                    "user_fname": "Er",
-//                    "user_lname": "Amrit",
-//                    "user_gender": "male",
-//                    "user_name": "Er Amrit",
-//                    "user_loginType": "facebook",
-//                    "user_social_id": "994613123922505"
-//        }
-//        }
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
             JSONObject userInfoObject;
@@ -620,8 +393,9 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 e.printStackTrace();
             }
             try {
-//                mUserBeanResponse.setUser_name(userInfoObject.getString(APIsConstants.KEY_USER_NAME));
-                mUserBeanResponse.setUser_name(userInfoObject.getString(APIsConstants.KEY_USER_FNAME));
+                mUserBeanResponse.setUser_name(userInfoObject.getString(APIsConstants.KEY_USER_NAME));
+                new Utils().setPreferences(SplashActivity.this, Constants.KEY_USER_NAME,
+                        userInfoObject.getString(APIsConstants.KEY_USER_NAME));
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -647,18 +421,24 @@ public class SplashActivity extends Activity implements View.OnClickListener {
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_USER_DETAILS,
                         mUserBeanResponse.getUser_id());
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_USER_NAME,
-                        mUserBeanResponse.getUser_fname() + " " + mUserBeanResponse.getUser_lname());
+                        mUserBeanResponse.getUser_name());
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_FACEBOOK_ACCESS_TOKEN,
-                        accessToken + "");
+                        mAndroidDeviceId);
                 new Utils().setPreferences(SplashActivity.this, Constants.KEY_FACEBOOK_ID,
                         mUserBeanResponse.getUser_social_id());
-
                 Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
                 finish();
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                 startActivity(intent);
             } else {
+                Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
             }
+            Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
+        } else if (jsonObject.has(Constants.LOGGED_IN)) {
+            LoginManager.getInstance().logOut();
+            mDialog = Utils.showSweetProgressDialog(this, jsonObject.getString(APIsConstants
+                            .KEY_MESSAGE),
+                    SweetAlertDialog.ERROR_TYPE);
 
         } else {
             try {
@@ -670,9 +450,10 @@ public class SplashActivity extends Activity implements View.OnClickListener {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
         }
 
-        Utils.closeSweetProgressDialog(SplashActivity.this, mDialog);
     }
+
 
 }

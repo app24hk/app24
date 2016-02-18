@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="@dimen/main_screen_padding">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/main_screen_padding">
     <RelativeLayout
         android:id="@+id/xtra_layout"
         android:layout_width="match_parent"
@@ -11,113 +12,112 @@
         android:visibility="gone">
     </RelativeLayout>
     <RelativeLayout
-        android:id="@+id/layout_heading"
+        android:id="@+id/main_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/xtra_layout">
-
-        <TextView
-            android:id="@+id/txt_feed_heading"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:maxLines="2"
-            android:text="@string/chinese_lorem_ipsum_title"
-            android:textColor="@color/black"
-            android:textSize="@dimen/feed_heading_text"
-            android:textStyle="bold"/>
-
-    </RelativeLayout>
-
-
-    <RelativeLayout
-        android:id="@+id/layout_feed_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_heading"
-        android:layout_marginTop="10dp"
-        android:paddingRight="@dimen/main_screen_padding">
-
-        <TextView
-            android:id="@+id/txt_creator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="@string/creator_name"
-            android:textColor="@color/text_small_blue"/>
-
-        <TextView
-            android:id="@+id/txt_created_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/txt_creator"
-            android:paddingLeft="5dp"
-            android:text="@string/created_time"
-            android:textColor="@color/text_small_blue"/>
-
-        <TextView
-            android:id="@+id/txt_profile_count_login_user"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:paddingBottom="10dp"
-            android:text="@string/profile_count_login_user"
-            android:textColor="@color/text_small_blue"/>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/layout_feed_body"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_feed_details"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
         <RelativeLayout
+            android:id="@+id/layout_heading"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            android:layout_height="wrap_content">
+
             <TextView
-                android:id="@+id/txt_feed_body"
+                android:id="@+id/txt_feed_heading"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center_vertical|left"
-                android:lineSpacingMultiplier="1.2"
-                android:maxLines="5"
-                android:text="@string/chinese_lorem_ipsum"
-                android:textSize="@dimen/feed_body_text"/>
+                android:layout_height="wrap_content"
+                android:maxLines="2"
+                android:text="@string/chinese_lorem_ipsum_title"
+                android:textColor="@color/black"
+                android:textSize="@dimen/feed_heading_text"
+                android:textStyle="bold"/>
+
         </RelativeLayout>
+
+
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1.2"
-            android:gravity="center">
+            android:id="@+id/layout_feed_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_heading"
+            android:layout_marginTop="10dp"
+            android:paddingRight="@dimen/main_screen_padding">
 
-            <FrameLayout
-                android:id="@+id/progress_dialog"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <TextView
+                android:id="@+id/txt_creator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/creator_name"
+                android:textColor="@color/text_small_blue"/>
 
-                <ProgressBar android:layout_width="wrap_content"
-                             android:layout_height="wrap_content"
-                             android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/txt_created_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/txt_creator"
+                android:paddingLeft="5dp"
+                android:text="@string/created_time"
+                android:textColor="@color/text_small_blue"/>
+
+            <TextView
+                android:id="@+id/txt_profile_count_login_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:paddingBottom="10dp"
+                android:text="@string/profile_count_login_user"
+                android:textColor="@color/text_small_blue"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_feed_body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_feed_details"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/txt_feed_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:gravity="center_vertical|left"
+                    android:lineSpacingMultiplier="1.2"
+                    android:maxLines="5"
+                    android:text="@string/chinese_lorem_ipsum"
+                    android:textSize="@dimen/feed_body_text"/>
+            </RelativeLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/progress_dialog_layout"
+                android:layout_width="0dp"
+                android:layout_height="120dp"
+                android:layout_marginLeft="10dp"
+                android:layout_weight=".8"
+                android:gravity="center">
+
+
+                <ProgressBar
+                    android:id="@+id/progress_dialog"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"/>
 
                 <ImageView
                     android:id="@+id/img_preview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
                     />
-            </FrameLayout>
 
 
-            <RelativeLayout
-                android:id="@+id/layout_img_video_preview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true">
                 <!--<VideoView-->
                 <!--android:id="@+id/video"-->
                 <!--android:layout_width="match_parent"-->
@@ -135,24 +135,24 @@
 
 
             </RelativeLayout>
-        </RelativeLayout>
-    </LinearLayout>
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/txt_seen"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/layout_feed_body"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:drawableLeft="@drawable/seen"
-        android:drawablePadding="5dp"
-        android:text="3,027"
-        android:textSize="12dp"/>
+        <TextView
+            android:id="@+id/txt_seen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_feed_body"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:drawableLeft="@drawable/seen"
+            android:drawablePadding="5dp"
+            android:text="3,027"
+            android:textSize="12dp"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/txt_seen"
-        android:background="@color/view_color"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/txt_seen"
+            android:background="@color/view_color"/>
+    </RelativeLayout>
 </RelativeLayout>

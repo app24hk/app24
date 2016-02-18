@@ -4,13 +4,9 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -28,55 +24,24 @@ import android.widget.Toast;
 
 import com.capstone.app24.R;
 import com.capstone.app24.animations.AnimatorUtils;
-import com.capstone.app24.bean.UserFeedModel;
 import com.capstone.app24.fragments.HomeFragment;
 import com.capstone.app24.fragments.UserProfileDetailsFragment;
-import com.capstone.app24.interfaces.OnListUpdateListener;
-import com.capstone.app24.receiver.AlarmReceiver;
 import com.capstone.app24.sliding_tabs.SlidingTabLayout;
-import com.capstone.app24.utils.APIsConstants;
-import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
-import com.capstone.app24.utils.FacebookUtils;
 import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.Utils;
 import com.facebook.AccessToken;
-import com.facebook.FacebookDialog;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
 import com.facebook.login.widget.LoginButton;
-import com.facebook.share.model.ShareLinkContent;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.ogaclejapan.arclayout.ArcLayout;
-import com.sromku.simple.fb.Permission;
-import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.SimpleFacebookConfiguration;
-import com.sromku.simple.fb.listeners.OnPublishListener;
-
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
-import volley.Request;
-import volley.VolleyError;
-import volley.VolleyLog;
-import volley.toolbox.StringRequest;
 
 /**
  * Created by amritpal on 3/11/15.
@@ -95,24 +60,18 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     UserProfileDetailsFragment userProfileDetailsFragment;
     private FragmentManager manager;
     boolean isFabOpened;
-    private RelativeLayout layout_tab_buttons;
     private static RelativeLayout layout;
-    InterstitialAd mInterstitialAd;
+    public InterstitialAd mInterstitialAd;
     private LoginButton fb_btn;
     public static SlidingTabLayout tabs;
     public static RelativeLayout layout_user_profle;
     private ImageButton ibtn_setting, ibtn_search;
 
     //Setting Alarm
-    private AlarmManager alarmMgr;
-    private PendingIntent alarmIntent;
-    private Bitmap mIcon_val;
-    private SimpleFacebook mSimpleFacebook;
-    OnPublishListener onPublishListener;
-    private ArrayList<UserFeedModel> userFeedList = new ArrayList<>();
     private static TextView txt_profile_header;
     public static final String pageId = "103197256730126";
     private String mPageFeedId;
+    private CountDownTimer counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,38 +79,30 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         setContentView(R.layout.activity_main);
         fb_btn = (LoginButton) findViewById(R.id.login_button);
         initializeViews();
-        mSimpleFacebook = SimpleFacebook.getInstance(this);
-        Permission[] permissions = new Permission[]{
-                Permission.USER_PHOTOS,
-                Permission.EMAIL,
-                Permission.PUBLISH_ACTION
-        };
-
-        SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
-                .setAppId("1673090976236867")
-                .setNamespace("com_capstone_app")
-                .setPermissions(permissions)
-                .build();
-        SimpleFacebook.setConfiguration(configuration);
-
-
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
 
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdClosed() {
-                requestNewInterstitial();
-                beginPlayingGame();
-            }
-        });
-        requestNewInterstitial();
         setClickListeners();
         setHomeFragment();
-        //mInterstitialAd.show();
-        // registerReceiver(AlarmReceiver.getInstance(),)
-        setAlarm();
+    }
 
+
+    private void setAd() {
+        counter = new CountDownTimer(2 * 60 * 1000, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+//                Utils.debug("timer", "onTick()");
+                long l = millisUntilFinished / 1000;
+//                Utils.debug("timer", l + " min");
+            }
+
+            public void onFinish() {
+//                Utils.debug("timer", "onFinish()");
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                }
+            }
+        };
     }
 
     private void beginPlayingGame() {
@@ -171,6 +122,21 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onResume() {
         super.onResume();
+//        Utils.debug("timer", "onResume()");
+        setAd();
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                requestNewInterstitial();
+                beginPlayingGame();
+//                Utils.debug("timer", "onAdClosed()");
+                //counter.start();
+            }
+        });
+        requestNewInterstitial();
+        counter.start();
+
     }
 
     /**
@@ -184,7 +150,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         btn_home.setOnTouchListener(this);
         ibtn_setting.setOnClickListener(this);
         ibtn_search.setOnClickListener(this);
-
     }
 
     /**
@@ -220,31 +185,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    private void setAlarm() {
-        alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                1000 * 30, alarmIntent);
-
-    }
-
 
     @Override
     public void onClick(View v) {
-        if (mInterstitialAd.isLoaded()) {
-            //   mInterstitialAd.show();
-        }
 
 
         Intent intent;
         if (v.getId() == R.id.btn_app_24)
 
         {
-            postStory();
 
             // setAlarm();
             onFabClick(v);
@@ -311,61 +260,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    private void postStory() {
-
-     /*   ShareOpenGraphObject object = new ShareOpenGraphObject.Builder()
-                .putString("og:type", "food.food")//613292//
-                .putString("og:title", "A Game of Thrones")
-                .putString("og:description", "In the frozen wastes to the north of Winterfell, sinister and supernatural forces are mustering.")
-                .build();
-
-        ShareOpenGraphAction action = new ShareOpenGraphAction.Builder()
-                .setActionType("eat:food")
-                .putObject("food", object)
-                .build();*/
-
-//        Feed feed = new Feed.Builder()
-//                .setMessage("Clone it out...")
-//                .setName("Simple Facebook SDK for Android")
-//                .setCaption("Code less, do the same.")
-//                .setDescription("Login, publish feeds and stories, invite friends and more...")
-//                .setPicture("https://raw.github.com/sromku/android-simple-facebook/master/Refs/android_facebook_sdk_logo.png")
-//                .setLink("https://github.com/sromku/android-simple-facebook")
-//                .addAction("Clone", "https://github.com/sromku/android-simple-facebook")
-//                .addProperty("Full documentation", "http://sromku.github.io/android-simple-facebook", "http://sromku.github.io/android-simple-facebook")
-//                .addProperty("Stars", "14")
-//                .build();
-//        mSimpleFacebook.publish(feed, onPublishListener);
-//
-
-        /*ShareOpenGraphContent content = new ShareOpenGraphContent.Builder()
-                .setPreviewPropertyName("food")
-                .setAction(action)
-                .build();
-
-        ShareDialog.show(this, content);
-
-        ShareApi.share(content, new FacebookCallback<Sharer.Result>() {
-            @Override
-            public void onSuccess(Sharer.Result result) {
-                Utils.debug("fb", "facebook Result  : " + result);
-                Utils.debug("fb", "facebook Post Id  : " + result.getPostId());
-
-            }
-
-            @Override
-            public void onCancel() {
-                Utils.debug("fb", "facebook Cancel  : ");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Utils.debug("fb", "facebook Error  : " + error);
-            }
-        });*/
-
-    }
-
 
     /**
      * handle the Floationg Action Button Click
@@ -378,28 +272,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         } else {
             showMenu();
         }
-//        TimeZone tz = TimeZone.getDefault();
-//        Utils.debug("timezone", "TimeZone   " + tz.getDisplayName(false, TimeZone.SHORT) + " " +
-//                "Timezon id :: "
-//                + tz
-//                .getID());
-
-//        Working
-        //postFeedOnPage();
-
-
-        //parsePageContent();
-        //Post id  on Page : 183731428649374
-        //postFeedOnPage();
-        //working
-//        getPageFeeds("103197256730126_183731428649374");
-
-//        String s = "183731428649374";
-//        //Utils.debug(TAG, s);
-//
-//        ShareLinkContent content = new ShareLinkContent.Builder()
-//                .setContentUrl(Uri.parse("https://developers.facebook.com/" + s))
-//                .build();
 
         if (v.isSelected()) {
             btn_app_24.setImageResource(R.drawable.app_button);
@@ -421,69 +293,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                     public void onCompleted(GraphResponse response) {
                         Utils.debug(TAG, "response : " + response.getRawResponse());
             /* handle the result */
-                    }
-                }
-        ).executeAsync();
-    }
-
-
-    private boolean parsePageContent() {
-        try {
-            // String OWNER_OF_FEED = "feedbook.hk";
-
-//            HttpClient client = new DefaultHttpClient();
-//            HttpGet get = new HttpGet("https://graph.facebook.com/me?access_token=" + AccessToken
-//                    .getCurrentAccessToken().getToken());
-
-            //  ResponseHandler<String> responseHandler = new BasicResponseHandler();
-
-            // String access_token = client.execute(get, responseHandler);
-            // Utils.debug(TAG, "Response from FB PAGE access_token : " + access_token);
-//            JSONObject object = new JSONObject(access_token);
-            postFeedOnPage();
-            //textview.setText(responseBody);
-//            TextView txtv = (TextView) findViewById(R.id.feed);
-//            txtv.setText(String.valueOf(responseBody));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-
-
-    }
-
-    private void postFeedOnPage() {
-        Bundle params = new Bundle();
-        params.putString("message", "This is a test from abhi");
-        params.putString("picture", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
-        params.putString("link", "http://dev614.trigma.us/24app/development/assets/images/uploads/feeds/feed_1453974676.png");
-
-/* make the API call */
-        new GraphRequest(
-                AccessToken.getCurrentAccessToken(),
-                "/" + pageId + "/feed",
-                params,
-                HttpMethod.POST,
-                new GraphRequest.Callback() {
-                    public void onCompleted(GraphResponse response) {
-            /* handle the result */
-                        Utils.debug(TAG, "response.getRawResponse() postFeedOnPage : " + response
-                                .getRawResponse());
-                        JSONObject object = null;
-                        try {
-                            object = response.getJSONObject();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        if (object != null) {
-                            try {
-                                mPageFeedId = object.getString(Constants.KEY_ID);
-                                Utils.debug(TAG, "Page Feed Id : " + mPageFeedId);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            getAllPageFeeds(pageId);
-                        }
                     }
                 }
         ).executeAsync();
@@ -636,9 +445,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Utils.debug(TAG, "OnTouch ");
-        if (mInterstitialAd.isLoaded()) {
-            mInterstitialAd.show();
-        }
+//        if (mInterstitialAd.isLoaded()) {
+//            mInterstitialAd.show();
+//        }
         if (v.getId() == R.id.btn_home) {
             Utils.debug(TAG, "Inside OnClick home");
             btn_home.setImageResource(R.drawable.home_selected);
@@ -684,7 +493,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onPause() {
         super.onPause();
-
+//        Utils.debug("timer", "onPause()");
+        counter.cancel();
+        counter = null;
     }
 
     public static void setUsername(String username) {
@@ -698,6 +509,5 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public View getAppMenu() {
         return menuLayout;
     }
-
 
 }

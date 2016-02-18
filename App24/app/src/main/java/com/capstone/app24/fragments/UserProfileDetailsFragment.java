@@ -2,6 +2,7 @@ package com.capstone.app24.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,13 +24,12 @@ import com.capstone.app24.activities.SettingsActivity;
 import com.capstone.app24.adapters.UserProfitAdapter;
 import com.capstone.app24.animations.HidingScrollListener;
 import com.capstone.app24.bean.UserFeedModel;
-import com.capstone.app24.bean.UserFeedModel;
 import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
-import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
+import com.github.yasevich.endlessrecyclerview.EndlessRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,11 +50,12 @@ import volley.toolbox.StringRequest;
  * Created by amritpal on 6/11/15.
  */
 public class UserProfileDetailsFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener/*,
-        TextWatcher, View.OnFocusChangeListener, CustomDrawablEditText.OnDrawableClickListener */ {
+        TextWatcher, View.OnFocusChangeListener, CustomDrawablEditText.OnDrawableClickListener */, EndlessRecyclerView.Pager {
     private static final String TAG = UserProfileDetailsFragment.class.getSimpleName();
     View mView;
     private ImageButton ibtn_setting, ibtn_search;
-    private RecyclerView user_feeds_list;
+    //    private RecyclerView user_feeds_list;
+    private EndlessRecyclerView user_feeds_list;
     private UserProfitAdapter mLatestFeedsAdapter;
     /* Volley Request Tags */
     private String res = "";
@@ -65,13 +66,12 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
     /* End of Volley Request Tags */
     private SweetAlertDialog mDialog;
     private LinearLayout profit_details;
-    private String mUnreceivedProfit;
-    private String mReceivedProfit;
-    private String mTotalAmount;
-    private String mProfitAmount;
+    private String mTotalProfit = "", mTodayProfit = "", mUnreceivedProfit = "", mThisMonthProfit = "";
+
 
     private TextView txt_todays_profit_value, txt_this_month_profit_value,
             txt_unreceived_profit_value, txt_heading_todays_profit_value;
+    private RelativeLayout xtra_layout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -89,15 +89,21 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
         MainActivity.setUsername(new Utils(getActivity())
                 .getSharedPreferences(getActivity(), Constants
                         .KEY_USER_NAME, ""));
-        if (NetworkUtils.isOnline(getActivity()))
+        if (NetworkUtils.isOnline(getActivity())) {
+            mDialog = Utils.showSweetProgressDialog(getActivity(),
+                    getResources
+                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
             getUserFeeds();
-        else
+        } else {
             Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
                     .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
-
+        }
         mLatestFeedsAdapter = new UserProfitAdapter(getActivity(), userFeedList);
         user_feeds_list.setLayoutManager(new LinearLayoutManager(getActivity()));
         user_feeds_list.setAdapter(mLatestFeedsAdapter);
+        user_feeds_list.setProgressView(R.layout.item_progress);
+        user_feeds_list.setPager(this);
+        mLatestFeedsAdapter.notifyDataSetChanged();
     }
 
     private boolean getUserFeeds() {
@@ -108,10 +114,10 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
          it will show (Searching...)
          */
 
-        if (mPageNo == 1)
-            mDialog = Utils.showSweetProgressDialog(getActivity(),
-                    getResources
-                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+//        if (mPageNo == 1)
+//            mDialog = Utils.showSweetProgressDialog(getActivity(),
+//                    getResources
+//                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_USER_FEEDS,
@@ -154,10 +160,11 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     private void initializeViews() {
 
-        user_feeds_list = (RecyclerView) mView.findViewById(R.id.user_feeds_list);
+        user_feeds_list = (EndlessRecyclerView) mView.findViewById(R.id.user_feeds_list);
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
         profit_details = (LinearLayout) mView.findViewById(R.id.profit_details);
+        xtra_layout = (RelativeLayout) mView.findViewById(R.id.xtra_layout);
         profit_details.setVisibility(View.GONE);
 
 
@@ -180,7 +187,6 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
         user_feeds_list.addOnScrollListener(new HidingScrollListener() {
             @Override
             public void onHide() {
-                Utils.debug(TAG, "Scrolling up");
                 RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
                 int fabBottomMargin = lp.bottomMargin;
                 MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
@@ -196,7 +202,6 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
             @Override
             public void onShow() {
-                Utils.debug(TAG, "Scrolling Down");
                 MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
                 MainActivity.layout_user_profle.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)); // Utils.setScrollDirection(Constants.SCROLL_DOWN);
             }
@@ -221,175 +226,20 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     public static UserProfileDetailsFragment newInstance() {
         UserProfileDetailsFragment f = new UserProfileDetailsFragment();
-        Bundle args = new Bundle();
-//        username = args.getString(Constants.KEY_USER_NAME);
         return f;
     }
 
-    private boolean getMonthProfit() {
-
-        StringRequest strReq = new StringRequest(Request.Method.POST,
-                APIsConstants.API_BASE_URL + APIsConstants.API_MONTH_PROFIT,
-                new volley.Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Utils.debug(TAG, response.toString());
-
-                        res = response.toString();
-                        try {
-                            setMonthProfitDetails(res);
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    }
-                }, new volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                res = error.toString();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(getActivity(),
-                        Constants.KEY_USER_DETAILS, ""));
-                Utils.debug("params", new Utils(getActivity())
-                        .getSharedPreferences(getActivity(), Constants.KEY_USER_DETAILS, ""));
-                Utils.info("params... of " + APIsConstants.API_RECENT_FEEDS, params.toString());
-                return params;
-            }
-            // Adding request to request queue
-        };
-        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
-        return false;
-    }
-
-    private void setMonthProfitDetails(String res) {
-        Utils.debug("month_profit_web_service", res);
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(res);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (jsonObject != null) {
-            try {
-                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-                    try {
-                        mProfitAmount = jsonObject.getString("profitAmount");
-                        Utils.debug("profit_web_service profitAmount: ", mProfitAmount);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-//                notifyDataSetChanged();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            updateProfitDetails();
-        }
-    }
-
-    private boolean getProfit() {
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
-
-        StringRequest strReq = new StringRequest(Request.Method.POST,
-                APIsConstants.API_BASE_URL + APIsConstants.API_TOTAL_MONTHS_PROFIT,
-                new volley.Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Utils.debug(TAG, response.toString());
-
-                        res = response.toString();
-                        try {
-                            setProfitDetails(res);
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    }
-                }, new volley.Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                res = error.toString();
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(getActivity(),
-                        Constants.KEY_USER_DETAILS, ""));
-                Utils.debug("params", new Utils(getActivity())
-                        .getSharedPreferences(getActivity(), Constants.KEY_USER_DETAILS, ""));
-                Utils.info("params... of " + APIsConstants.API_RECENT_FEEDS, params.toString());
-                return params;
-            }
-            // Adding request to request queue
-        };
-        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
-        return false;
-    }
-
-    private void setProfitDetails(String res) {
-        Utils.debug("profit_web_service", res);
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(res);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (jsonObject != null) {
-            try {
-                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-                    try {
-                        mUnreceivedProfit = jsonObject.getString("UnreceivedProfit");
-                        Utils.debug("profit_web_service mUnreceivedProfit: ", mUnreceivedProfit);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        mReceivedProfit = jsonObject.getString("ReceivedProfit");
-                        Utils.debug("profit_web_service ReceivedProfit: ", res);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        mTotalAmount = jsonObject.getString("TotalAmount");
-                        Utils.debug("profit_web_service TotalAmount : ", res);
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    // updateProfitDetails();
-                }
-                // mLatestFeedsAdapter.notifyDataSetChanged();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            updateProfitDetails();
-        }
-    }
-
     private List<UserFeedModel> refreshUserFeeds(String res) throws JSONException {
-        //    Utils.debug(TAG, "Response for UserProfile   : " + res);
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject != null) {
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
                 JSONArray jsonArray = jsonObject.getJSONArray(APIsConstants.KEY_FEED_DATA);
-                Utils.debug(TAG, "jsonArray Size() : " + jsonArray.length());
                 profit_details.setVisibility(View.GONE);
                 if (jsonArray != null) {
-
+                    if (mPageNo == 1)
+                        userFeedList.clear();
+                    ITEMS_ON_PAGE = jsonArray.length();
+                    addItems();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         UserFeedModel userFeedModel = new UserFeedModel();
                         JSONObject object = jsonArray.getJSONObject(i);
@@ -436,6 +286,11 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                             }
                             try {
                                 userFeedModel.setUser_name(object.getString(APIsConstants.KEY_USER_NAME));
+                                new Utils().setPreferences(getActivity(), Constants.KEY_USER_NAME,
+                                        object.getString(APIsConstants.KEY_USER_NAME));
+                                MainActivity.setUsername(new Utils(getActivity())
+                                        .getSharedPreferences(getActivity(), Constants
+                                                .KEY_USER_NAME, ""));
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -468,20 +323,15 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                     }
                 }
                 if (jsonArray.length() == 0) {
-//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
-//                                    ().getResources().getString(R.string.no_more_data)),
-//                            SweetAlertDialog.ERROR_TYPE);
                 }
             } else {
-                if (userFeedList.size() <= 0)
+                if (userFeedList.size() <= 0) {
                     profit_details.setVisibility(View.VISIBLE);
-
-                getProfit();
-                getMonthProfit();
+                    xtra_layout.setVisibility(View.VISIBLE);
+                }
+                getProfitAmount();
                 try {
                     Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-//                    Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
-//                            .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -496,27 +346,121 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     @Override
     public void onRefresh() {
-        mPageNo = mPageNo + 1;
+//        mPageNo = mPageNo + 1;
+//        getUserFeeds();
+        mPageNo = 1;
+
+//        ITEMS_ON_PAGE = 0;
+//        latestFeedList.clear();
+        loading = false;
+        mLatestFeedsAdapter.setCount(0);
         getUserFeeds();
+    }
+
+    /**
+     * get Profit Data of User
+     *
+     * @return boolean
+     */
+    private boolean getProfitAmount() {
+        StringRequest strReq = new StringRequest(Request.Method.POST,
+                APIsConstants.API_BASE_URL + APIsConstants.API_PROFIT_AMOUNT,
+                new volley.Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        res = response.toString();
+                        try {
+                            setProfitData(res);
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }, new volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d(TAG, "Error: " + error.getMessage());
+                res = error.toString();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(APIsConstants.KEY_USER_ID, new Utils().getSharedPreferences(getActivity(),
+                        Constants.KEY_USER_DETAILS, ""));
+                Utils.info("params... of " + APIsConstants.API_RECENT_FEEDS, params.toString());
+                return params;
+            }
+            // Adding request to request queue
+        };
+        AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
+        return false;
+    }
+
+    private void setProfitData(String res) {
+        Utils.debug(TAG, res);
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (jsonObject != null) {
+            try {
+                if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
+                    try {
+                        mTotalProfit = jsonObject.getString(Constants.KEY_TOTAL_PROFIT);
+                        Utils.debug(TAG, mTotalProfit);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mTodayProfit = jsonObject.getString(Constants.KEY_TODAY_PROFIT);
+                        Utils.debug(TAG, mTodayProfit);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mUnreceivedProfit = jsonObject.getString(Constants.KEY_UNRECEIVED_PROFIT);
+                        Utils.debug(TAG, mUnreceivedProfit);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        mThisMonthProfit = jsonObject.getString(Constants.KEY_THIS_MONTH_PROFIT);
+                        Utils.debug(TAG, mThisMonthProfit);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                updateProfitDetails();
+                mLatestFeedsAdapter.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     private void updateProfitDetails() {
 
-        txt_todays_profit_value.setVisibility(View.GONE);
-//yet to calculate
-        if (mProfitAmount.equalsIgnoreCase(Constants.ZERO)) {
+        // txt_todays_profit_value.setVisibility(View.GONE);
+        if (mTodayProfit.equalsIgnoreCase(Constants.ZERO)) {
             txt_todays_profit_value.setVisibility(View.GONE);
         } else {
-            txt_todays_profit_value.setVisibility(View.GONE);
-            txt_todays_profit_value.setText(Constants.DOLLAR_SIGN + " " + mProfitAmount);
+            txt_todays_profit_value.setVisibility(View.VISIBLE);
+            txt_todays_profit_value.setText(Constants.DOLLAR_SIGN + " " + mTodayProfit);
         }
-//
 
-        if (mProfitAmount.equalsIgnoreCase(Constants.ZERO)) {
+        if (mThisMonthProfit.equalsIgnoreCase(Constants.ZERO)) {
             txt_this_month_profit_value.setVisibility(View.GONE);
         } else {
             txt_this_month_profit_value.setVisibility(View.VISIBLE);
-            txt_this_month_profit_value.setText(Constants.DOLLAR_SIGN + " " + mProfitAmount);
+            txt_this_month_profit_value.setText(Constants.DOLLAR_SIGN + " " + mThisMonthProfit);
         }
         if (mUnreceivedProfit.equalsIgnoreCase(Constants.ZERO)) {
             txt_unreceived_profit_value.setVisibility(View.GONE);
@@ -524,13 +468,48 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
             txt_unreceived_profit_value.setVisibility(View.VISIBLE);
             txt_unreceived_profit_value.setText(Constants.DOLLAR_SIGN + " " + mUnreceivedProfit);
         }
-//        if (mTotalAmount.equalsIgnoreCase(Constants.ZERO)) {
+//        if (mTotalProfit.equalsIgnoreCase(Constants.ZERO)) {
 //            txt_heading_todays_profit_value.setVisibility(View.GONE);
 //        } else {
         txt_heading_todays_profit_value.setVisibility(View.VISIBLE);
-        txt_heading_todays_profit_value.setText(Constants.DOLLAR_SIGN + " " + mTotalAmount);
+        txt_heading_todays_profit_value.setText(Constants.DOLLAR_SIGN + " " + mTotalProfit);
 //        }
 
     }
 
+    int ITEMS_ON_PAGE = 0;
+    private static final int TOTAL_PAGES = 10;
+    private static final long DELAY = 1000L;
+    private boolean loading = false;
+
+    private final Handler handler = new Handler();
+
+    @Override
+    public boolean shouldLoad() {
+//        return false;
+        return !loading && mLatestFeedsAdapter.getItemCount() / ITEMS_ON_PAGE < TOTAL_PAGES;
+
+    }
+
+
+    @Override
+    public void loadNextPage() {
+        loading = true;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPageNo = mPageNo + 1;                //addItems();
+
+                getUserFeeds();
+
+                user_feeds_list.setRefreshing(false);
+                loading = false;
+                //addItems();
+            }
+        }, DELAY);
+    }
+
+    private void addItems() {
+        mLatestFeedsAdapter.setCount(mLatestFeedsAdapter.getItemCount() + ITEMS_ON_PAGE);
+    }
 }

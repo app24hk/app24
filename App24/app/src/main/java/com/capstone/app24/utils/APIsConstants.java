@@ -24,6 +24,8 @@ public class APIsConstants {
     public static final String API_UPDATE_FB_FEED_ID = "/updateFbFeedId";
     public static final String API_TOTAL_MONTHS_PROFIT = "/TotalMonthsProfit";
     public static final String API_MONTH_PROFIT = "/monthProfit";
+    public static final String API_PROFIT_AMOUNT = "/profitAmount";
+
     public static final String KEY_RESULT = "result";
     public static final String KEY_USERINFO = "userInfo";
 
@@ -70,4 +72,21 @@ public class APIsConstants {
     public static final String CREATED_TIME = "created_time";
     public static final String KEY_FROM = "from";
     public static final String NAME = "name";
+    public static final String VIDEO_ID = "video_id";
+    public static final String START_OFFSET = "start_offset";
+    public static final String END_OFFSET = "end_offset";
+    public static final String UPLOAD_SESSION_ID = "upload_session_id";
+    public static final String SUCCESS = "success";
+    public static final String KEY_USER_DEVICE_TYPE = "user_deviceType";
+    public static final String KEY_USER_DEVICE_TOKEN = "user_deviceToken";
+
+    //Facebook Video Upload
+    public static final String KEY_UPLOAD_SESSION_ID = "upload_session_id";
+    public static final String KEY_UPLOAD_PHASE = "upload_phase";
+    public static final String KEY_TRANSFER = "transfer";
+    public static final String KEY_VIDEO_FILE_CHUNK = "video_file_chunk";
+    public static final String KEY_START_OFFSET = "start_offset";
+    public static final String KEY_FINISH = "finish";
+    public static final String KEY_START = "start";
+    public static final String KEY_FILE_SIZE = "file_size";
 }

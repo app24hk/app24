@@ -51,10 +51,6 @@ public class ProfileActivity extends FragmentActivity implements View.OnClickLis
         initializeViews();
         setClickListeners();
         updateUI();
-//        latestFeedList = getIntent().getParcelableArrayListExtra(Constants.SEARCH_LIST);
-//        if (latestFeedList != null) {
-//            Utils.debug(TAG, "Size of parcelable list : " + latestFeedList.size());
-//        }
     }
 
     private void updateUI() {

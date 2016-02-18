@@ -85,7 +85,7 @@ public class CommentAdapter extends BaseAdapter {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        holder.comment_time.setText(Utils.getTimeAgo(date.getTime()));
+        holder.comment_time.setText(Utils.getTimeAgo(mActivity, date.getTime()));
 
         dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         String formatedDate = dateFormat.format(date);

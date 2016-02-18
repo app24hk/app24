@@ -38,7 +38,11 @@
     <string name="setting">設定</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
     <string name="post">發佈</string>
-    <!--<string name="edit_post">編輯 Feed</string>-->
+    <string name="save">儲存</string>
+
+    <string name="edit_feed">編輯 Feed</string>
+    <string name="delete_feed">刪除 Feed</string>
+
     <string name="edit_post">儲存</string>
 
     <!--Toasts to Users-->
@@ -72,13 +76,26 @@
     <string name="whats_in_your_mind">請輸入內容</string>
     <string name="comment_description">新增一則評論</string>
     <string name="title">標題</string>
-    <string name="just_now">剛剛</string>
     <string name="add_media">上載相片/影片</string>
     <string name="please_add_a_comment">Please add a comment</string>
     <string name="please_add_a_title">請輸入標題</string>
     <string name="please_add_description">請輸入內容</string>
     <string name="cancel">取消</string>
     <string name="search">搜尋</string>
+    <string name="just_now">&#032; 剛剛</string>
+    <string name="a_minute_ago">&#032;1 分鐘前</string>
+    <string name="minute_ago">&#032; 分鐘前</string>
+    <string name="an_hour_ago">&#032;1 小時前</string>
+    <string name="hour_ago">&#032; 小時前</string>
+    <string name="yesterday">&#032; 昨天</string>
+    <string name="day_ago">&#032; 天前</string>
+    <string name="month_ago">&#032; 個月前</string>
+    <string name="year_ago">&#032; 年以前</string>
+
+    <string name="upload_error">無法上載影片至 Facebook</string>
+    <string name="you_cant_share_this_feed">You can\'t share your own feed!</string>
+    <string name="paypal_info_updated_successfully">PapPal 資料已成功更新</string>
+    <string name="delete_successfully">已刪除</string>
 
 
 </resources>

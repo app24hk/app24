@@ -3,6 +3,7 @@ package com.capstone.app24.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +27,7 @@ import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.InterfaceListener;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
+import com.github.yasevich.endlessrecyclerview.EndlessRecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,13 +47,15 @@ import volley.toolbox.StringRequest;
 /**
  * Created by amritpal on 4/11/15.
  */
-public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener {
+public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
+        OnDeleteListener, EndlessRecyclerView.Pager {
     private static final String TAG = MostViewedFragment.class.getSimpleName();
     private View mView;
     private Context mContext;
     private Activity mActivity;
     public MostViewedAdapter mMostViewedAdapter;
-    private RecyclerView most_viewed_feeds;
+    //    private RecyclerView most_viewed_feeds;
+    private EndlessRecyclerView most_viewed_feeds;
 
     private int mPageNo = 1;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -75,23 +79,30 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
         initializeViews();
         MainActivity.tabs.setVisibility(View.VISIBLE);
         MainActivity.layout_user_profle.setVisibility(View.GONE);
+        if (NetworkUtils.isOnline(getActivity())) {
+            mDialog = Utils.showSweetProgressDialog(getActivity(),
+                    getResources
+                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+            mDialog.setCancelable(true);
+            getMostViewedFeeds();
+        } else {
+            Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
+                    .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
+        }
+        mMostViewedAdapter = new MostViewedAdapter(getActivity(), mMostViewedFeedList);
+        most_viewed_feeds.setAdapter(mMostViewedAdapter);
+        most_viewed_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
+        most_viewed_feeds.setProgressView(R.layout.item_progress);
+        most_viewed_feeds.setPager(this);
         return mView;
     }
 
     private void updateUI() {
-        if (NetworkUtils.isOnline(getActivity()))
-            getMostViewedFeeds();
-        else
-            Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
-                    .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
-
-        mMostViewedAdapter = new MostViewedAdapter(getActivity(), mMostViewedFeedList);
-        most_viewed_feeds.setAdapter(mMostViewedAdapter);
-        most_viewed_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mMostViewedAdapter.notifyDataSetChanged();
     }
 
     private void initializeViews() {
-        most_viewed_feeds = (RecyclerView) mView.findViewById(R.id.most_viewed_feeds);
+        most_viewed_feeds = (EndlessRecyclerView) mView.findViewById(R.id.most_viewed_feeds);
         initRecyclerView();
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -138,12 +149,12 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
          If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
          it will show (Searching...)
          */
-        if (mPageNo == 1) {
-            mDialog = Utils.showSweetProgressDialog(getActivity(),
-                    getResources
-                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-            mDialog.setCancelable(true);
-        }
+//        if (mPageNo == 1) {
+//            mDialog = Utils.showSweetProgressDialog(getActivity(),
+//                    getResources
+//                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+//            mDialog.setCancelable(true);
+//        }
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_RECENT_FEEDS,
@@ -196,10 +207,14 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
         }
         if (jsonObject != null) {
             try {
+
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
                     JSONArray jsonArray = jsonObject.getJSONArray(APIsConstants.KEY_FEED_DATA);
                     if (jsonArray != null) {
-
+                        if (mPageNo == 1)
+                            mMostViewedFeedList.clear();
+                        ITEMS_ON_PAGE = jsonArray.length();
+                        addItems();
                         for (int i = 0; i < jsonArray.length(); i++) {
                             LatestFeedsModel mostViewedModel = new LatestFeedsModel();
                             JSONObject object = jsonArray.getJSONObject(i);
@@ -302,14 +317,21 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
         mMostViewedAdapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
 //        if (mPageNo == 1)
-            Utils.closeSweetProgressDialog(getActivity(), mDialog);
+        Utils.closeSweetProgressDialog(getActivity(), mDialog);
         return mMostViewedFeedList;
     }
 
 
     @Override
     public void onRefresh() {
-        mPageNo = mPageNo + 1;
+//        mPageNo = mPageNo + 1;
+//        getMostViewedFeeds();
+        mPageNo = 1;
+
+//        ITEMS_ON_PAGE = 0;
+//        latestFeedList.clear();
+        loading = false;
+        mMostViewedAdapter.setCount(0);
         getMostViewedFeeds();
     }
 
@@ -324,4 +346,42 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
     }
+
+    int ITEMS_ON_PAGE = 0;
+    private static final int TOTAL_PAGES = 10;
+    private static final long DELAY = 1000L;
+    private boolean loading = false;
+
+    private final Handler handler = new Handler();
+
+    @Override
+    public boolean shouldLoad() {
+//        return false;
+        return !loading && mMostViewedAdapter.getItemCount() / ITEMS_ON_PAGE < TOTAL_PAGES;
+
+    }
+
+
+    @Override
+    public void loadNextPage() {
+        loading = true;
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPageNo = mPageNo + 1;                //addItems();
+
+                getMostViewedFeeds();
+
+                most_viewed_feeds.setRefreshing(false);
+                loading = false;
+                //addItems();
+            }
+        }, DELAY);
+    }
+
+    private void addItems() {
+        mMostViewedAdapter.setCount(mMostViewedAdapter.getItemCount() + ITEMS_ON_PAGE);
+    }
+
+
 }

@@ -295,7 +295,7 @@ public class Utils {
     private static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 
-    public static String getTimeAgo(long time) {
+    public static String getTimeAgo(Activity activity, long time) {
         if (time < 1000000000000L) {
             // if timestamp given in seconds, convert to millis
             time *= 1000;
@@ -309,19 +309,19 @@ public class Utils {
         // TODO: localize
         final long diff = now - time;
         if (diff < MINUTE_MILLIS) {
-            return " Just now";
+            return activity.getResources().getString(R.string.just_now);
         } else if (diff < 2 * MINUTE_MILLIS) {
-            return " a minute ago";
+            return activity.getResources().getString(R.string.a_minute_ago);
         } else if (diff < 50 * MINUTE_MILLIS) {
-            return diff / MINUTE_MILLIS + " minutes ago";
+            return diff / MINUTE_MILLIS + activity.getResources().getString(R.string.minute_ago);
         } else if (diff < 90 * MINUTE_MILLIS) {
-            return " an hour ago";
+            return activity.getResources().getString(R.string.an_hour_ago);
         } else if (diff < 24 * HOUR_MILLIS) {
-            return diff / HOUR_MILLIS + " hours ago";
+            return diff / HOUR_MILLIS + activity.getResources().getString(R.string.hour_ago);
         } else if (diff < 48 * HOUR_MILLIS) {
-            return " yesterday";
+            return activity.getResources().getString(R.string.yesterday);
         } else {
-            return diff / DAY_MILLIS + " days ago";
+            return diff / DAY_MILLIS + activity.getResources().getString(R.string.day_ago);
         }
     }
 

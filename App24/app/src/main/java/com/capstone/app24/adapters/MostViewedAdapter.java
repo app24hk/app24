@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -55,6 +57,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     List<LatestFeedsModel> mMostViewedFeedList = new ArrayList<>();
     private String res = "";
     private SweetAlertDialog mDialog;
+    private int count;
 
     public MostViewedAdapter(Activity activity, List<LatestFeedsModel> mostViewedFeedList) {
         mActivity = activity;
@@ -86,28 +89,32 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
         if (mostViewedModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
             holder.img_preview.setVisibility(View.GONE);
             holder.img_video_preview.setVisibility(View.GONE);
-            holder.layout_img_video_preview.setVisibility(View.GONE);
             holder.progress_dialog.setVisibility(View.GONE);
+            holder.progress_dialog_layout.setVisibility(View.GONE);
         } else if (mostViewedModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
             holder.img_preview.setVisibility(View.VISIBLE);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
-                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
-            holder.img_preview.setLayoutParams(params);
-            Glide.with(mActivity).load(mostViewedModel.getMedia()).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
+            holder.progress_dialog.setVisibility(View.VISIBLE);
+            holder.progress_dialog_layout.setVisibility(View.VISIBLE);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
+//                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
+//            holder.progress_dialog_layout.setLayoutParams(params);
+            Glide.with(mActivity).load(mostViewedModel.getMedia()).centerCrop().diskCacheStrategy
+                    (DiskCacheStrategy.ALL).crossFade()
                     .into(holder.img_preview);
             holder.img_video_preview.setVisibility(View.GONE);
-            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
+            //     holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         } else if (mostViewedModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
-            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
-                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
-            holder.img_preview.setLayoutParams(params);
+            holder.progress_dialog.setVisibility(View.VISIBLE);
+            holder.progress_dialog_layout.setVisibility(View.VISIBLE);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
+//                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
+//            holder.progress_dialog_layout.setLayoutParams(params);
             Glide.with(mActivity).load(mostViewedModel.getThumbnail()).centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                     .into(holder.img_preview);
-            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
+            //   holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         }
         holder.txt_feed_heading.setText(StringEscapeUtils.unescapeJava(mostViewedModel.getTitle()));
         holder.txt_feed_body.setText(StringEscapeUtils.unescapeJava(mostViewedModel
@@ -117,13 +124,22 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             holder.txt_profile_count_login_user.setText(Constants.EMPTY);
         else
             holder.txt_profile_count_login_user.setText(mostViewedModel.getProfit_amount());
-        holder.txt_created_time.setText(Utils.getTimeAgo(Long
+        holder.txt_created_time.setText(Utils.getTimeAgo(mActivity, Long
                 .parseLong(mostViewedModel.getCreated())));
         holder.txt_seen.setText(mostViewedModel.getViewcount());
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showImageDialog(mMostViewedFeedList.get(position).getMedia());
+                if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
+                    new Utils(mActivity).setLatestFeedPreferences(mActivity, mMostViewedFeedList.get
+                            (position));
+                    intent = new Intent(mActivity, VideoActivity.class);
+                    mActivity.startActivity(intent);
+                } else if (holder.img_video_preview
+                        .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
+                    showImageDialog(mMostViewedFeedList.get(position).getMedia());
+                }
+                //                showImageDialog(mMostViewedFeedList.get(position).getMedia());
             }
         });
         holder.img_video_preview.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +154,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
                 mActivity.startActivity(intent);
             }
         });
-        holder.layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
+      /*  holder.layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
@@ -154,14 +170,19 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
                     showImageDialog(mMostViewedFeedList.get(position).getMedia());
                 }
             }
-        });
+        });*/
 
 
     }
 
     @Override
     public int getItemCount() {
-        return mMostViewedFeedList.size();
+        return /*mMostViewedFeedList.size()*/count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -176,14 +197,15 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private final ProgressBar progress_dialog;
 
         TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
         //        private final VideoView video;
-        private final FrameLayout progress_dialog;
+        //     private final FrameLayout progress_dialog;
 
         ImageView img_preview, img_video_preview;
-        RelativeLayout layout_img_video_preview, xtra_layout;
+        RelativeLayout /*layout_img_video_preview,*/ progress_dialog_layout, xtra_layout;
 
         public ViewHolder(View itemView, Activity act) {
             super(itemView);
@@ -196,8 +218,11 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
             img_preview = (ImageView) itemView.findViewById(R.id.img_preview);
             img_video_preview = (ImageView) itemView.findViewById(R.id.img_video_preview);
             xtra_layout = (RelativeLayout) itemView.findViewById(R.id.xtra_layout);
-            layout_img_video_preview = (RelativeLayout) itemView.findViewById(R.id.layout_img_video_preview);
-            progress_dialog = (FrameLayout) itemView.findViewById(R.id.progress_dialog);
+            //       layout_img_video_preview = (RelativeLayout) itemView.findViewById(R.id
+            //             .layout_img_video_preview);
+            //      progress_dialog = (FrameLayout) itemView.findViewById(R.id.progress_dialog);
+            progress_dialog = (ProgressBar) itemView.findViewById(R.id.progress_dialog);
+            progress_dialog_layout = (RelativeLayout) itemView.findViewById(R.id.progress_dialog_layout);
 
             // video = (VideoView) itemView.findViewById(R.id.video);
 
@@ -212,6 +237,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
                             , mMostViewedFeedList.get(getLayoutPosition()).getId());
                     mActivity.finish();
                     intent = new Intent(mActivity, PostDetailActivity.class);
+                    intent.putExtra(Constants.IS_FROM_LIST, true);
                     mActivity.startActivity(intent);
                 }
             });
@@ -223,6 +249,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter<MostViewedAdapter.Vi
            /* switch (v.getId()) {
                 case R.id.txt_feed_body:*/
             intent = new Intent(mActivity, PostDetailActivity.class);
+            intent.putExtra(Constants.IS_FROM_LIST, true);
             intent.putExtra("type", getLayoutPosition());
             mActivity.startActivity(intent);
                     /*break;

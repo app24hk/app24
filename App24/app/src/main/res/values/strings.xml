@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">App24</string>
+    <string name="app_name">Feedbook</string>
     <!-- Facebook Data-->
     <!--trigma facebook id-->
     <!--<string name="app_id">1673090976236867</string>-->
@@ -26,7 +26,7 @@
 
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
-    <string name="delete_post">Delete Post</string>
+    <string name="delete_feed">Delete Feed</string>
     <string name="user_name">User</string>
     <string name="total_profit">Total Profit</string>
     <string name="todays_profit">Todays Profit</string>
@@ -37,8 +37,9 @@
     <string name="logout">Logout</string>
     <string name="setting">Setting</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
-    <string name="post">Post</string>
+    <string name="save">Save</string>
     <string name="edit_post">Save</string>
+    <string name="edit_feed">Edit Feed</string>
 
     <!--Toasts to Users-->
     <string name="please_try_again">Please Try Again</string>
@@ -132,11 +133,28 @@
     <string name="whats_in_your_mind">Whats in your mind</string>
     <string name="comment_description">comment description</string>
     <string name="title">title</string>
-    <string name="just_now">Just now</string>
     <string name="add_media">Add Media</string>
     <string name="please_add_a_comment">Please add a comment</string>
     <string name="please_add_a_title">Please add a title</string>
     <string name="please_add_description">Please add description</string>
     <string name="cancel">Cancel</string>
     <string name="search">Search</string>
+
+    <string name="just_now">&#032; Just now</string>
+    <string name="a_minute_ago">&#032; 1 minute ago</string>
+    <string name="minute_ago">&#032; minute ago</string>
+    <string name="hour_ago">&#032; hour ago</string>
+    <string name="an_hour_ago">&#032;1 hour ago</string>
+    <string name="yesterday">&#032; yesterday</string>
+    <string name="day_ago">&#032; day ago</string>
+    <string name="month_ago">&#032; month ago</string>
+    <string name="year_ago">&#032; year ago</string>X
+
+    <!-- Strings not in chinese language-->
+    <string name="upload_error">Unable to post video on facebook</string>
+    <string name="you_cant_share_this_feed">You can\'t share your own feed!</string>
+    <string name="paypal_info_updated_successfully">Paypal Info updated successfully!</string>
+    <string name="delete_successfully">Feed delete successfully!</string>
+
+
 </resources>

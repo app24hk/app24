@@ -32,6 +32,7 @@ public class Constants {
 //    public static final String KEY_VIDEOS = "videos";
 //    public static final String KEY_TEXT = "text";
     public static final String KEY_GALLERY_TYPE = "gallery_type";
+    public static final String TITLE = "title";
     public static final String POST_TITLE = "post_title";
     public static final String POST_BODY = "post_body";
     public static final java.lang.String CRITTERCISM_APP_ID = "56555a2fd224ac0a00ed43fe";
@@ -73,4 +74,12 @@ public class Constants {
     public static final String DOLLAR_SIGN = "$";
     public static final String FB_IMAGE_SMALL = "fb_image_small";
     public static final String POST_ID = "postId";
+    public static final String KEY_TOTAL_PROFIT = "totalProfit";
+    public static final String KEY_TODAY_PROFIT = "todayProfit";
+    public static final String KEY_UNRECEIVED_PROFIT = "unreceivedProfit";
+    public static final String KEY_THIS_MONTH_PROFIT = "thisMonthProfit";
+    public static final String LOGGED_IN = "loggedIn";
+    public static final String DESCRIPTION = "description";
+    public static final String IS_FROM_LIST = "is_from_list";
+    public static final String UPDATED = "updated";
 }

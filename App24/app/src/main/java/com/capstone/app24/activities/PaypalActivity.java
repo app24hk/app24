@@ -1,9 +1,6 @@
 package com.capstone.app24.activities;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.capstone.app24.R;
 import com.capstone.app24.utils.APIsConstants;
@@ -22,16 +18,10 @@ import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
 import com.capstone.app24.utils.NetworkUtils;
 import com.capstone.app24.utils.Utils;
-import com.paypal.android.sdk.payments.PayPalConfiguration;
-import com.paypal.android.sdk.payments.PayPalPayment;
-import com.paypal.android.sdk.payments.PayPalService;
-import com.paypal.android.sdk.payments.PaymentActivity;
-import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,13 +37,13 @@ import volley.toolbox.StringRequest;
 public class PaypalActivity extends BaseActivity {
 
     private WebView webview;
-    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
-    // note that these credentials will differ between live & sandbox environments.
-    private static final String CONFIG_CLIENT_ID = "your paypal id";
-    private static final int REQUEST_CODE_PAYMENT = 1;
-    private static PayPalConfiguration config = new PayPalConfiguration()
-            .environment(CONFIG_ENVIRONMENT)
-            .clientId(CONFIG_CLIENT_ID);
+    //    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
+//    // note that these credentials will differ between live & sandbox environments.
+//    private static final String CONFIG_CLIENT_ID = "your paypal id";
+//    private static final int REQUEST_CODE_PAYMENT = 1;
+//    private static PayPalConfiguration config = new PayPalConfiguration()
+//            .environment(CONFIG_ENVIRONMENT)
+//            .clientId(CONFIG_CLIENT_ID);
     private Button payPal;
     private EditText editText;
     private String TAG = PaypalActivity.class.getSimpleName();
@@ -129,54 +119,54 @@ public class PaypalActivity extends BaseActivity {
         progress_dialog = (ProgressBar) findViewById(R.id.progress_dialog);
     }
 
-    public void onBuyPressed() {
-        PayPalPayment thingToBuy = getThingToBuy(PayPalPayment.PAYMENT_INTENT_SALE);
-        Intent intent = new Intent(PaypalActivity.this, PaymentActivity.class);
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, thingToBuy);
-        startActivityForResult(intent, REQUEST_CODE_PAYMENT);
-    }
+//    public void onBuyPressed() {
+//        PayPalPayment thingToBuy = getThingToBuy(PayPalPayment.PAYMENT_INTENT_SALE);
+//        Intent intent = new Intent(PaypalActivity.this, PaymentActivity.class);
+//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, thingToBuy);
+//        startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+//    }
 
-    private PayPalPayment getThingToBuy(String paymentIntent) {
-        return new PayPalPayment(new BigDecimal("1.75"), "USD", "sample item",
-                paymentIntent);
-    }
+//    private PayPalPayment getThingToBuy(String paymentIntent) {
+//        return new PayPalPayment(new BigDecimal("1.75"), "USD", "sample item",
+//                paymentIntent);
+//    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PAYMENT) {
-            if (resultCode == Activity.RESULT_OK) {
-                PaymentConfirmation confirm =
-                        data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-                if (confirm != null) {
-                    try {
-                        Log.e("Show", confirm.toJSONObject().toString(4));
-                        Log.e("Show", confirm.getPayment().toJSONObject().toString(4));
-                        /**
-                         *  TODO: send 'confirm' (and possibly confirm.getPayment() to your server for verification
-                         */
-                        Toast.makeText(getApplicationContext(), "PaymentConfirmation info received" +
-                                " from PayPal", Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        Toast.makeText(getApplicationContext(), "an extremely unlikely failure" +
-                                " occurred:", Toast.LENGTH_LONG).show();
-                    }
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getApplicationContext(), "The user canceled.", Toast.LENGTH_LONG).show();
-            } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
-                Toast.makeText(getApplicationContext(), "An invalid Payment or PayPalConfiguration" +
-                        " was submitted. Please see the docs.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_CODE_PAYMENT) {
+//            if (resultCode == Activity.RESULT_OK) {
+//                PaymentConfirmation confirm =
+//                        data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+//                if (confirm != null) {
+//                    try {
+//                        Log.e("Show", confirm.toJSONObject().toString(4));
+//                        Log.e("Show", confirm.getPayment().toJSONObject().toString(4));
+//                        /**
+//                         *  TODO: send 'confirm' (and possibly confirm.getPayment() to your server for verification
+//                         */
+//                        Toast.makeText(getApplicationContext(), "PaymentConfirmation info received" +
+//                                " from PayPal", Toast.LENGTH_LONG).show();
+//                    } catch (JSONException e) {
+//                        Toast.makeText(getApplicationContext(), "an extremely unlikely failure" +
+//                                " occurred:", Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//            } else if (resultCode == Activity.RESULT_CANCELED) {
+//                Toast.makeText(getApplicationContext(), "The user canceled.", Toast.LENGTH_LONG).show();
+//            } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+//                Toast.makeText(getApplicationContext(), "An invalid Payment or PayPalConfiguration" +
+//                        " was submitted. Please see the docs.", Toast.LENGTH_LONG).show();
+//            }
+//        }
+//    }
 
-    @Override
-    public void onDestroy() {
-        // Stop service when done
-        stopService(new Intent(this, PayPalService.class));
-        super.onDestroy();
-    }
+//    @Override
+//    public void onDestroy() {
+//        // Stop service when done
+//        stopService(new Intent(this, PayPalService.class));
+//        super.onDestroy();
+//    }
 
     public boolean getPaypalDetails() {
         progress_dialog.setVisibility(View.VISIBLE);
@@ -236,9 +226,8 @@ public class PaypalActivity extends BaseActivity {
 
                         res = response.toString();
                         try {
-                            refreshLatestFeeds(res);
+                            handlePaypalDetails(res);
                         } catch (Exception e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     }
@@ -252,7 +241,6 @@ public class PaypalActivity extends BaseActivity {
         }) {
             @Override
             protected Map<String, String> getParams() {
-//                        user_id(int)
                 Map<String, String> params = new HashMap<String, String>();
                 params.put(APIsConstants.KEY_USER_ID, new Utils(PaypalActivity.this)
                         .getSharedPreferences
@@ -283,6 +271,8 @@ public class PaypalActivity extends BaseActivity {
                         editText.setText(jsonObject1.getString(APIsConstants.PAYPAL_EMAIL));
                     progress_dialog.setVisibility(View.GONE);
 
+                } else {
+                    progress_dialog.setVisibility(View.GONE);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -290,7 +280,7 @@ public class PaypalActivity extends BaseActivity {
         }
     }
 
-    private void refreshLatestFeeds(String res) {
+    private void handlePaypalDetails(String res) {
         JSONObject jsonObject = null;
         Utils.closeSweetProgressDialog(PaypalActivity.this, mDialog);
         try {
@@ -301,8 +291,10 @@ public class PaypalActivity extends BaseActivity {
         if (jsonObject != null) {
             try {
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-                    mDialog = Utils.showSweetProgressDialog(this, jsonObject.getString(APIsConstants
-                                    .KEY_MESSAGE),
+//                    if (jsonObject.getString(APIsConstants
+//                            .KEY_MESSAGE).contains(Constants.UPDATED)) {
+                    mDialog = Utils.showSweetProgressDialog(this, getResources().getString(R
+                                    .string.paypal_info_updated_successfully),
                             SweetAlertDialog
                                     .SUCCESS_TYPE);
                     mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
@@ -312,6 +304,7 @@ public class PaypalActivity extends BaseActivity {
                             finish();
                         }
                     });
+//                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -319,7 +312,6 @@ public class PaypalActivity extends BaseActivity {
         }
 
     }
-
 
     private void loadWebViewLoad(WebView webview, String url) {
         webview.getSettings().setJavaScriptEnabled(true);

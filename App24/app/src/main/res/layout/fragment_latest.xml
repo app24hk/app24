@@ -12,12 +12,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
+        <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/list_latest_feeds"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:clipToPadding="false"-->
+        <!--android:scaleType="fitXY"-->
+        <!--/>-->
+        <com.github.yasevich.endlessrecyclerview.EndlessRecyclerView
             android:id="@+id/list_latest_feeds"
+            xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
-            android:scaleType="fitXY"
-            />
+            android:orientation="vertical"
+            android:scaleType="fitXY"/>
+
+
     </android.support.v4.widget.SwipeRefreshLayout>
 </RelativeLayout>

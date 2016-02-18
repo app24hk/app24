@@ -2,9 +2,12 @@ package com.capstone.app24.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.capstone.app24.R;
+import com.capstone.app24.activities.CreatePostActivity;
+import com.capstone.app24.activities.SplashActivity;
 import com.capstone.app24.bean.OwnerDataModel;
 import com.capstone.app24.webservices_model.FeedRequestModel;
 import com.capstone.app24.webservices_model.UserLoginModel;
@@ -71,5 +74,22 @@ public class Session {
 
     public static OwnerDataModel getOwnerModel() {
         return mOwnerDataModel;
+    }
+
+    /**
+     * This method will logout user from App and Facebook.
+     * @param activity
+     */
+    public static void logout(Activity activity) {
+        new Utils(activity).setPreferences
+                (activity, Constants
+                        .KEY_IS_LOGGED_IN, false);
+        new Utils(activity).clearSharedPreferences(activity);
+        Intent intent = new Intent(activity, SplashActivity.class);
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        activity.finish();
+        activity.startActivity(intent);
     }
 }

@@ -76,26 +76,21 @@
             android:name=".activities.CommentActivity"
             android:screenOrientation="portrait"></activity>
 
-        <receiver android:name=".receiver.AlarmReceiver"
-                  android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".receiver.AlarmReceiver" android:process=":remote"/>
         <!--Paypal Classes-->
 
-        <service
-            android:name="com.paypal.android.sdk.payments.PayPalService"
-            android:exported="false"/>
+        <!--<service-->
+        <!--android:name="com.paypal.android.sdk.payments.PayPalService"-->
+        <!--android:exported="false"/>-->
 
-        <activity android:name="com.paypal.android.sdk.payments.PaymentActivity"/>
-        <activity android:name="com.paypal.android.sdk.payments.LoginActivity"/>
-        <activity android:name="com.paypal.android.sdk.payments.PaymentMethodActivity"/>
-        <activity android:name="com.paypal.android.sdk.payments.PaymentConfirmActivity"/>
-        <activity
-            android:name="io.card.payment.CardIOActivity"
-            android:configChanges="keyboardHidden|orientation"/>
-        <activity android:name="io.card.payment.DataEntryActivity"/>
+        <!--<activity android:name="com.paypal.android.sdk.payments.PaymentActivity"/>-->
+        <!--<activity android:name="com.paypal.android.sdk.payments.LoginActivity"/>-->
+        <!--<activity android:name="com.paypal.android.sdk.payments.PaymentMethodActivity"/>-->
+        <!--<activity android:name="com.paypal.android.sdk.payments.PaymentConfirmActivity"/>-->
+        <!--<activity-->
+        <!--android:name="io.card.payment.CardIOActivity"-->
+        <!--android:configChanges="keyboardHidden|orientation"/>-->
+        <!--<activity android:name="io.card.payment.DataEntryActivity"/>-->
 
         <activity android:name="com.facebook.FacebookActivity"
                   android:configChanges=

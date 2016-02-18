@@ -60,7 +60,7 @@
         android:layout_alignParentRight="true"
         android:background="@android:color/transparent"
         android:gravity="center"
-        android:text="@string/post"
+        android:text="@string/save"
         android:textColor="@color/white"/>
     <!-- Share feed Button-->
     <LinearLayout

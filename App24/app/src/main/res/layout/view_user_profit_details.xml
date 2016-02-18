@@ -34,7 +34,7 @@
                 android:layout_below="@+id/txt_total"
                 android:layout_margin="@dimen/main_screen_padding"
                 android:gravity="center"
-                android:text="@string/profile_count_login_user"
+                android:text="$0"
                 android:textColor="@color/text_small_blue"
                 android:textSize="@dimen/feed_heading_text"
                 android:textStyle="bold"/>
@@ -61,7 +61,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:gravity="right"
-                android:text="@string/profile_count_login_user"
+                android:text=""
                 android:textColor="@color/text_small_blue"/>
         </RelativeLayout>
         <RelativeLayout
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:gravity="right"
-                android:text="@string/profile_count_login_user"
+                android:text=""
                 android:textColor="@color/text_small_blue"/>
         </RelativeLayout>
         <RelativeLayout
@@ -96,9 +96,7 @@
             android:layout_below="@+id/layout_this_month"
             android:layout_marginTop="@dimen/main_screen_padding"
             android:background="@color/white"
-            android:paddingBottom="@dimen/main_screen_padding"
-            android:paddingLeft="@dimen/main_screen_padding"
-            android:paddingRight="@dimen/main_screen_padding">
+            android:padding="@dimen/main_screen_padding">
             <TextView
                 android:id="@+id/txt_unreceived_profit"
                 android:layout_width="wrap_content"
@@ -113,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:gravity="right"
-                android:text="@string/profile_count_login_user"
+                android:text=""
                 android:textColor="@color/text_small_blue"/>
         </RelativeLayout>
 

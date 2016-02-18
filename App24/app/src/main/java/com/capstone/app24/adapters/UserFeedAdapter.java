@@ -15,6 +15,7 @@ import android.widget.Filterable;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -77,28 +78,32 @@ public class UserFeedAdapter extends RecyclerView.Adapter<UserFeedAdapter.ViewHo
         if (userFeedModel.getType().equalsIgnoreCase(Constants.KEY_TEXT)) {
             holder.img_preview.setVisibility(View.GONE);
             holder.img_video_preview.setVisibility(View.GONE);
-            holder.layout_img_video_preview.setVisibility(View.GONE);
+//            holder.layout_img_video_preview.setVisibility(View.GONE);
             holder.progress_dialog.setVisibility(View.GONE);
+            holder.progress_dialog_layout.setVisibility(View.GONE);
         } else if (userFeedModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
             holder.img_preview.setVisibility(View.VISIBLE);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
-                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
-            holder.img_preview.setLayoutParams(params);
+//            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
+//                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
+//            holder.img_preview.setLayoutParams(params);
             Glide.with(mActivity).load(userFeedModel.getMedia()).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                     .into(holder.img_preview);
+            holder.progress_dialog.setVisibility(View.VISIBLE);
+            holder.progress_dialog_layout.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.GONE);
-            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
+//            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         } else if (userFeedModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
             holder.img_preview.setVisibility(View.VISIBLE);
             holder.img_video_preview.setVisibility(View.VISIBLE);
-            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
-                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
-            holder.img_preview.setLayoutParams(params);
+//            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
+            holder.progress_dialog.setVisibility(View.VISIBLE);
+            holder.progress_dialog_layout.setVisibility(View.VISIBLE);
+//            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout
+//                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
+//            holder.img_preview.setLayoutParams(params);
             Glide.with(mActivity).load(userFeedModel.getThumbnail()).centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
                     .into(holder.img_preview);
-            holder.layout_img_video_preview.setVisibility(View.VISIBLE);
         }
         holder.txt_feed_heading.setText(StringEscapeUtils.unescapeJava(userFeedModel.getTitle()));
         holder.txt_feed_body.setText(StringEscapeUtils.unescapeJava(userFeedModel.getDescription
@@ -110,13 +115,25 @@ public class UserFeedAdapter extends RecyclerView.Adapter<UserFeedAdapter.ViewHo
         else
             holder.txt_profile_count_login_user.setText(userFeedModel.getProfit_amount());
 
-        holder.txt_created_time.setText(Utils.getTimeAgo(Long.parseLong(userFeedModel.getCreated
-                ())));
+        holder.txt_created_time.setText(Utils.getTimeAgo(mActivity, Long.parseLong(userFeedModel
+                .getCreated
+                        ())));
 
         holder.img_preview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showImageDialog(friendslist.get(position).getMedia());
+                if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
+                    new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
+                            (position));
+                    Utils.debug(TAG, "layout_img_video_preview Clicked : Data of Latest Feed " +
+                            "Model : " + new Utils(mActivity)
+                            .getLatestFeedPreferences(mActivity));
+                    intent = new Intent(mActivity, VideoActivity.class);
+                    mActivity.startActivity(intent);
+                } else if (holder.img_video_preview
+                        .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
+                    showImageDialog(friendslist.get(position).getMedia());
+                }//                showImageDialog(friendslist.get(position).getMedia());
             }
         });
         holder.img_video_preview.setOnClickListener(new View.OnClickListener() {
@@ -128,20 +145,20 @@ public class UserFeedAdapter extends RecyclerView.Adapter<UserFeedAdapter.ViewHo
                 mActivity.startActivity(intent);
             }
         });
-        holder.layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
-                    new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
-                            (position));
-                    intent = new Intent(mActivity, VideoActivity.class);
-                    mActivity.startActivity(intent);
-                } else if (holder.img_video_preview
-                        .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
-                    showImageDialog(friendslist.get(position).getMedia());
-                }
-            }
-        });
+//        holder.layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
+//                    new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
+//                            (position));
+//                    intent = new Intent(mActivity, VideoActivity.class);
+//                    mActivity.startActivity(intent);
+//                } else if (holder.img_video_preview
+//                        .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
+//                    showImageDialog(friendslist.get(position).getMedia());
+//                }
+//            }
+//        });
 
     }
 
@@ -152,14 +169,14 @@ public class UserFeedAdapter extends RecyclerView.Adapter<UserFeedAdapter.ViewHo
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        private final FrameLayout progress_dialog;
+        private final ProgressBar progress_dialog;
 
         private final LinearLayout layout_feed_body;
         private final LinearLayout view_profit_and_feeds;
         TextView txt_feed_heading, txt_creator, txt_created_time, txt_profile_count_login_user,
                 txt_feed_body, txt_seen;
         ImageView img_preview, img_video_preview;
-        RelativeLayout layout_img_video_preview, xtra_layout;
+        RelativeLayout layout_img_video_preview, xtra_layout, progress_dialog_layout;
 
         public ViewHolder(View itemView, Activity act) {
             super(itemView);
@@ -175,16 +192,17 @@ public class UserFeedAdapter extends RecyclerView.Adapter<UserFeedAdapter.ViewHo
             view_profit_and_feeds = (LinearLayout) itemView.findViewById(R.id.view_profit_and_feeds);
             layout_img_video_preview = (RelativeLayout) itemView.findViewById(R.id.layout_img_video_preview);
             xtra_layout = (RelativeLayout) itemView.findViewById(R.id.xtra_layout);
-            progress_dialog = (FrameLayout) itemView.findViewById(R.id.progress_dialog);
-
+            progress_dialog = (ProgressBar) itemView.findViewById(R.id.progress_dialog);
+            progress_dialog_layout = (RelativeLayout) itemView.findViewById(R.id.progress_dialog_layout);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     new Utils(mActivity).setUserFeedPreferences(mActivity, friendslist.get
                             (getLayoutPosition()));
 //                    makeSeenPostRequest(friendslist.get(getLayoutPosition()).getUser_id(), friendslist.get(getLayoutPosition()).getId());
+                    mActivity.finish();
                     intent = new Intent(mActivity, PostDetailActivity.class);
-                    //intent.putExtra("type", getLayoutPosition());
+                    intent.putExtra(Constants.IS_FROM_LIST, true);
                     mActivity.startActivity(intent);
                 }
             });

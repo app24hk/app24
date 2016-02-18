@@ -225,8 +225,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
 
 
                 publishProgress(1);
-                Utils.debug(TAG, "galleryImagesAndVideoModelArrayList.size() : " +
-                        "" + mGalleryList.size());
             }
             return null;
         }
@@ -234,9 +232,12 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         @Override
         protected void onProgressUpdate(Integer... values) {
             //  super.onProgressUpdate(values);
-            Utils.debug(TAG, "Inside OnProgressUpdate");
-
-            imageAdapter.notifyDataSetChanged();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    imageAdapter.notifyDataSetChanged();
+                }
+            });
 
         }
     }
@@ -266,26 +267,26 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void updateUI() {
-
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-
-                Bundle bundle = new Bundle();
-                bundle.putString("path", view.getTag().toString());
-                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
-                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
-                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
-                if (isEditable)
-                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
-                intent.putExtra("come_from", "gallery");
-                intent.putExtra("gallery_bundle", bundle);
-                finish();
-
-                startActivity(intent);
-            }
-        });
+//
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//
+//                Bundle bundle = new Bundle();
+//                bundle.putString("path", view.getTag().toString());
+//                Intent intent = new Intent(AddMediaActivity.this, CreatePostActivity.class);
+//                intent.putExtra(Constants.IS_FROM_MEDIA_ACTIVITY, true);
+//                intent.putExtra(Constants.KEY_GALLERY_TYPE, mType);
+//                if (isEditable)
+//                    intent.putExtra(Constants.KEY_IS_EDITABLE, true);
+//                intent.putExtra("come_from", "gallery");
+//                intent.putExtra("gallery_bundle", bundle);
+//                finish();
+//
+//                startActivity(intent);
+//            }
+//        });
 
     }
 
@@ -530,7 +531,6 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
         }
 
         public View getView(final int position, View convertView, ViewGroup parent) {
-            Utils.debug(TAG, mGalleryModelsList.size() + "");
             ViewHolder holder = null;
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.grid_item_view, null);
@@ -594,9 +594,14 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                     }
                 }
 
-                convertView.setOnClickListener(new View.OnClickListener() {
+                finalConvertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        mDialog = Utils.showSweetProgressDialog(AddMediaActivity.this,
+                                getResources().getString(R
+                                        .string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
+                        finish();
+                        closeCursor();
                         Utils.debug(TAG, "mGalleryModelsList.get(position).getImage() : " + mGalleryModelsList.get(position).getImage());
                         if (mGalleryModelsList.get(position).getImage() != null) {
 
@@ -747,13 +752,13 @@ public class AddMediaActivity extends BaseActivity implements View.OnClickListen
                                     finish();
                                     startActivity(intent);
                                 }
-                                Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
+
                             }
 
                         } else {
                             AlertToastManager.showToast("Loading images", AddMediaActivity.this);
                         }
-
+                        Utils.closeSweetProgressDialog(AddMediaActivity.this, mDialog);
                     }
                 });
             }

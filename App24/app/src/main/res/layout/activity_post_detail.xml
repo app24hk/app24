@@ -120,14 +120,14 @@
                         android:singleLine="true"
                         android:text="3,027"
                         android:textSize="@dimen/grey_heading_text"/>
-                    <com.facebook.share.widget.LikeView
-                        android:id="@+id/like_view"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toStartOf="@+id/like_count">
-                    </com.facebook.share.widget.LikeView>
+                    <!--<com.facebook.share.widget.LikeView-->
+                    <!--android:id="@+id/like_view"-->
+                    <!--android:layout_width="0dp"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:layout_centerVertical="true"-->
+                    <!--android:layout_marginLeft="5dp"-->
+                    <!--android:layout_toStartOf="@+id/like_count">-->
+                    <!--</com.facebook.share.widget.LikeView>-->
                     <Button
                         android:id="@+id/like"
                         android:layout_width="wrap_content"

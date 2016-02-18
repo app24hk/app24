@@ -29,7 +29,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="left|center_vertical"
-            android:hint="Search"
+            android:hint="@string/search"
             android:imeOptions="actionSearch"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
@@ -73,7 +73,7 @@
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
         android:padding="5dp"
-        android:text="Cancel"
+        android:text="@string/cancel"
         android:visibility="gone"/>
     <View
         android:layout_width="match_parent"

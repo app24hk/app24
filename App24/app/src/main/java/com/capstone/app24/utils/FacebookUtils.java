@@ -14,7 +14,7 @@ import org.json.JSONObject;
 public class FacebookUtils {
     public static String mUrl;
 
-    public static String getFeedUrl(String feedId) {
+    private static String getFeedUrl(String feedId) {
         new GraphRequest(
                 AccessToken.getCurrentAccessToken(),
                 "/" + feedId,

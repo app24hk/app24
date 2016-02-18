@@ -1,35 +1,24 @@
 package com.capstone.app24.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.capstone.app24.R;
 import com.capstone.app24.utils.APIsConstants;
 import com.capstone.app24.utils.AlertToastManager;
 import com.capstone.app24.utils.AppController;
 import com.capstone.app24.utils.Constants;
+import com.capstone.app24.utils.Session;
 import com.capstone.app24.utils.Utils;
-import com.capstone.app24.webservices_model.UserLoginResponseModel;
-import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.LoginButton;
-import com.paypal.android.sdk.payments.PayPalConfiguration;
-import com.paypal.android.sdk.payments.PayPalPayment;
-import com.paypal.android.sdk.payments.PayPalService;
-import com.paypal.android.sdk.payments.PaymentActivity;
-import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,15 +36,13 @@ public class SettingsActivity extends BaseActivity {
     private static final String TAG = SettingsActivity.class.getSimpleName();
     private RelativeLayout layout_paypal, layout_about, layout_logout;
 
-    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
-    // note that these credentials will differ between live & sandbox environments.
-    private static final String CONFIG_CLIENT_ID = "AcqYvFVkNOVGuh1hZVlQgzfavgG7UxLm22QBXXGXyiT-Gp7OK2kfT3bEOAirkc-ruokolbC34JDrCWsI";
-    private static final int REQUEST_CODE_PAYMENT = 1;
-    private static PayPalConfiguration config = new PayPalConfiguration()
-            .environment(CONFIG_ENVIRONMENT)
-            .clientId(CONFIG_CLIENT_ID);
-
-    private LoginButton fb_btn;
+//    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
+//    // note that these credentials will differ between live & sandbox environments.
+//    private static final String CONFIG_CLIENT_ID = "AcqYvFVkNOVGuh1hZVlQgzfavgG7UxLm22QBXXGXyiT-Gp7OK2kfT3bEOAirkc-ruokolbC34JDrCWsI";
+//    private static final int REQUEST_CODE_PAYMENT = 1;
+//    private static PayPalConfiguration config = new PayPalConfiguration()
+//            .environment(CONFIG_ENVIRONMENT)
+//            .clientId(CONFIG_CLIENT_ID);
 
     /* Volley Request Tags */
     private String res = "";
@@ -75,7 +62,6 @@ public class SettingsActivity extends BaseActivity {
         layout_paypal = (RelativeLayout) findViewById(R.id.layout_paypal);
         layout_about = (RelativeLayout) findViewById(R.id.layout_about);
         layout_logout = (RelativeLayout) findViewById(R.id.layout_logout);
-        fb_btn = (LoginButton) findViewById(R.id.login_button);
     }
 
     private void setClickListeners() {
@@ -166,17 +152,7 @@ public class SettingsActivity extends BaseActivity {
     private void logoutResponse(String res) throws JSONException {
         JSONObject jsonObject = new JSONObject(res);
         if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
-            new Utils(SettingsActivity
-                    .this).setPreferences
-                    (SettingsActivity.this, Constants
-                            .KEY_IS_LOGGED_IN, false);
-            new Utils(this).clearSharedPreferences(this);
-            finish();
-            Intent intent = new Intent(SettingsActivity.this, SplashActivity.class);
-            intent.setAction(Intent.ACTION_MAIN);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.addCategory(Intent.CATEGORY_HOME);
-            startActivity(intent);
+            Session.logout(SettingsActivity.this);
         } else {
             try {
                 Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
@@ -189,52 +165,52 @@ public class SettingsActivity extends BaseActivity {
 
     }
 
-    public void onBuyPressed() {
-        PayPalPayment thingToBuy = getThingToBuy(PayPalPayment.PAYMENT_INTENT_SALE);
-        Intent intent = new Intent(SettingsActivity.this, PaymentActivity.class);
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, thingToBuy);
-        startActivityForResult(intent, REQUEST_CODE_PAYMENT);
-    }
+//    public void onBuyPressed() {
+//        PayPalPayment thingToBuy = getThingToBuy(PayPalPayment.PAYMENT_INTENT_SALE);
+//        Intent intent = new Intent(SettingsActivity.this, PaymentActivity.class);
+//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//        intent.putExtra(PaymentActivity.EXTRA_PAYMENT, thingToBuy);
+//        startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+//    }
 
-    private PayPalPayment getThingToBuy(String paymentIntent) {
-        return new PayPalPayment(new BigDecimal("1.75"), "USD", "Sample item",
-                paymentIntent);
-    }
+//    private PayPalPayment getThingToBuy(String paymentIntent) {
+//        return new PayPalPayment(new BigDecimal("1.75"), "USD", "Sample item",
+//                paymentIntent);
+//    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CODE_PAYMENT) {
-            if (resultCode == Activity.RESULT_OK) {
-                PaymentConfirmation confirm =
-                        data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-                if (confirm != null) {
-                    try {
-                        Log.e("Show", confirm.toJSONObject().toString(4));
-                        Log.e("Show", confirm.getPayment().toJSONObject().toString(4));
-                        /**
-                         *  TODO: send 'confirm' (and possibly confirm.getPayment() to your server for verification
-                         */
-                        Toast.makeText(getApplicationContext(), "PaymentConfirmation info received" +
-                                " from PayPal", Toast.LENGTH_LONG).show();
-                    } catch (JSONException e) {
-                        Toast.makeText(getApplicationContext(), "an extremely unlikely failure" +
-                                " occurred:", Toast.LENGTH_LONG).show();
-                    }
-                }
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                Toast.makeText(getApplicationContext(), "The user canceled.", Toast.LENGTH_LONG).show();
-            } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
-                Toast.makeText(getApplicationContext(), "An invalid Payment or PayPalConfiguration" +
-                        " was submitted. Please see the docs.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == REQUEST_CODE_PAYMENT) {
+//            if (resultCode == Activity.RESULT_OK) {
+//                PaymentConfirmation confirm =
+//                        data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+//                if (confirm != null) {
+//                    try {
+//                        Log.e("Show", confirm.toJSONObject().toString(4));
+//                        Log.e("Show", confirm.getPayment().toJSONObject().toString(4));
+//                        /**
+//                         *  TODO: send 'confirm' (and possibly confirm.getPayment() to your server for verification
+//                         */
+//                        Toast.makeText(getApplicationContext(), "PaymentConfirmation info received" +
+//                                " from PayPal", Toast.LENGTH_LONG).show();
+//                    } catch (JSONException e) {
+//                        Toast.makeText(getApplicationContext(), "an extremely unlikely failure" +
+//                                " occurred:", Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//            } else if (resultCode == Activity.RESULT_CANCELED) {
+//                Toast.makeText(getApplicationContext(), "The user canceled.", Toast.LENGTH_LONG).show();
+//            } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+//                Toast.makeText(getApplicationContext(), "An invalid Payment or PayPalConfiguration" +
+//                        " was submitted. Please see the docs.", Toast.LENGTH_LONG).show();
+//            }
+//        }
+//    }
 
     @Override
     public void onDestroy() {
         // Stop service when done
-        stopService(new Intent(this, PayPalService.class));
+//        stopService(new Intent(this, PayPalService.class));
         super.onDestroy();
     }
 
