@@ -1,4 +1,4 @@
-package com.capstone.app24;
+package com.capstone.hk;
 
 import org.junit.Test;
 

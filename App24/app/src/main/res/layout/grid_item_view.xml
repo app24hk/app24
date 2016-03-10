@@ -10,7 +10,7 @@
         android:layout_marginBottom="5dp"
         android:background="@color/white"
         android:padding="1dp">
-        <com.capstone.app24.custom.SquareImageView
+        <com.capstone.hk.custom.SquareImageView
             android:id="@+id/pictures_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

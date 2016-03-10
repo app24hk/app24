@@ -5,10 +5,17 @@
     <!--<string name="app_id">1673090976236867</string>-->
     <!--capstone facebook id -->
     <string name="app_id">1626774610922182</string>
+
     <!--Banner ad unit-id-->
-    <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383
-    </string>
+    <!--Development  -->
+    <!--<string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>-->
+    <!--<string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383-->
+
+    <!--Production -->
+    <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/3203478581</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/7773278987</string>
+
+    <!--Banner ad unit-id-->
     <!-- Splash Screen-->
     <string name="terms_of_use">使用條款</string>
     <string name="by_continuing">如果繼續，即表示你同意</string>
@@ -33,7 +40,9 @@
     <string name="this_month_profit">今月利潤分成</string>
     <string name="unreceived_profit">未領利潤分成</string>
     <string name="paypal">Paypal</string>
-    <string name="about">關於</string>
+    <!--<string name="about">關於</string>-->
+    <string name="about">使用條款</string>
+
     <string name="logout">登出</string>
     <string name="setting">設定</string>
     <string name="email_hint_chinese">請填寫您的Paypal帳戶信箱</string>
@@ -93,9 +102,11 @@
     <string name="year_ago">&#032; 年以前</string>
 
     <string name="upload_error">無法上載影片至 Facebook</string>
-    <string name="you_cant_share_this_feed">You can\'t share your own feed!</string>
     <string name="paypal_info_updated_successfully">PapPal 資料已成功更新</string>
     <string name="delete_successfully">已刪除</string>
+    <string name="are_you_sure_you_want_to_exit">請確認要退出？</string>
+    <string name="ok">取消</string>
+    <string name="yes">確認</string>
 
 
 </resources>

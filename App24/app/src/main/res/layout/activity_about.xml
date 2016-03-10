@@ -7,38 +7,60 @@
     <include
         android:id="@+id/menu_grey"
         layout="@layout/grey_main_toolbar"/>
+    <!--<TextView-->
+    <!--android:id="@+id/textview"-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center_horizontal"-->
+    <!--android:text="loading...."-->
+    <!--android:textColor="#000000"-->
+    <!--android:textSize="16dp">-->
+    <!--</TextView>-->
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="@dimen/main_screen_padding">
+    <!--<ProgressBar-->
+    <!--android:id="@+id/progressBar1"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center"/>-->
 
-            <TextView
-                android:id="@+id/about_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_marginBottom="30dp"
-                android:text="@string/about"
-                android:textColor="@color/black"/>
-            <TextView
-                android:id="@+id/about_sub_heading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/about_heading"
-                android:layout_marginBottom="30dp"
-                android:text="@string/key_to_success"
-                android:textColor="@color/black"/>
-            <TextView
-                android:id="@+id/about_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/about_sub_heading"
-                android:text="@string/lorem_ipsum"
-                android:textColor="@color/black"/>
-        </RelativeLayout>
-    </ScrollView>
+    <WebView
+        android:id="@+id/webview_aboutus"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+
+        />
+
+    <!--<ScrollView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+    <!--<RelativeLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:padding="@dimen/main_screen_padding">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/about_heading"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_alignParentTop="true"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--android:text="@string/about"-->
+    <!--android:textColor="@color/black"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/about_sub_heading"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/about_heading"-->
+    <!--android:layout_marginBottom="30dp"-->
+    <!--android:text="@string/key_to_success"-->
+    <!--android:textColor="@color/black"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/about_description"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_below="@+id/about_sub_heading"-->
+    <!--android:text="@string/lorem_ipsum"-->
+    <!--android:textColor="@color/black"/>-->
+    <!--</RelativeLayout>-->
+    <!--</ScrollView>-->
 </LinearLayout>

@@ -19,7 +19,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_toLeftOf="@+id/cancel"
                     android:padding="10dp">
-        <com.capstone.app24.custom.CustomDrawablEditText
+        <com.capstone.hk.custom.CustomDrawablEditText
             android:id="@+id/edit_search"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -36,7 +36,7 @@
             android:singleLine="true"
             android:visibility="gone">
             <requestFocus/>
-        </com.capstone.app24.custom.CustomDrawablEditText>
+        </com.capstone.hk.custom.CustomDrawablEditText>
 
     </RelativeLayout>
 
