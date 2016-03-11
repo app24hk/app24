@@ -4,7 +4,7 @@
                 android:layout_height="match_parent"
                 android:background="@android:color/black">
 
-    <com.capstone.hk.utils.TouchImageView
+    <app24.feedbook.hk.utils.TouchImageView
         android:id="@+id/custom_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -23,7 +23,7 @@
     </FrameLayout>
 
     <!-- [ End of tab scroll color ] -->
-    <com.capstone.hk.sliding_tabs.SlidingTabLayout
+    <app24.feedbook.hk.sliding_tabs.SlidingTabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
