@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import app24.feedbook.hk.adapters.MostViewedAdapter;
 import app24.feedbook.hk.animations.HidingScrollListener;
 import app24.feedbook.hk.bean.LatestFeedsModel;
 import app24.feedbook.hk.interfaces.OnDeleteListener;
+import app24.feedbook.hk.interfaces.OnLoadMoreListener;
 import app24.feedbook.hk.utils.APIsConstants;
 import app24.feedbook.hk.utils.AppController;
 import app24.feedbook.hk.utils.Constants;
@@ -49,14 +51,13 @@ import volley.toolbox.StringRequest;
  * Created by amritpal on 4/11/15.
  */
 public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
-        OnDeleteListener, EndlessRecyclerView.Pager {
+        OnDeleteListener {
     private static final String TAG = MostViewedFragment.class.getSimpleName();
     private View mView;
     private Context mContext;
     private Activity mActivity;
     public MostViewedAdapter mMostViewedAdapter;
-    //    private RecyclerView most_viewed_feeds;
-    private EndlessRecyclerView most_viewed_feeds;
+    private RecyclerView most_viewed_feeds;
 
     private int mPageNo = 1;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -65,6 +66,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
     private SweetAlertDialog mDialog;
     private String res = "";
     private String tag_string_req = "feeds_req";
+    private boolean hasMoreItems = true;
 
     @Override
     public void onResume() {
@@ -90,20 +92,45 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
             Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
                     .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
         }
-        mMostViewedAdapter = new MostViewedAdapter(getActivity(), mMostViewedFeedList);
-        most_viewed_feeds.setAdapter(mMostViewedAdapter);
+
+        most_viewed_feeds.setHasFixedSize(true);
         most_viewed_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
-        most_viewed_feeds.setProgressView(R.layout.item_progress);
-        most_viewed_feeds.setPager(this);
+
+        mMostViewedAdapter = new MostViewedAdapter(getActivity(), mMostViewedFeedList, most_viewed_feeds);
+        most_viewed_feeds.setAdapter(mMostViewedAdapter);
+
+        mMostViewedAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                if (hasMoreItems) {
+                    mMostViewedFeedList.add(null);
+                    mMostViewedAdapter.notifyItemInserted(mMostViewedFeedList.size() - 1);
+
+                    refreshItems();
+                } else {
+                }
+            }
+        });
+
+
+        //most_viewed_feeds.setProgressView(R.layout.item_progress);
+//        most_viewed_feeds.setPager(this);
         return mView;
     }
+
+    public void refreshItems() {
+        mPageNo = mPageNo + 1;
+        getMostViewedFeeds();
+    }
+
 
     private void updateUI() {
         mMostViewedAdapter.notifyDataSetChanged();
     }
 
     private void initializeViews() {
-        most_viewed_feeds = (EndlessRecyclerView) mView.findViewById(R.id.most_viewed_feeds);
+        most_viewed_feeds = (RecyclerView) mView.findViewById(R.id.most_viewed_feeds);
         initRecyclerView();
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -212,10 +239,18 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                 if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
                     JSONArray jsonArray = jsonObject.getJSONArray(APIsConstants.KEY_FEED_DATA);
                     if (jsonArray != null) {
+
+                        if (mPageNo > 1) {
+                            if (mMostViewedFeedList.size() != 0) {
+                                mMostViewedFeedList.remove(mMostViewedFeedList.size() - 1);
+                                mMostViewedAdapter.notifyItemRemoved(mMostViewedFeedList.size());
+                            }
+                        }
+
                         if (mPageNo == 1)
                             mMostViewedFeedList.clear();
-                        ITEMS_ON_PAGE = jsonArray.length();
-                        addItems();
+//                        ITEMS_ON_PAGE = jsonArray.length();
+//                        addItems();
                         for (int i = 0; i < jsonArray.length(); i++) {
                             LatestFeedsModel mostViewedModel = new LatestFeedsModel();
                             JSONObject object = jsonArray.getJSONObject(i);
@@ -303,6 +338,13 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                         }
                     }
                 } else {
+
+                    if (mMostViewedFeedList.size() != 0) {
+                        hasMoreItems = false;
+                        mMostViewedFeedList.remove(mMostViewedFeedList.size() - 1);
+                        mMostViewedAdapter.notifyItemRemoved(mMostViewedFeedList.size());
+                        mMostViewedAdapter.notifyDataSetChanged();
+                    }
                     try {
                         Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
 //                        Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
@@ -316,6 +358,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
         mMostViewedAdapter.notifyDataSetChanged();
+        mMostViewedAdapter.setLoaded();
         swipeRefreshLayout.setRefreshing(false);
 //        if (mPageNo == 1)
         Utils.closeSweetProgressDialog(getActivity(), mDialog);
@@ -325,14 +368,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
 
     @Override
     public void onRefresh() {
-//        mPageNo = mPageNo + 1;
-//        getMostViewedFeeds();
         mPageNo = 1;
-
-//        ITEMS_ON_PAGE = 0;
-//        latestFeedList.clear();
-        loading = false;
-        mMostViewedAdapter.setCount(0);
         getMostViewedFeeds();
     }
 
@@ -347,42 +383,5 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
             }
         }
     }
-
-    int ITEMS_ON_PAGE = 0;
-    private static final int TOTAL_PAGES = 10;
-    private static final long DELAY = 1000L;
-    private boolean loading = false;
-
-    private final Handler handler = new Handler();
-
-    @Override
-    public boolean shouldLoad() {
-//        return false;
-        return !loading && mMostViewedAdapter.getItemCount() / ITEMS_ON_PAGE < TOTAL_PAGES;
-
-    }
-
-
-    @Override
-    public void loadNextPage() {
-        loading = true;
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mPageNo = mPageNo + 1;                //addItems();
-
-                getMostViewedFeeds();
-
-                most_viewed_feeds.setRefreshing(false);
-                loading = false;
-                //addItems();
-            }
-        }, DELAY);
-    }
-
-    private void addItems() {
-        mMostViewedAdapter.setCount(mMostViewedAdapter.getItemCount() + ITEMS_ON_PAGE);
-    }
-
 
 }

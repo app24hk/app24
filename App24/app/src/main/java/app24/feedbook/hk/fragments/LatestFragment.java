@@ -21,6 +21,7 @@ import app24.feedbook.hk.adapters.LatestFeedsAdapter;
 import app24.feedbook.hk.animations.HidingScrollListener;
 import app24.feedbook.hk.bean.LatestFeedsModel;
 import app24.feedbook.hk.interfaces.OnDeleteListener;
+import app24.feedbook.hk.interfaces.OnLoadMoreListener;
 import app24.feedbook.hk.utils.APIsConstants;
 import app24.feedbook.hk.utils.AppController;
 import app24.feedbook.hk.utils.Constants;
@@ -49,12 +50,12 @@ import volley.toolbox.StringRequest;
 /**
  * Created by amritpal on 3/11/15.
  */
-public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener, EndlessRecyclerView.Pager {
+public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener/*, EndlessRecyclerView.Pager*/ {
 
     private static final String TAG = LatestFragment.class.getSimpleName();
     View mView;
     //    private RecyclerView list_latest_feeds;
-    private EndlessRecyclerView list_latest_feeds;
+    private RecyclerView list_latest_feeds;
     public LatestFeedsAdapter mLatestFeedsAdapter;
     private Context mContext;
     private Activity mActivity;
@@ -68,6 +69,7 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     /* End of Volley Request Tags */
     private SweetAlertDialog mDialog;
     private LinearLayoutManager linearLayoutManager;
+    private boolean hasMoreItems = true;
 
     @Override
 
@@ -88,14 +90,39 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
                     .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
         }
-        mLatestFeedsAdapter = new LatestFeedsAdapter(getActivity(), latestFeedList);
+
         list_latest_feeds.setHasFixedSize(true);
         list_latest_feeds.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mLatestFeedsAdapter = new LatestFeedsAdapter(getActivity(), latestFeedList, list_latest_feeds);
         list_latest_feeds.setAdapter(mLatestFeedsAdapter);
-        list_latest_feeds.setProgressView(R.layout.item_progress);
-        list_latest_feeds.setPager(this);
-        mLatestFeedsAdapter.notifyDataSetChanged();
+
+        mLatestFeedsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                if (hasMoreItems) {
+                    latestFeedList.add(null);
+                    mLatestFeedsAdapter.notifyItemInserted(latestFeedList.size() - 1);
+
+                    refreshItems();
+                } else {
+                }
+            }
+        });
+
+
+
+
+        //   list_latest_feeds.setProgressView(R.layout.item_progress);
+//        list_latest_feeds.setPager(this);
+
+
         return mView;
+    }
+
+    public void refreshItems() {
+        mPageNo = mPageNo + 1;
+        getLatestFeeds();
     }
 
     @Override
@@ -142,12 +169,13 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
      * Initialize views for the user Interface
      */
     private void initializeViews() {
-        list_latest_feeds = (EndlessRecyclerView) mView.findViewById(R.id.list_latest_feeds);
+        list_latest_feeds = (RecyclerView) mView.findViewById(R.id.list_latest_feeds);
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
         disabler = new RecyclerViewDisabler();
         swipeRefreshLayout.setOnRefreshListener(this);
-        initRecyclerView();
         InterfaceListener.setOnDeleteListener(LatestFragment.this);
+
+        initRecyclerView();
     }
 
     public boolean getLatestFeeds() {
@@ -215,10 +243,19 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 if (jsonArray != null) {
                     //latestFeedList.clear();
                     //mLatestFeedsAdapter.setCount(jsonArray.length());
-                    if (mPageNo == 1)
-                        latestFeedList.clear();
-                    ITEMS_ON_PAGE = jsonArray.length();
-                    addItems();
+
+
+                    if (mPageNo > 1) {
+                        if (latestFeedList.size() != 0) {
+                            latestFeedList.remove(latestFeedList.size() - 1);
+                            mLatestFeedsAdapter.notifyItemRemoved(latestFeedList.size());
+                        }
+                    }
+
+                   /* if (mPageNo == 1)
+                        latestFeedList.clear();*/
+//                    ITEMS_ON_PAGE = jsonArray.length();
+//                    addItems();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
                         JSONObject object = jsonArray.getJSONObject(i);
@@ -296,9 +333,17 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         }
                     }
                     mLatestFeedsAdapter.notifyDataSetChanged();
-
+                    mLatestFeedsAdapter.setLoaded();
                 }
             } else {
+
+                if (latestFeedList.size() != 0) {
+                    hasMoreItems = false;
+                    latestFeedList.remove(latestFeedList.size() - 1);
+                    mLatestFeedsAdapter.notifyItemRemoved(latestFeedList.size());
+                    mLatestFeedsAdapter.notifyDataSetChanged();
+                }
+
                 try {
                     Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
                 } catch (Exception e) {
@@ -319,8 +364,8 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
 //        ITEMS_ON_PAGE = 0;
 //        latestFeedList.clear();
-        loading = false;
-        mLatestFeedsAdapter.setCount(0);
+//        loading = false;
+        //mLatestFeedsAdapter.setCount(0);
         getLatestFeeds();
 //        mLatestFeedsAdapter.notifyDataSetChanged();
     }
@@ -336,41 +381,41 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         }
     }
-
-    int ITEMS_ON_PAGE = 0;
-    private static final int TOTAL_PAGES = 10;
-    private static final long DELAY = 1000L;
-    private boolean loading = false;
-
-    private final Handler handler = new Handler();
-
-    @Override
-    public boolean shouldLoad() {
-//        return false;
-        return !loading && mLatestFeedsAdapter.getItemCount() / ITEMS_ON_PAGE < TOTAL_PAGES;
-
-    }
-
-
-    @Override
-    public void loadNextPage() {
-        loading = true;
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getLatestFeeds();
-
-                mPageNo = mPageNo + 1;                //addItems();
+//
+//    int ITEMS_ON_PAGE = 0;
+//    private static final int TOTAL_PAGES = 10;
+//    private static final long DELAY = 1000L;
+//    private boolean loading = false;
+//
+//    private final Handler handler = new Handler();
+//
+//    @Override
+//    public boolean shouldLoad() {
+////        return false;
+//        return !loading && mLatestFeedsAdapter.getItemCount() / ITEMS_ON_PAGE < TOTAL_PAGES;
+//
+//    }
 
 
-                list_latest_feeds.setRefreshing(false);
-                loading = false;
-                //addItems();
-            }
-        }, DELAY);
-    }
+//    @Override
+//    public void loadNextPage() {
+//        loading = true;
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                getLatestFeeds();
+//
+//                mPageNo = mPageNo + 1;                //addItems();
+//
+//
+//                list_latest_feeds.setRefreshing(false);
+//                loading = false;
+//                //addItems();
+//            }
+//        }, DELAY);
+//    }
 
-    private void addItems() {
+   /* private void addItems() {
         mLatestFeedsAdapter.setCount(mLatestFeedsAdapter.getItemCount() + ITEMS_ON_PAGE);
-    }
+    }*/
 }

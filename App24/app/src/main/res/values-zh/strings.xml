@@ -9,12 +9,11 @@
     <!--Banner ad unit-id-->
     <!--Development  -->
     <!--<string name="banner_ad_unit_id">ca-app-pub-8326929898685917/8560858180</string>-->
-    <!--<string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383-->
+    <!--<string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/1037591383</string>-->
 
     <!--Production -->
-    <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/3203478581</string>
-    <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/7773278987</string>
-
+    <string name="interstitial_ad_unit_id">ca-app-pub-8326929898685917/3203478581</string>
+    <string name="banner_ad_unit_id">ca-app-pub-8326929898685917/7773278987</string>
     <!--Banner ad unit-id-->
     <!-- Splash Screen-->
     <string name="terms_of_use">使用條款</string>
