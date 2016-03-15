@@ -3,6 +3,7 @@ package app24.feedbook.hk.utils;
 import app24.feedbook.hk.bean.GalleryModel;
 import app24.feedbook.hk.bean.OwnerDataModel;
 import app24.feedbook.hk.bean.UserFeedModel;
+import app24.feedbook.hk.interfaces.OnAdViewListener;
 import app24.feedbook.hk.interfaces.OnDeleteListener;
 import app24.feedbook.hk.interfaces.OnListUpdateListener;
 import app24.feedbook.hk.interfaces.OnLoadMoreListener;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 public class InterfaceListener {
     public static OnListUpdateListener mOnListUpdateListener;
     public static OnDeleteListener mOnDeleteListener;
+    public static OnAdViewListener mOnAdViewListener;
     public static OwnerDataModel mOwnerDataModel;
     public static OnLoadMoreListener mOnLoadMoreListener;
     public static OnNewMediaListener mOnNewMediaListener;
@@ -51,6 +53,18 @@ public class InterfaceListener {
     public static void OnDelete(String id, boolean isDelete) {
         try {
             mOnDeleteListener.onDelete(id, isDelete);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setOnAdViewListener(OnAdViewListener listener) {
+        mOnAdViewListener = listener;
+    }
+
+    public static void onAdView() {
+        try {
+            mOnAdViewListener.onAdView();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -18,7 +18,7 @@
         <!--android:layout_height="wrap_content"-->
         <!--android:layout_below="@+id/layout_unreceived">-->
         <!--</android.support.v7.widget.RecyclerView>-->
-        <com.github.yasevich.endlessrecyclerview.EndlessRecyclerView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/user_feeds_list"
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"

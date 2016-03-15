@@ -12,6 +12,8 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -26,6 +28,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import app24.feedbook.hk.activities.MainActivity;
 import app24.feedbook.hk.activities.PostDetailActivity;
 import app24.feedbook.hk.activities.VideoActivity;
+import app24.feedbook.hk.animations.HidingScrollListener;
 import app24.feedbook.hk.bean.LatestFeedsModel;
 import app24.feedbook.hk.interfaces.OnLoadMoreListener;
 import app24.feedbook.hk.utils.Constants;
@@ -76,11 +79,23 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
             final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView
                     .getLayoutManager();
             recyclerView
-                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    .addOnScrollListener(new HidingScrollListener() {
+
+                        //   super.onScrolled(recyclerView, dx, dy);
+
                         @Override
-                        public void onScrolled(RecyclerView recyclerView,
-                                               int dx, int dy) {
-                            super.onScrolled(recyclerView, dx, dy);
+                        public void onHide() {
+                            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
+                            int fabBottomMargin = lp.bottomMargin;
+                            MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
+                                    .setInterpolator(new AccelerateInterpolator(2)).start();
+                            RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
+                                    .getLayoutParams();
+                            int fabTopMargin = lp1.topMargin;
+                            MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
+                                    fabTopMargin).setInterpolator(new
+                                    AccelerateInterpolator(2));
+                            //   super.onScrolled(recyclerView, dx, dy);
                             Log.i("loading adapter", "loading....." + totalItemCount);
 
                             totalItemCount = linearLayoutManager.getItemCount();
@@ -95,10 +110,18 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
                                     onLoadMoreListener.onLoadMore();
                                 }
                                 loading = true;
-                            }
 
+                            }
+                        }
+
+                        @Override
+                        public void onShow() {
+                            MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                            MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
                         }
                     });
+
+
         }
     /*[  End of load more code   ]*/
 
@@ -108,9 +131,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    /*    View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_latest_feeds_with_image, null);
-        MyViewHolder viewHolder = new MyViewHolder(view, mActivity);
-        return viewHolder;*/
         RecyclerView.ViewHolder vh;
         if (viewType == VIEW_ITEM) {
             View v = mInflater.inflate(R.layout.view_latest_feeds_with_image, parent, false);
@@ -143,18 +163,11 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
                 holder.img_video_preview.setVisibility(View.GONE);
                 holder.progress_dialog.setVisibility(View.GONE);
                 holder.progress_dialog_layout.setVisibility(View.GONE);
-                //    holder.layout_img_video_preview.setVisibility(View.GONE);
-                //  holder.progress_dialog.setVisibility(View.GONE);
             } else if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_IMAGES)) {
                 holder.img_preview.setVisibility(View.VISIBLE);
                 holder.progress_dialog.setVisibility(View.VISIBLE);
                 holder.progress_dialog_layout.setVisibility(View.VISIBLE);
-
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
-//                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
-//            holder.main_frame_layout.setLayoutParams(params);
                 holder.img_video_preview.setVisibility(View.GONE);
-                //    holder.layout_img_video_preview.setVisibility(View.VISIBLE);
                 Utils.debug("image_url", "latestFeedsModel.getThumbnail()" + latestFeedsModel.getThumbnail());
 
                 Glide.with(mActivity).load(latestFeedsModel.getMedia())
@@ -164,14 +177,8 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
             } else if (latestFeedsModel.getType().equalsIgnoreCase(Constants.KEY_VIDEOS)) {
                 holder.img_preview.setVisibility(View.VISIBLE);
                 holder.img_video_preview.setVisibility(View.VISIBLE);
-                //  holder.layout_img_video_preview.setVisibility(View.VISIBLE);
-
                 holder.progress_dialog.setVisibility(View.VISIBLE);
                 holder.progress_dialog_layout.setVisibility(View.VISIBLE);
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
-//                    .LayoutParams.MATCH_PARENT, (Utils.getHeight(mActivity) / 4) - 100); // (width, height)
-//            holder.main_frame_layout.setLayoutParams(params);
-                // holder.layout_img_video_preview.setVisibility(View.VISIBLE);
                 Glide.with(mActivity).load(latestFeedsModel
                         .getThumbnail())
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
@@ -202,7 +209,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
                             .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
                         showImageDialog(mLatestFeedList.get(position).getMedia());
                     }
-//                showImageDialog(mLatestFeedList.get(position).getMedia());
                 }
             });
             holder.img_video_preview.setOnClickListener(new View.OnClickListener() {
@@ -214,20 +220,6 @@ public class LatestFeedsAdapter extends RecyclerView.Adapter {
                     mActivity.startActivity(intent);
                 }
             });
-       /* holder.layout_img_video_preview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (holder.img_video_preview.getVisibility() == View.VISIBLE) {
-                    new Utils(mActivity).setLatestFeedPreferences(mActivity, mLatestFeedList.get
-                            (position));
-                    intent = new Intent(mActivity, VideoActivity.class);
-                    mActivity.startActivity(intent);
-                } else if (holder.img_video_preview
-                        .getVisibility() == View.GONE && holder.img_preview.getVisibility() == View.VISIBLE) {
-                    showImageDialog(mLatestFeedList.get(position).getMedia());
-                }
-            }
-        });*/
         } else {
             ((ProgressViewHolder) viewholder).progressBar.setIndeterminate(true);
         }

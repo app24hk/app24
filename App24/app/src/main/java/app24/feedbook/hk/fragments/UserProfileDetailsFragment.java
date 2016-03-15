@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,12 +21,15 @@ import app24.feedbook.hk.R;
 import app24.feedbook.hk.activities.MainActivity;
 import app24.feedbook.hk.activities.ProfileActivity;
 import app24.feedbook.hk.activities.SettingsActivity;
+import app24.feedbook.hk.adapters.MostViewedAdapter;
 import app24.feedbook.hk.adapters.UserProfitAdapter;
 import app24.feedbook.hk.animations.HidingScrollListener;
 import app24.feedbook.hk.bean.UserFeedModel;
+import app24.feedbook.hk.interfaces.OnLoadMoreListener;
 import app24.feedbook.hk.utils.APIsConstants;
 import app24.feedbook.hk.utils.AppController;
 import app24.feedbook.hk.utils.Constants;
+import app24.feedbook.hk.utils.InterfaceListener;
 import app24.feedbook.hk.utils.NetworkUtils;
 import app24.feedbook.hk.utils.Utils;
 
@@ -50,12 +54,12 @@ import volley.toolbox.StringRequest;
  * Created by amritpal on 6/11/15.
  */
 public class UserProfileDetailsFragment extends Fragment implements View.OnClickListener, SwipeRefreshLayout.OnRefreshListener/*,
-        TextWatcher, View.OnFocusChangeListener, CustomDrawablEditText.OnDrawableClickListener */, EndlessRecyclerView.Pager {
+        TextWatcher, View.OnFocusChangeListener, CustomDrawablEditText.OnDrawableClickListener */ /*EndlessRecyclerView.Pager*/ {
     private static final String TAG = UserProfileDetailsFragment.class.getSimpleName();
     View mView;
     private ImageButton ibtn_setting, ibtn_search;
     //    private RecyclerView user_feeds_list;
-    private EndlessRecyclerView user_feeds_list;
+    private RecyclerView user_feeds_list;
     private UserProfitAdapter mLatestFeedsAdapter;
     /* Volley Request Tags */
     private String res = "";
@@ -72,6 +76,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
     private TextView txt_todays_profit_value, txt_this_month_profit_value,
             txt_unreceived_profit_value, txt_heading_todays_profit_value;
     private RelativeLayout xtra_layout;
+    private boolean hasMoreItems = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,27 +103,38 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
             Utils.showSweetProgressDialog(getActivity(), getActivity().getResources().getString(R
                     .string.check_your_internet_connection), SweetAlertDialog.WARNING_TYPE);
         }
-        mLatestFeedsAdapter = new UserProfitAdapter(getActivity(), userFeedList);
+
+        user_feeds_list.setHasFixedSize(true);
         user_feeds_list.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        mLatestFeedsAdapter = new UserProfitAdapter(getActivity(), userFeedList, user_feeds_list);
         user_feeds_list.setAdapter(mLatestFeedsAdapter);
-        user_feeds_list.setProgressView(R.layout.item_progress);
-        user_feeds_list.setPager(this);
+
+        mLatestFeedsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore() {
+                //add null , so the adapter will check view_type and show progress bar at bottom
+                if (userFeedList.size() >= 10) {
+                    if (hasMoreItems) {
+                        userFeedList.add(null);
+                        mLatestFeedsAdapter.notifyItemInserted(userFeedList.size() - 1);
+
+                        refreshItems();
+                    } else {
+                    }
+                }
+            }
+        });
+
         mLatestFeedsAdapter.notifyDataSetChanged();
     }
 
+    private void refreshItems() {
+        mPageNo = mPageNo + 1;
+        getUserFeeds();
+    }
+
     private boolean getUserFeeds() {
-
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
-
-//        if (mPageNo == 1)
-//            mDialog = Utils.showSweetProgressDialog(getActivity(),
-//                    getResources
-//                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_USER_FEEDS,
                 new volley.Response.Listener<String>() {
@@ -151,7 +167,6 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                 Utils.info("params...", params.toString());
                 return params;
             }
-            // Adding request to request queue
         };
         AppController.getInstance().addToRequestQueue(strReq, Constants.ADD_TO_QUEUE);
         return false;
@@ -160,7 +175,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     private void initializeViews() {
 
-        user_feeds_list = (EndlessRecyclerView) mView.findViewById(R.id.user_feeds_list);
+        user_feeds_list = (RecyclerView) mView.findViewById(R.id.user_feeds_list);
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(this);
         profit_details = (LinearLayout) mView.findViewById(R.id.profit_details);
@@ -177,35 +192,33 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
         txt_this_month_profit_value = (TextView) mView.findViewById(R.id.txt_this_month_profit_value);
         txt_unreceived_profit_value = (TextView) mView.findViewById(R.id.txt_unreceived_profit_value);
         txt_heading_todays_profit_value = (TextView) mView.findViewById(R.id.txt_heading_todays_profit_value);
-
-
         initRecyclerView();
 
     }
 
     private void initRecyclerView() {
-        user_feeds_list.addOnScrollListener(new HidingScrollListener() {
-            @Override
-            public void onHide() {
-                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
-                int fabBottomMargin = lp.bottomMargin;
-                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
-                        .setInterpolator(new AccelerateInterpolator(2)).start();
-
-                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.layout_user_profle
-                        .getLayoutParams();
-                int fabTopMargin = lp1.topMargin;
-                MainActivity.layout_user_profle.animate().translationY(-MainActivity
-                        .layout_user_profle.getHeight() + fabTopMargin).setInterpolator(new
-                        AccelerateInterpolator(2));
-            }
-
-            @Override
-            public void onShow() {
-                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                MainActivity.layout_user_profle.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)); // Utils.setScrollDirection(Constants.SCROLL_DOWN);
-            }
-        });
+//        user_feeds_list.addOnScrollListener(new HidingScrollListener() {
+//            @Override
+//            public void onHide() {
+//                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
+//                int fabBottomMargin = lp.bottomMargin;
+//                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
+//                        .setInterpolator(new AccelerateInterpolator(2)).start();
+//
+//                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.layout_user_profle
+//                        .getLayoutParams();
+//                int fabTopMargin = lp1.topMargin;
+//                MainActivity.layout_user_profle.animate().translationY(-MainActivity
+//                        .layout_user_profle.getHeight() + fabTopMargin).setInterpolator(new
+//                        AccelerateInterpolator(2));
+//            }
+//
+//            @Override
+//            public void onShow() {
+//                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//                MainActivity.layout_user_profle.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)); // Utils.setScrollDirection(Constants.SCROLL_DOWN);
+//            }
+//        });
     }
 
     @Override
@@ -236,10 +249,16 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                 JSONArray jsonArray = jsonObject.getJSONArray(APIsConstants.KEY_FEED_DATA);
                 profit_details.setVisibility(View.GONE);
                 if (jsonArray != null) {
+
+                    if (mPageNo > 1) {
+                        if (userFeedList.size() != 0) {
+                            userFeedList.remove(userFeedList.size() - 1);
+                            mLatestFeedsAdapter.notifyItemRemoved(userFeedList.size());
+                        }
+                    }
+
                     if (mPageNo == 1)
                         userFeedList.clear();
-                    ITEMS_ON_PAGE = jsonArray.length();
-                    addItems();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         UserFeedModel userFeedModel = new UserFeedModel();
                         JSONObject object = jsonArray.getJSONObject(i);
@@ -325,6 +344,15 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
                 if (jsonArray.length() == 0) {
                 }
             } else {
+
+
+                if (userFeedList.size() != 0) {
+                    hasMoreItems = false;
+                    userFeedList.remove(userFeedList.size() - 1);
+                    mLatestFeedsAdapter.notifyItemRemoved(userFeedList.size());
+                    mLatestFeedsAdapter.notifyDataSetChanged();
+                }
+
                 if (userFeedList.size() <= 0) {
                     profit_details.setVisibility(View.VISIBLE);
                     xtra_layout.setVisibility(View.VISIBLE);
@@ -338,6 +366,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
             }
         }
         mLatestFeedsAdapter.notifyDataSetChanged();
+        mLatestFeedsAdapter.setLoaded();
         swipeRefreshLayout.setRefreshing(false);
         if (mPageNo == 1)
             Utils.closeSweetProgressDialog(getActivity(), mDialog);
@@ -346,14 +375,8 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     @Override
     public void onRefresh() {
-//        mPageNo = mPageNo + 1;
-//        getUserFeeds();
+        InterfaceListener.onAdView();
         mPageNo = 1;
-
-//        ITEMS_ON_PAGE = 0;
-//        latestFeedList.clear();
-        loading = false;
-        mLatestFeedsAdapter.setCount(0);
         getUserFeeds();
     }
 
@@ -477,7 +500,7 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     }
 
-    int ITEMS_ON_PAGE = 0;
+  /*  int ITEMS_ON_PAGE = 0;
     private static final int TOTAL_PAGES = 10;
     private static final long DELAY = 1000L;
     private boolean loading = false;
@@ -511,5 +534,5 @@ public class UserProfileDetailsFragment extends Fragment implements View.OnClick
 
     private void addItems() {
         mLatestFeedsAdapter.setCount(mLatestFeedsAdapter.getItemCount() + ITEMS_ON_PAGE);
-    }
+    }*/
 }

@@ -12,6 +12,8 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -25,6 +27,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import app24.feedbook.hk.activities.MainActivity;
 import app24.feedbook.hk.activities.PostDetailActivity;
 import app24.feedbook.hk.activities.VideoActivity;
+import app24.feedbook.hk.animations.HidingScrollListener;
 import app24.feedbook.hk.bean.LatestFeedsModel;
 import app24.feedbook.hk.interfaces.OnLoadMoreListener;
 import app24.feedbook.hk.utils.APIsConstants;
@@ -85,7 +88,7 @@ public class MostViewedAdapter extends RecyclerView.Adapter
             final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView
                     .getLayoutManager();
             recyclerView
-                    .addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    .addOnScrollListener(/*new RecyclerView.OnScrollListener() {
                         @Override
                         public void onScrolled(RecyclerView recyclerView,
                                                int dx, int dy) {
@@ -106,6 +109,48 @@ public class MostViewedAdapter extends RecyclerView.Adapter
                                 loading = true;
                             }
 
+                        }
+                    }*/new HidingScrollListener() {
+                        @Override
+                        public void onHide() {
+                            Utils.debug(TAG, "Scrolling up");
+                            //Utils.setScrollDirection(Constants.SCROLL_UP);
+                            RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
+                            int fabBottomMargin = lp.bottomMargin;
+                            MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
+                                    .setInterpolator(new AccelerateInterpolator(2)).start();
+
+//                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+                            RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
+                                    .getLayoutParams();
+                            int fabTopMargin = lp1.topMargin;
+                            MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
+                                    fabTopMargin).setInterpolator(new
+                                    AccelerateInterpolator(2));
+                            Log.i("loading adapter", "loading....." + totalItemCount);
+
+                            totalItemCount = linearLayoutManager.getItemCount();
+                            lastVisibleItem = linearLayoutManager
+                                    .findLastVisibleItemPosition();
+                            if (!loading
+                                    && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+
+                                // End has been reached
+                                // Do something
+                                if (onLoadMoreListener != null) {
+                                    onLoadMoreListener.onLoadMore();
+                                }
+                                loading = true;
+                            }
+                        }
+
+                        @Override
+                        public void onShow() {
+                            Utils.debug(TAG, "Scrolling Down");
+
+                            MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                            MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+                            // Utils.setScrollDirection(Constants.SCROLL_DOWN);
                         }
                     });
         }

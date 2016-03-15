@@ -26,8 +26,10 @@ import app24.feedbook.hk.R;
 import app24.feedbook.hk.animations.AnimatorUtils;
 import app24.feedbook.hk.fragments.HomeFragment;
 import app24.feedbook.hk.fragments.UserProfileDetailsFragment;
+import app24.feedbook.hk.interfaces.OnAdViewListener;
 import app24.feedbook.hk.sliding_tabs.SlidingTabLayout;
 import app24.feedbook.hk.utils.Constants;
+import app24.feedbook.hk.utils.InterfaceListener;
 import app24.feedbook.hk.utils.Utils;
 
 import com.facebook.login.widget.LoginButton;
@@ -45,7 +47,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * Created by amritpal on 3/11/15.
  */
 public class MainActivity extends FragmentActivity implements View.OnClickListener, View
-        .OnTouchListener {
+        .OnTouchListener, OnAdViewListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private ImageButton btn_app_24;
     private Toast toast = null;
@@ -78,6 +80,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fb_btn = (LoginButton) findViewById(R.id.login_button);
+
         initializeViews();
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_ad_unit_id));
@@ -150,6 +153,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         btn_home.setOnTouchListener(this);
         ibtn_setting.setOnClickListener(this);
         ibtn_search.setOnClickListener(this);
+        InterfaceListener.setOnAdViewListener(this);
     }
 
     /**
@@ -474,6 +478,19 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     public View getAppMenu() {
         return menuLayout;
+    }
+
+    @Override
+    public void onAdView() {
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            requestNewInterstitial();
+            if (counter != null) {
+                counter.cancel();
+                counter.start();
+            }
+        }
     }
 
 }

@@ -103,19 +103,17 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
             @Override
             public void onLoadMore() {
                 //add null , so the adapter will check view_type and show progress bar at bottom
-                if (hasMoreItems) {
-                    mMostViewedFeedList.add(null);
-                    mMostViewedAdapter.notifyItemInserted(mMostViewedFeedList.size() - 1);
+                if (mMostViewedFeedList.size() >= 10) {
+                    if (hasMoreItems) {
+                        mMostViewedFeedList.add(null);
+                        mMostViewedAdapter.notifyItemInserted(mMostViewedFeedList.size() - 1);
 
-                    refreshItems();
-                } else {
+                        refreshItems();
+                    } else {
+                    }
                 }
             }
         });
-
-
-        //most_viewed_feeds.setProgressView(R.layout.item_progress);
-//        most_viewed_feeds.setPager(this);
         return mView;
     }
 
@@ -141,48 +139,37 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
 
     private void initRecyclerView() {
 
-        most_viewed_feeds.addOnScrollListener(new HidingScrollListener() {
-            @Override
-            public void onHide() {
-                Utils.debug(TAG, "Scrolling up");
-                //Utils.setScrollDirection(Constants.SCROLL_UP);
-                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
-                int fabBottomMargin = lp.bottomMargin;
-                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
-                        .setInterpolator(new AccelerateInterpolator(2)).start();
-
-//                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
-                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
-                        .getLayoutParams();
-                int fabTopMargin = lp1.topMargin;
-                MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
-                        fabTopMargin).setInterpolator(new
-                        AccelerateInterpolator(2));
-            }
-
-            @Override
-            public void onShow() {
-                Utils.debug(TAG, "Scrolling Down");
-
-                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                // Utils.setScrollDirection(Constants.SCROLL_DOWN);
-            }
-        });
+//        most_viewed_feeds.addOnScrollListener(new HidingScrollListener() {
+//            @Override
+//            public void onHide() {
+//                Utils.debug(TAG, "Scrolling up");
+//                //Utils.setScrollDirection(Constants.SCROLL_UP);
+//                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
+//                int fabBottomMargin = lp.bottomMargin;
+//                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
+//                        .setInterpolator(new AccelerateInterpolator(2)).start();
+//
+////                final SlidingTabLayout slidingTabLayout = HomeFragment.getHeaderView();
+//                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
+//                        .getLayoutParams();
+//                int fabTopMargin = lp1.topMargin;
+//                MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
+//                        fabTopMargin).setInterpolator(new
+//                        AccelerateInterpolator(2));
+//            }
+//
+//            @Override
+//            public void onShow() {
+//                Utils.debug(TAG, "Scrolling Down");
+//
+//                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//                // Utils.setScrollDirection(Constants.SCROLL_DOWN);
+//            }
+//        });
     }
 
     public boolean getMostViewedFeeds() {
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
-//        if (mPageNo == 1) {
-//            mDialog = Utils.showSweetProgressDialog(getActivity(),
-//                    getResources
-//                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-//            mDialog.setCancelable(true);
-//        }
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_RECENT_FEEDS,
@@ -330,9 +317,6 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                     }
                     if (jsonArray.length() == 0) {
                         try {
-//                            Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(getActivity
-//                                            ().getResources().getString(R.string.no_more_data)),
-//                                    SweetAlertDialog.ERROR_TYPE);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -347,8 +331,6 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
                     }
                     try {
                         Utils.debug(Constants.API_TAG, jsonObject.getString(APIsConstants.KEY_MESSAGE));
-//                        Utils.showSweetProgressDialog(getActivity(), jsonObject.getString(APIsConstants
-//                                .KEY_MESSAGE), SweetAlertDialog.ERROR_TYPE);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -368,6 +350,7 @@ public class MostViewedFragment extends Fragment implements SwipeRefreshLayout.O
 
     @Override
     public void onRefresh() {
+        InterfaceListener.onAdView();
         mPageNo = 1;
         getMostViewedFeeds();
     }

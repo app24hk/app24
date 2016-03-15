@@ -3,7 +3,6 @@ package app24.feedbook.hk.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +13,15 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.RelativeLayout;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import app24.feedbook.hk.R;
 import app24.feedbook.hk.activities.MainActivity;
@@ -29,18 +37,6 @@ import app24.feedbook.hk.utils.InterfaceListener;
 import app24.feedbook.hk.utils.NetworkUtils;
 import app24.feedbook.hk.utils.RecyclerViewDisabler;
 import app24.feedbook.hk.utils.Utils;
-
-import com.github.yasevich.endlessrecyclerview.EndlessRecyclerView;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import volley.Request;
 import volley.VolleyError;
@@ -50,7 +46,7 @@ import volley.toolbox.StringRequest;
 /**
  * Created by amritpal on 3/11/15.
  */
-public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener/*, EndlessRecyclerView.Pager*/ {
+public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, OnDeleteListener {
 
     private static final String TAG = LatestFragment.class.getSimpleName();
     View mView;
@@ -99,24 +95,17 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
         mLatestFeedsAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                //add null , so the adapter will check view_type and show progress bar at bottom
                 if (hasMoreItems) {
                     latestFeedList.add(null);
-                    mLatestFeedsAdapter.notifyItemInserted(latestFeedList.size() - 1);
+                    if (latestFeedList.size() >= 10) {
+                        mLatestFeedsAdapter.notifyItemInserted(latestFeedList.size() - 1);
+                        refreshItems();
+                    }
 
-                    refreshItems();
                 } else {
                 }
             }
         });
-
-
-
-
-        //   list_latest_feeds.setProgressView(R.layout.item_progress);
-//        list_latest_feeds.setPager(this);
-
-
         return mView;
     }
 
@@ -142,27 +131,27 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private void initRecyclerView() {
 
 
-        list_latest_feeds.addOnScrollListener(new HidingScrollListener() {
-            @Override
-            public void onHide() {
-                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
-                int fabBottomMargin = lp.bottomMargin;
-                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
-                        .setInterpolator(new AccelerateInterpolator(2)).start();
-                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
-                        .getLayoutParams();
-                int fabTopMargin = lp1.topMargin;
-                MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
-                        fabTopMargin).setInterpolator(new
-                        AccelerateInterpolator(2));
-            }
-
-            @Override
-            public void onShow() {
-                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
-                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
-            }
-        });
+//        list_latest_feeds.addOnScrollListener(new HidingScrollListener() {
+//            @Override
+//            public void onHide() {
+//                RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) MainActivity.getBottomLayout().getLayoutParams();
+//                int fabBottomMargin = lp.bottomMargin;
+//                MainActivity.getBottomLayout().animate().translationY(MainActivity.getBottomLayout().getHeight() + fabBottomMargin + 100)
+//                        .setInterpolator(new AccelerateInterpolator(2)).start();
+//                RelativeLayout.LayoutParams lp1 = (RelativeLayout.LayoutParams) MainActivity.tabs
+//                        .getLayoutParams();
+//                int fabTopMargin = lp1.topMargin;
+//                MainActivity.tabs.animate().translationY(-MainActivity.tabs.getHeight() +
+//                        fabTopMargin).setInterpolator(new
+//                        AccelerateInterpolator(2));
+//            }
+//
+//            @Override
+//            public void onShow() {
+//                MainActivity.getBottomLayout().animate().translationY(0).setInterpolator(new DecelerateInterpolator(2)).start();
+//                MainActivity.tabs.animate().translationY(0).setInterpolator(new DecelerateInterpolator(2));
+//            }
+//        });
     }
 
     /**
@@ -179,18 +168,6 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public boolean getLatestFeeds() {
-        /*
-         Starting a progress Dialog...
-         If second parameter is passed null then progressdialog will show (Loading...) by default if pass string such as(Searching..) then
-         it will show (Searching...)
-         */
-
-//        if (mPageNo == 1) {
-//            mDialog = Utils.showSweetProgressDialog(getActivity(),
-//                    getResources
-//                            ().getString(R.string.progress_loading), SweetAlertDialog.PROGRESS_TYPE);
-//            mDialog.setCancelable(true);
-//        }
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
                 APIsConstants.API_BASE_URL + APIsConstants.API_RECENT_FEEDS,
@@ -241,21 +218,14 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (jsonObject.getBoolean(APIsConstants.KEY_RESULT)) {
                 JSONArray jsonArray = jsonObject.getJSONArray(APIsConstants.KEY_FEED_DATA);
                 if (jsonArray != null) {
-                    //latestFeedList.clear();
-                    //mLatestFeedsAdapter.setCount(jsonArray.length());
-
-
+                    if (mPageNo == 1)
+                        latestFeedList.clear();
                     if (mPageNo > 1) {
                         if (latestFeedList.size() != 0) {
                             latestFeedList.remove(latestFeedList.size() - 1);
                             mLatestFeedsAdapter.notifyItemRemoved(latestFeedList.size());
                         }
                     }
-
-                   /* if (mPageNo == 1)
-                        latestFeedList.clear();*/
-//                    ITEMS_ON_PAGE = jsonArray.length();
-//                    addItems();
                     for (int i = 0; i < jsonArray.length(); i++) {
                         LatestFeedsModel latestFeedsModel = new LatestFeedsModel();
                         JSONObject object = jsonArray.getJSONObject(i);
@@ -352,22 +322,15 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         }
         swipeRefreshLayout.setRefreshing(false);
-        //if (mPageNo == 1)
         Utils.closeSweetProgressDialog(getActivity(), mDialog);
         return latestFeedList;
     }
 
     @Override
     public void onRefresh() {
-        //mPageNo = mPageNo + 1;
+        InterfaceListener.onAdView();
         mPageNo = 1;
-
-//        ITEMS_ON_PAGE = 0;
-//        latestFeedList.clear();
-//        loading = false;
-        //mLatestFeedsAdapter.setCount(0);
         getLatestFeeds();
-//        mLatestFeedsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -381,41 +344,4 @@ public class LatestFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         }
     }
-//
-//    int ITEMS_ON_PAGE = 0;
-//    private static final int TOTAL_PAGES = 10;
-//    private static final long DELAY = 1000L;
-//    private boolean loading = false;
-//
-//    private final Handler handler = new Handler();
-//
-//    @Override
-//    public boolean shouldLoad() {
-////        return false;
-//        return !loading && mLatestFeedsAdapter.getItemCount() / ITEMS_ON_PAGE < TOTAL_PAGES;
-//
-//    }
-
-
-//    @Override
-//    public void loadNextPage() {
-//        loading = true;
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                getLatestFeeds();
-//
-//                mPageNo = mPageNo + 1;                //addItems();
-//
-//
-//                list_latest_feeds.setRefreshing(false);
-//                loading = false;
-//                //addItems();
-//            }
-//        }, DELAY);
-//    }
-
-   /* private void addItems() {
-        mLatestFeedsAdapter.setCount(mLatestFeedsAdapter.getItemCount() + ITEMS_ON_PAGE);
-    }*/
 }
