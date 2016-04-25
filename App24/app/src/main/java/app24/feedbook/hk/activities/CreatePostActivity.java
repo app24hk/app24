@@ -210,7 +210,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
                         }
                         ByteArrayOutputStream thumb_stream = new ByteArrayOutputStream();
                         if (bitmap != null) {
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, thumb_stream);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, thumb_stream);
                         }
                         mBytes_array = thumb_stream.toByteArray();
                         base64 = Base64.encodeBytes(mBytes_array);
@@ -253,7 +253,7 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
 
 
                         if (bitmap != null) {
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, thumb_stream);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, thumb_stream);
                         }
                         byte[] ful_bytes = thumb_stream.toByteArray();
 
@@ -968,7 +968,9 @@ public class CreatePostActivity extends BaseActivity implements View.OnFocusChan
             postOnPageVideos();
 
         } else if (mType.equalsIgnoreCase(Constants.KEY_IMAGES)) {
-            mParams.putString(APIsConstants.KEY_MESSAGE, edit_post_title.getText().toString().trim());
+            mParams.putString(APIsConstants.KEY_MESSAGE, edit_post_title.getText().toString()
+                    .trim() + "\n\n" + edit_write_post.getText().toString()
+                    .trim());
             mParams.putString(Constants.DESCRIPTION, edit_write_post.getText().toString().trim());
             postOnPageImage();
         }

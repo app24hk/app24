@@ -290,7 +290,7 @@ public class SplashActivity extends Activity implements View.OnClickListener {
     public void getKeyHash() {
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
-                    "com.capstone.app24",
+                    "app24.feedbook.hk",
                     PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");

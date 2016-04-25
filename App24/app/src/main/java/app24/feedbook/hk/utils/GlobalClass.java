@@ -11,9 +11,9 @@ import android.view.View;
  */
 public class GlobalClass {
     // Show Alert Toast
-    static boolean debuging = false;
+    static boolean debuging = true;
     // Show Logs
-    static boolean showComment = false;
+    static boolean showComment = true;
 
     public static interface ClickListener {
         public void onClick(View view, int position);

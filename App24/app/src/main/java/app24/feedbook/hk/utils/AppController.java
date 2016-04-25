@@ -82,7 +82,7 @@ public class AppController extends Application {
 
     public void getKeyHash() {
         try {
-            PackageInfo info = getPackageManager().getPackageInfo("com.android.euro16", PackageManager.GET_SIGNATURES);
+            PackageInfo info = getPackageManager().getPackageInfo("app24.feedbook.hk", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());

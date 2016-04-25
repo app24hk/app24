@@ -16,7 +16,6 @@
     <application
         android:name="app24.feedbook.hk.utils.AppController"
         android:allowBackup="true"
-        android:debuggable="false"
         android:icon="@drawable/launcher"
         android:label="@string/app_name"
         android:largeHeap="true"

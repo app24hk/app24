@@ -442,7 +442,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
             @Override
             public void onClick(SweetAlertDialog sweetAlertDialog) {
-                finish();
+                MainActivity.this.finishAffinity();
             }
         });
         mDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {

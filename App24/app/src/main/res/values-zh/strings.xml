@@ -88,7 +88,6 @@
     <string name="please_add_a_comment">Please add a comment</string>
     <string name="please_add_a_title">請輸入標題</string>
     <string name="please_add_description">請輸入內容</string>
-    <string name="cancel">取消</string>
     <string name="search">搜尋</string>
     <string name="just_now">&#032; 剛剛</string>
     <string name="a_minute_ago">&#032;1 分鐘前</string>
@@ -105,6 +104,7 @@
     <string name="delete_successfully">已刪除</string>
     <string name="are_you_sure_you_want_to_exit">請確認要退出？</string>
     <string name="ok">取消</string>
+    <string name="cancel">取消</string>
     <string name="yes">確認</string>
 
 
