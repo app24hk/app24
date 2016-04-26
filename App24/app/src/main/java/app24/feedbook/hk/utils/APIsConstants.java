@@ -5,9 +5,9 @@ package app24.feedbook.hk.utils;
  */
 public class APIsConstants {
     //    Local Server
-    public static final String API_BASE_URL = "http://dev614.trigma.us/24app/development/Users";
+//    public static final String API_BASE_URL = "http://dev614.trigma.us/24app/development/Users";
     //    production server
-//    public static final String API_BASE_URL = "http://52.27.64.132/24app/development/Users";
+    public static final String API_BASE_URL = "http://52.27.64.132/24app/development/Users";
     public static final String TERMS_LINK = "https://sites.google.com/site/app24hk/terms";
     //Web Services
     public static final String API_FACEBOOK_LOGIN = "/facebooklogin";
