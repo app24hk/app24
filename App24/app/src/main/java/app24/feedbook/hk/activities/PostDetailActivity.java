@@ -1081,8 +1081,10 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
     }
     //............FullView imageView..............//
 
+
+    //............FullView imageView..............
     public void showImageDialog(String media) {
-        Display display = this.getWindowManager().getDefaultDisplay();
+        Display display = getWindowManager().getDefaultDisplay();
         int width = display.getWidth();
         int height = display.getHeight();
 
@@ -1094,8 +1096,9 @@ public class PostDetailActivity extends BaseActivity implements View.OnClickList
         final TouchImageView custom_image = (TouchImageView) (dialog.findViewById(R.id.custom_image));
         custom_image.setLayoutParams(params);
         custom_image.setImageResource(R.drawable.pic_two);
-        Glide.with(this).load(media).centerCrop()
-                .diskCacheStrategy(DiskCacheStrategy.ALL).crossFade()
+
+        Glide.with(this).load(media)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(custom_image);
         custom_image.setOnTouchImageViewListener(new TouchImageView.OnTouchImageViewListener() {
             @Override

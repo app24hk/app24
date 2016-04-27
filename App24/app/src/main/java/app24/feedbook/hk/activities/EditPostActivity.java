@@ -16,19 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import app24.feedbook.hk.R;
-import app24.feedbook.hk.bean.OwnerDataModel;
-import app24.feedbook.hk.custom.SquareImageView;
-import app24.feedbook.hk.utils.APIsConstants;
-import app24.feedbook.hk.utils.AlertToastManager;
-import app24.feedbook.hk.utils.AppController;
-import app24.feedbook.hk.utils.Base64;
-import app24.feedbook.hk.utils.Constants;
-import app24.feedbook.hk.utils.NetworkUtils;
-import app24.feedbook.hk.utils.Session;
-import app24.feedbook.hk.utils.Utils;
-import app24.feedbook.hk.webservices_model.FeedRequestModel;
-
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
@@ -39,6 +26,7 @@ import com.facebook.share.widget.ShareButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.apache.commons.lang.StringEscapeUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,6 +40,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import app24.feedbook.hk.R;
+import app24.feedbook.hk.bean.OwnerDataModel;
+import app24.feedbook.hk.custom.SquareImageView;
+import app24.feedbook.hk.utils.APIsConstants;
+import app24.feedbook.hk.utils.AlertToastManager;
+import app24.feedbook.hk.utils.AppController;
+import app24.feedbook.hk.utils.Base64;
+import app24.feedbook.hk.utils.Constants;
+import app24.feedbook.hk.utils.NetworkUtils;
+import app24.feedbook.hk.utils.Session;
+import app24.feedbook.hk.utils.Utils;
+import app24.feedbook.hk.webservices_model.FeedRequestModel;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import volley.Request;
 import volley.VolleyError;
@@ -100,7 +100,6 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_create_post);
         setHeader(null, true, false, false, false, false, getResources().getString(R.string.save));
-        AlertToastManager.showToast("EditPostActivity", this);
         initializeViews();
         UpdateUI();
         setClickListeners();
@@ -123,8 +122,8 @@ public class EditPostActivity extends BaseActivity implements View.OnFocusChange
                 SweetAlertDialog.PROGRESS_TYPE);
         ownerDataModel = Session.getOwnerModel();
         if (ownerDataModel != null) {
-            edit_post_title.setText(ownerDataModel.getTitle());
-            edit_write_post.setText(ownerDataModel.getDescription());
+            edit_post_title.setText(StringEscapeUtils.unescapeJava(ownerDataModel.getTitle()));
+            edit_write_post.setText(StringEscapeUtils.unescapeJava(ownerDataModel.getDescription()));
             mType = ownerDataModel.getType();
         }
         if (mType.equalsIgnoreCase(Constants.KEY_TEXT)) {
